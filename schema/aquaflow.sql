@@ -4,8 +4,8 @@
 -- =============================================
 
 -- Create Database
-CREATE DATABASE IF NOT EXISTS wbfms_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE wbfms_db;
+CREATE DATABASE IF NOT EXISTS aquaflow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE aquaflow;
 
 -- =============================================
 -- 1. Users Table
@@ -258,14 +258,14 @@ CREATE TABLE notifications (
 -- Password: admin123 (hashed with bcrypt cost 10)
 -- =============================================
 INSERT INTO users (full_name, email, phone, password_hash, role, status) VALUES
-('System Administrator', 'admin@wbfms.com', '+2348000000000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active');
+('System Administrator', 'admin@aquaflow.com', '+2348000000000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active');
 
 -- =============================================
 -- Insert Default System Settings
 -- =============================================
 INSERT INTO settings (setting_key, setting_value, setting_type) VALUES
 ('company_name', 'Water & Beverage Factory', 'general'),
-('company_email', 'info@wbfms.com', 'general'),
+('company_email', 'info@aquaflow.com', 'general'),
 ('company_phone', '+2348000000000', 'general'),
 ('company_address', 'Port Harcourt, Rivers State, Nigeria', 'general'),
 ('delivery_fee', '500', 'delivery'),
