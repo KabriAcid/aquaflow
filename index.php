@@ -1,7 +1,3 @@
-<?php
-// Simple entry page for Aquaflow app
-// This file provides a minimal landing page with the main sections used by the app.
-?>
 <!doctype html>
 <html lang="en">
 
