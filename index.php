@@ -18,6 +18,7 @@
             <a href="/aquaflow/index.php" class="text-xl font-semibold">Aquaflow</a>
             <nav class="space-x-4">
                 <a href="frontend/products.php" class="text-gray-600 hover:text-blue-600">Products</a>
+                <a href="frontend/contact.php" class="text-gray-600 hover:text-blue-600">Contact</a>
                 <a href="frontend/login.php" class="text-gray-600 hover:text-blue-600">Login</a>
                 <a href="frontend/register.php" class="bg-blue-600 text-white px-3 py-1 rounded">Register</a>
             </nav>
@@ -88,7 +89,7 @@
                 <div>© 2025 Aquaflow. All rights reserved.</div>
                 <div class="space-x-4">
                     <a href="#">Privacy</a>
-                    <a href="#">Contact</a>
+                    <a href="frontend/contact.php">Contact</a>
                 </div>
             </div>
         </div>
