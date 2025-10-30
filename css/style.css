@@ -1,6 +1,11 @@
-/* import plus jakarta sans font cdn */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+/* Use local Product Sans font */
+@font-face {
+  font-family: "Product Sans";
+  src: url("../assets/fonts/ProductSans-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 
 body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Product Sans", sans-serif;
 }
