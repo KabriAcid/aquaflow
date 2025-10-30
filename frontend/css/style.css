@@ -1,7 +1,7 @@
 /* Use local Product Sans font */
 @font-face {
   font-family: "Product Sans";
-  src: url("../assets/fonts/ProductSans-Regular.ttf") format("truetype");
+  src: url("../../assets/fonts/ProductSans-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
