@@ -31,12 +31,11 @@ $page_title = "Sales Dashboard";
 
         <main class="flex-1 p-6">
             <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
-
             <div id="dashboard-summary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Total Sales -->
                 <div class="bg-white p-6 rounded-lg multi-shadow">
                     <h2 class="text-lg font-semibold text-gray-600">Total Sales</h2>
-                    <p id="totalSales" class="text-3xl font-bold text-blue-600 mt-2">Loading...</p>
+                    <p id="totalSales" class="text-3xl font-bold text-blue-600 mt-2">Loading</p>
                 </div>
                 <!-- Total Orders -->
                 <div class="bg-white p-6 rounded-lg multi-shadow">

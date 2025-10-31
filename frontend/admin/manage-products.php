@@ -12,6 +12,7 @@ $page_title = "Manage Products";
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,8 +20,8 @@ $page_title = "Manage Products";
     <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 flex text-gray-800">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -34,7 +35,7 @@ $page_title = "Manage Products";
                 <button id="add-product-btn" class="btn-primary">Add Product</button>
             </div>
 
-            <div class="bg-card p-6 rounded-lg shadow-md">
+            <div class="bg-white p-6 rounded-lg multi-shadow">
                 <table class="w-full" id="products-table">
                     <thead>
                         <tr class="border-b">
@@ -56,7 +57,7 @@ $page_title = "Manage Products";
 
     <!-- Add/Edit Product Modal -->
     <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center hidden">
-        <div class="bg-card p-8 rounded-lg shadow-xl w-full max-w-md">
+        <div class="bg-white p-8 rounded-lg multi-shadow w-full max-w-md">
             <h2 id="modal-title" class="text-2xl font-bold mb-6">Add Product</h2>
             <form id="product-form">
                 <input type="hidden" id="product-id" name="product-id">
@@ -64,7 +65,7 @@ $page_title = "Manage Products";
                     <label for="product-name" class="block text-sm font-medium text-muted-foreground">Product Name</label>
                     <input type="text" id="product-name" name="product-name" class="form-input mt-1 block w-full" required>
                 </div>
-                 <div class="mb-4">
+                <div class="mb-4">
                     <label for="product-description" class="block text-sm font-medium text-muted-foreground">Description</label>
                     <textarea id="product-description" name="product-description" rows="3" class="form-input mt-1 block w-full" required></textarea>
                 </div>
@@ -89,4 +90,5 @@ $page_title = "Manage Products";
     <script src="../js/admin-products.js"></script>
 
 </body>
+
 </html>
