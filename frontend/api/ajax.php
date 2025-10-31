@@ -20,6 +20,30 @@ try {
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 switch ($action) {
+    case 'get_orders':
+        $searchTerm = isset($_GET['search']) ? strtolower($_GET['search']) : '';
+        $statusFilter = isset($_GET['status']) ? strtolower($_GET['status']) : 'all';
+
+        // TODO: Replace with real database query
+        $allOrders = [
+            ['id' => 101, 'customer_name' => 'John Doe', 'created_at' => '2023-10-28T11:00:00Z', 'total_amount' => 150.00, 'status' => 'Shipped'],
+            ['id' => 102, 'customer_name' => 'Jane Smith', 'created_at' => '2023-10-29T12:30:00Z', 'total_amount' => 75.50, 'status' => 'Processing'],
+            ['id' => 103, 'customer_name' => 'Peter Jones', 'created_at' => '2023-10-29T15:00:00Z', 'total_amount' => 25.00, 'status' => 'Delivered'],
+            ['id' => 104, 'customer_name' => 'John Doe', 'created_at' => '2023-10-30T09:00:00Z', 'total_amount' => 50.00, 'status' => 'Pending'],
+            ['id' => 105, 'customer_name' => 'Mary Johnson', 'created_at' => '2023-10-30T10:15:00Z', 'total_amount' => 120.00, 'status' => 'Cancelled'],
+        ];
+
+        $filteredOrders = array_filter($allOrders, function($order) use ($searchTerm, $statusFilter) {
+            $statusMatch = ($statusFilter === 'all') || (strtolower($order['status']) === $statusFilter);
+            $searchMatch = empty($searchTerm) || 
+                           (strpos(strtolower($order['customer_name']), $searchTerm) !== false) || 
+                           (strpos((string)$order['id'], $searchTerm) !== false);
+            return $statusMatch && $searchMatch;
+        });
+
+        echo json_encode(['success' => true, 'data' => array_values($filteredOrders)]);
+        break;
+
     case 'get_customers':
         // TODO: Replace with real database query
         $customers = [
