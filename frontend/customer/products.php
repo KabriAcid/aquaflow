@@ -84,20 +84,27 @@
                             return;
                         }
                         products.forEach(product => {
+                            // determine if product already in cart
+                            const cartNow = getCart();
+                            const inCart = cartNow.some(i => String(i.id) === String(product.id));
+                            const btnId = `add-btn-${product.id}`;
+                            const btnText = inCart ? 'In Cart' : 'Add to Cart';
+                            const btnClasses = inCart ? 'bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed' : 'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600';
+
                             const productCard = `
-                        <div class="bg-white rounded-lg shadow-md p-4">
-                             <div class="h-40 bg-gray-200 rounded-md mb-4 flex items-center justify-center">
-                                <img src="${product.image_url || '../../assets/images/default.png'}" alt="${product.name}" class="h-full w-full object-cover rounded-md">
+                            <div class="bg-white rounded-lg shadow-md p-4">
+                                 <div class="h-40 bg-gray-200 rounded-md mb-4 flex items-center justify-center">
+                                    <img src="${product.image_url || '../../assets/images/default.png'}" alt="${product.name}" class="h-full w-full object-cover rounded-md">
+                                </div>
+                                <h3 class="font-semibold text-lg">${product.name}</h3>
+                                <p class="text-gray-600">${product.size} ${product.volume}</p>
+                                <p class="text-blue-500 font-bold mt-2">₦${parseFloat(product.unit_price).toFixed(2)}</p>
+                                <p class="text-sm text-gray-500 mt-1">Min. Order: ${product.minimum_order_quantity}</p>
+                                <div class="mt-4 flex justify-between items-center">
+                                    <button id="${btnId}" onclick='addToCart(${JSON.stringify(product)})' class="${btnClasses}" ${inCart ? 'disabled' : ''}>${btnText}</button>
+                                </div>
                             </div>
-                            <h3 class="font-semibold text-lg">${product.name}</h3>
-                            <p class="text-gray-600">${product.size} ${product.volume}</p>
-                            <p class="text-blue-500 font-bold mt-2">₦${parseFloat(product.unit_price).toFixed(2)}</p>
-                            <p class="text-sm text-gray-500 mt-1">Min. Order: ${product.minimum_order_quantity}</p>
-                            <div class="mt-4 flex justify-between items-center">
-                                <button onclick='addToCart(${JSON.stringify(product)})' class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Add to Cart</button>
-                            </div>
-                        </div>
-                    `;
+                        `;
                             productsGrid.innerHTML += productCard;
                         });
                     }
@@ -135,6 +142,19 @@
                 // The actual addToCart function is in cart.js
                 if (window.addToCart && typeof window.addToCart === 'function') {
                     window.addToCart(product, 1);
+                    // update UI button state
+                    try {
+                        const btn = document.getElementById(`add-btn-${product.id}`);
+                        if (btn) {
+                            btn.textContent = 'In Cart';
+                            btn.className = 'bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed';
+                            btn.disabled = true;
+                        }
+                    } catch (e) {
+                        console.error('Failed to update add button', e);
+                    }
+                    // update badge
+                    if (typeof updateCartBadge === 'function') updateCartBadge();
                     alert(`${product.name} has been added to your cart.`);
                 } else {
                     console.error('cart.js is not loaded or addToCart function is not available.');
