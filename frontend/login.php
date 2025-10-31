@@ -16,20 +16,117 @@
 
 <body class="bg-gray-50 text-gray-800">
   <div class="min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-md bg-white rounded shadow p-6">
-      <h1 class="text-2xl font-semibold mb-4">Sign in to your account</h1>
+    <div class="w-full max-w-md bg-white rounded p-6 multi-shadow">
+      <h1 class="text-2xl font-semibold mb-2">Sign in to your account</h1>
+      <p class="form-note mb-4">Enter your credentials to access your dashboard.</p>
+
       <!-- PLACEHOLDER: Add login form that posts to backend/api/auth/login.php -->
-      <form>
-        <label class="block text-sm font-medium">Email</label>
-        <input class="mt-1 block w-full border rounded px-3 py-2" placeholder="you@example.com">
-        <label class="block text-sm font-medium mt-4">Password</label>
-        <input type="password" class="mt-1 block w-full border rounded px-3 py-2" placeholder="Your password">
-        <div class="mt-6">
-          <button class="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+      <form id="loginForm" novalidate>
+        <div class="mb-3">
+          <label for="email" class="block text-sm font-medium">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" class="form-input mt-1 block w-full" required>
+          <p class="form-error mt-1 hidden" data-error-for="email"></p>
         </div>
+
+        <div class="mb-3">
+          <label for="password" class="block text-sm font-medium">Password</label>
+          <input id="password" name="password" type="password" placeholder="Your password" class="form-input mt-1 block w-full" required>
+          <p class="form-error mt-1 hidden" data-error-for="password"></p>
+        </div>
+
+        <div class="flex items-center justify-between mb-4">
+          <label class="flex items-center text-sm">
+            <input type="checkbox" id="remember" name="remember" class="mr-2"> Remember me
+          </label>
+          <a href="#" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
+        </div>
+
+        <div>
+          <button id="submitBtn" type="submit" class="btn-primary w-full">Sign in</button>
+        </div>
+
+        <div id="formMessage" class="mt-3 text-sm"></div>
       </form>
     </div>
   </div>
+
+  <script>
+    // simple helper functions
+    const showFieldError = (field, message) => {
+      const el = document.querySelector('[data-error-for="' + field + '"]');
+      if (el) {
+        el.textContent = message;
+        el.classList.remove('hidden');
+      }
+    };
+    const clearFieldErrors = () => {
+      document.querySelectorAll('[data-error-for]').forEach(e => {
+        e.textContent = '';
+        e.classList.add('hidden');
+      });
+      const msg = document.getElementById('formMessage');
+      if (msg) {
+        msg.textContent = '';
+        msg.className = 'mt-3 text-sm';
+      }
+    };
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearFieldErrors();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      let hasError = false;
+      if (!email) {
+        showFieldError('email', 'Email is required');
+        hasError = true;
+      }
+      if (!password) {
+        showFieldError('password', 'Password is required');
+        hasError = true;
+      }
+      if (hasError) return;
+
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in...';
+
+      try {
+        const res = await fetch('../backend/api/auth/login.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
+        const data = await res.json();
+        const msgEl = document.getElementById('formMessage');
+        if (res.ok && data && data.success) {
+          msgEl.textContent = data.message || 'Login successful';
+          msgEl.className = 'mt-3 text-sm text-green-600';
+          // redirect to customer dashboard or home
+          setTimeout(() => {
+            window.location.href = 'index.php';
+          }, 800);
+        } else {
+          msgEl.textContent = (data && data.message) ? data.message : 'Login failed';
+          msgEl.className = 'mt-3 text-sm text-red-600';
+        }
+      } catch (err) {
+        const msgEl = document.getElementById('formMessage');
+        msgEl.textContent = 'Network or server error';
+        msgEl.className = 'mt-3 text-sm text-red-600';
+        console.error(err);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign in';
+      }
+    });
+  </script>
 </body>
 
 </html>

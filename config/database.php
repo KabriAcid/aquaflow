@@ -5,6 +5,9 @@
  * Usage: require_once __DIR__ . '/database.php'; $pdo = get_db_connection();
  */
 
+// Set timezone to AFrica/Lagos
+date_default_timezone_set('Africa/Lagos');
+
 // Load Composer autoloader if available
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($autoload)) {
