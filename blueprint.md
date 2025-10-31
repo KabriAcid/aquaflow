@@ -60,7 +60,7 @@ Aquaflow is a web application designed to facilitate the sale and delivery of bo
     *   **Customer Details (`customer-details.php`):** Detailed information about a specific customer, including their order history.
     *   **Manage Orders (`manage-orders.php`):** A list of all customer orders, with search and filtering capabilities.
     *   **Order Details (`order-details.php`):** Detailed information about a specific order.
-    *   **Manage Products (`manage-products.php`):** A list of all water products, with options to add, edit, or delete products.
+    *   **Manage Products (`manage-products.php`):** A list of all water products, with options to add, edit, or delete products via a modal interface.
     *   **Shared Partials:** The admin portal uses shared partials for the sidebar, top bar, and footer to ensure a consistent look and feel.
 
 ### Backend
@@ -68,26 +68,29 @@ Aquaflow is a web application designed to facilitate the sale and delivery of bo
 *   **API:** A central `ajax.php` file handles all asynchronous requests from the admin portal.
 *   **Authentication:** Session-based authentication is used to manage user logins and protect admin routes.
 *   **API Actions (`frontend/api/ajax.php`):**
-    *   **`get_customers`:** Returns a list of all customers. Supports searching by name or email.
-    *   **`get_customer_details`:** Returns details for a single customer.
-    *   **`get_customer_orders`:** Returns the order history for a single customer.
-    *   **`get_order_details`:** Returns complete details for a single order.
-    *   *Other actions for products and dashboard widgets to be implemented.*
+    *   **Product Actions:** `get_products`, `get_product`, `add_product`, `update_product`, `delete_product`.
+    *   **Order Actions:** `get_orders` (with search and filtering).
+    *   **Customer Actions:** `get_customers` (with search), `get_customer_details`, `get_customer_orders`.
+    *   **Order Detail Actions:** `get_order_details`.
 
-## Current Task: Build Admin Portal
+## Current Task: Initial Admin Portal Development Complete
 
-**Plan:**
+**Summary:**
 
-1.  **Create Customer Management Pages:**
-    *   `manage-customers.php`: Display a searchable list of all customers.
-    *   `customer-details.php`: Show detailed customer information and their order history.
-    *   `admin-customers.js`: Implement AJAX calls to fetch and display customer data.
-    *   `admin-customer-details.js`: Implement AJAX calls for the customer detail view.
-2.  **Create Order Management Pages:**
-    *   `manage-orders.php`: Display a searchable and filterable list of all orders. *(Yet to be created)*
-    *   `order-details.php`: Show comprehensive details for a single order.
-    *   `admin-orders.js`: Implement AJAX calls to fetch and display order data. *(Yet to be created)*
-    *   `admin-order-details.js`: Implement AJAX calls for the order detail view.
-3.  **Implement API Endpoint:**
-    *   Create `frontend/api/ajax.php` to handle all admin-related API requests.
-    *   Add actions for `get_customers`, `get_customer_details`, `get_customer_orders`, and `get_order_details` with placeholder data.
+The initial scaffolding and front-end development of the admin portal are now complete. The core sections for managing customers, orders, and products have been created with a consistent design and user experience. The front-end is powered by a centralized API (`ajax.php`) that currently serves placeholder data. The next major phase will be to connect the application to a live database.
+
+**Completed Steps:**
+
+1.  **Created Customer Management Pages:**
+    *   `manage-customers.php`: Displays a searchable list of all customers.
+    *   `customer-details.php`: Shows detailed customer information and their order history.
+    *   `admin-customers.js` & `admin-customer-details.js`: Implemented AJAX calls for customer data.
+2.  **Created Order Management Pages:**
+    *   `manage-orders.php`: Displays a searchable and filterable list of all orders.
+    *   `order-details.php`: Shows comprehensive details for a single order.
+    *   `admin-orders.js` & `admin-order-details.js`: Implemented AJAX calls for order data.
+3.  **Created Product Management Page:**
+    *   `manage-products.php`: Displays a list of products with a modal for adding/editing.
+    *   `admin-products.js`: Implemented AJAX calls for product CRUD operations.
+4.  **Implemented Central API Endpoint:**
+    *   Created `frontend/api/ajax.php` to handle all admin-related API requests with placeholder data and logic.
