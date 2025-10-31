@@ -118,6 +118,27 @@
                 });
         });
 
+        // small helper to escape text for insertion into HTML
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+            return String(unsafe)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // calculate total robustly from current cart (tolerant of different item shapes)
+        function calculateTotal() {
+            const cart = getCart();
+            return cart.reduce((acc, item) => {
+                const qty = (item.quantity !== undefined && item.quantity !== null) ? Number(item.quantity) : (item.qty !== undefined ? Number(item.qty) : 1);
+                const price = (item.price !== undefined && item.price !== null) ? Number(item.price) : (item.unit_price !== undefined ? Number(item.unit_price) : 0);
+                return acc + (price * qty);
+            }, 0);
+        }
+
         function renderOrderSummary() {
             const cart = getCart();
             const orderSummary = document.getElementById('orderSummary');
@@ -129,11 +150,16 @@
                 return;
             }
 
+            // render each item — be tolerant of different cart item shapes
             cart.forEach(item => {
+                const name = item.name || item.product_name || 'Item';
+                const qty = (item.quantity !== undefined && item.quantity !== null) ? Number(item.quantity) : (item.qty !== undefined ? Number(item.qty) : 1);
+                const price = (item.price !== undefined && item.price !== null) ? Number(item.price) : (item.unit_price !== undefined ? Number(item.unit_price) : 0);
+
                 summaryHtml += `
                     <div class="flex justify-between items-center mb-2">
-                        <span>${item.name} (x${item.quantity})</span>
-                        <span>₦${(item.price * item.quantity).toFixed(2)}</span>
+                        <span>${escapeHtml(name)} (x${qty})</span>
+                        <span>₦${price * qty ? (price * qty).toFixed(2) : '0.00'}</span>
                     </div>`;
             });
 
@@ -242,15 +268,28 @@
                 return;
             }
             const deliveryAddress = [document.getElementById('address').value, document.getElementById('city').value, document.getElementById('state').value].filter(Boolean).join(', ');
+
+            // sanitize and normalize cart items before sending to server
+            const sanitizedItems = cart.map(it => {
+                return {
+                    id: it.id ?? it.product_id ?? null,
+                    name: it.name ?? it.product_name ?? 'Item',
+                    quantity: Number(it.quantity ?? it.qty ?? 1),
+                    price: Number(it.price ?? it.unit_price ?? 0)
+                };
+            }).filter(i => i.id !== null);
+
+            const subtotal = sanitizedItems.reduce((acc, it) => acc + (Number(it.price || 0) * Number(it.quantity || 0)), 0);
+
             const orderData = {
                 delivery_address: deliveryAddress,
                 delivery_date: document.getElementById('delivery_date').value,
                 special_instructions: document.getElementById('special_instructions').value,
                 payment_method: document.querySelector('input[name="payment_method"]:checked').value,
-                items: cart,
-                subtotal: calculateTotal(),
+                items: sanitizedItems,
+                subtotal: subtotal,
                 delivery_fee: 500, // Example fee
-                total_amount: calculateTotal() + 500
+                total_amount: subtotal + 500
             };
 
             // create order on server first

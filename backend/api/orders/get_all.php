@@ -1,48 +1,51 @@
 <?php
+// backend/api/orders/get_all.php
+// Returns a list of orders for the authenticated user (or all orders for admin)
 
 require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../utils/response.php';
-require_once __DIR__ . '/../../utils/auth.php';
 
 set_json_headers();
-
-// A sales_manager can see all orders.
-// A customer can only see their own orders.
-$user_id = require_role(['sales_manager', 'customer']);
-$user_role = $_SESSION['user_role'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+// Determine role and role-specific id key
+$role = $_SESSION['user_role'] ?? null;
+$userId = null;
+if ($role) {
+    $roleKey = preg_replace('/[^a-z0-9_]/', '', strtolower($role)) . '_id';
+    if (!empty($_SESSION[$roleKey])) {
+        $userId = (int)$_SESSION[$roleKey];
+    }
+}
+if (!$userId && !empty($_SESSION['user_id'])) {
+    $userId = (int)$_SESSION['user_id'];
+}
+
 try {
     $pdo = get_db_connection();
-    $customer_id_filter = $_GET['customer_id'] ?? null;
 
-    $sql = "SELECT o.*, u.full_name as customer_name FROM orders o JOIN users u ON o.customer_id = u.id";
-    $params = [];
-
-    if ($user_role === 'customer') {
-        $sql .= " WHERE o.customer_id = :customer_id";
-        $params[':customer_id'] = $user_id;
-    } elseif ($user_role === 'sales_manager' && $customer_id_filter) {
-        $sql .= " WHERE o.customer_id = :customer_id";
-        $params[':customer_id'] = $customer_id_filter;
+    if ($role === 'admin') {
+        $stmt = $pdo->prepare('SELECT id, order_number, order_date, subtotal, delivery_fee, total_amount, status, payment_status FROM orders ORDER BY order_date DESC');
+        $stmt->execute();
+    } else {
+        if (!$userId) {
+            error_response('Not authenticated', null, 401);
+        }
+        $stmt = $pdo->prepare('SELECT id, order_number, order_date, subtotal, delivery_fee, total_amount, status, payment_status FROM orders WHERE customer_id = :cid ORDER BY order_date DESC');
+        $stmt->execute([':cid' => $userId]);
     }
 
-    $sql .= " ORDER BY o.order_date DESC";
-
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    success_response('Orders fetched successfully', $orders);
-
-} catch (PDOException $e) {
-    error_log('Database error fetching orders: ' . $e->getMessage());
-    error_response('A database error occurred.', null, 500);
-} catch (Exception $e) {
-    error_log('Error fetching orders: ' . $e->getMessage());
-    error_response($e->getMessage(), null, $e->getCode() ?: 500);
+    // return simple list; frontend will group/filter by status
+    success_response('Orders retrieved', $orders);
+} catch (PDOException $ex) {
+    error_log('orders/get_all.php error: ' . $ex->getMessage());
+    error_response('Server error', null, 500);
 }
