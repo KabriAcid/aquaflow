@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aquaflow is a web application designed to facilitate the sale and delivery of bottled water. The application provides a customer-facing interface for ordering water and an admin portal for managing orders, customers, and products.
+Aquaflow is a web application designed to facilitate the sale and delivery of bottled water. The application provides a customer-facing interface for ordering water and an admin portal for managing orders, customers, and products. The application is now fully connected to a MySQL database.
 
 ## Project Structure
 
@@ -35,6 +35,7 @@ Aquaflow is a web application designed to facilitate the sale and delivery of bo
 |   |   `-- admin-products.js
 |   |-- about.php
 |   |-- contact.php
+|   |-- config.php
 |   |-- index.php
 |   |-- login.php
 |   |-- register.php
@@ -65,32 +66,35 @@ Aquaflow is a web application designed to facilitate the sale and delivery of bo
 
 ### Backend
 
-*   **API:** A central `ajax.php` file handles all asynchronous requests from the admin portal.
+*   **Database:** The application uses a MySQL database (`aquaflow`) to store all data.
+*   **Configuration:** A `config.php` file stores database credentials and other configuration settings.
+*   **API:** A central `ajax.php` file handles all asynchronous requests from the admin portal. It uses PDO with prepared statements to ensure secure database interactions.
 *   **Authentication:** Session-based authentication is used to manage user logins and protect admin routes.
 *   **API Actions (`frontend/api/ajax.php`):**
-    *   **Product Actions:** `get_products`, `get_product`, `add_product`, `update_product`, `delete_product`.
-    *   **Order Actions:** `get_orders` (with search and filtering).
-    *   **Customer Actions:** `get_customers` (with search), `get_customer_details`, `get_customer_orders`.
-    *   **Order Detail Actions:** `get_order_details`.
+    *   **Product Actions:** Full CRUD functionality for products.
+    *   **Customer Actions:** Full CRUD functionality for customers.
+    *   **Order Actions:** Full CRUD functionality for orders.
 
-## Current Task: Initial Admin Portal Development Complete
+## Current Task: Admin Portal & Database Integration Complete
 
 **Summary:**
 
-The initial scaffolding and front-end development of the admin portal are now complete. The core sections for managing customers, orders, and products have been created with a consistent design and user experience. The front-end is powered by a centralized API (`ajax.php`) that currently serves placeholder data. The next major phase will be to connect the application to a live database.
+The development of the admin portal is now complete, with full integration into a MySQL database. All placeholder data and logic have been replaced with live database queries using secure prepared statements. The application now provides a robust and fully functional back-end for managing products, customers, and orders.
 
 **Completed Steps:**
 
-1.  **Created Customer Management Pages:**
-    *   `manage-customers.php`: Displays a searchable list of all customers.
-    *   `customer-details.php`: Shows detailed customer information and their order history.
-    *   `admin-customers.js` & `admin-customer-details.js`: Implemented AJAX calls for customer data.
-2.  **Created Order Management Pages:**
-    *   `manage-orders.php`: Displays a searchable and filterable list of all orders.
-    *   `order-details.php`: Shows comprehensive details for a single order.
-    *   `admin-orders.js` & `admin-order-details.js`: Implemented AJAX calls for order data.
-3.  **Created Product Management Page:**
-    *   `manage-products.php`: Displays a list of products with a modal for adding/editing.
-    *   `admin-products.js`: Implemented AJAX calls for product CRUD operations.
-4.  **Implemented Central API Endpoint:**
-    *   Created `frontend/api/ajax.php` to handle all admin-related API requests with placeholder data and logic.
+1.  **Admin Portal Scaffolding:**
+    *   Created all necessary PHP files for the dashboard, customer management, order management, and product management sections.
+    *   Implemented the front-end layout with HTML, Tailwind CSS, and custom styles.
+    *   Created corresponding JavaScript files to handle dynamic content and user interactions.
+2.  **API Implementation:**
+    *   Developed a central `ajax.php` endpoint to handle all back-end requests.
+    *   Initially implemented API actions with placeholder data.
+3.  **Database Integration:**
+    *   Created a `config.php` file for database credentials.
+    *   Connected the application to a MySQL database using PDO.
+    *   Replaced all placeholder logic in `ajax.php` with live database queries.
+    *   Implemented secure CRUD operations for products, customers, and orders using prepared statements.
+4.  **Finalization:**
+    *   The admin portal is now fully functional and data-driven.
+    *   The project is ready for further feature development or deployment.
