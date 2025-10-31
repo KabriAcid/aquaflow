@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - Aquaflow</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
 
@@ -27,14 +27,14 @@
                         </a>
                     </div>
                     <div class="hidden md:flex items-center space-x-1">
-                         <a href="dashboard.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Dashboard</a>
+                        <a href="dashboard.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Dashboard</a>
                         <a href="products.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Products</a>
                         <a href="orders.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">My Orders</a>
                         <a href="cart.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Cart</a>
                     </div>
                 </div>
                 <div class="hidden md:flex items-center space-x-3 ">
-                     <a href="profile.php" class="py-2 px-2 text-blue-500 border-b-4 border-blue-500 font-semibold">Profile</a>
+                    <a href="profile.php" class="py-2 px-2 text-blue-500 border-b-4 border-blue-500 font-semibold">Profile</a>
                     <a href="#" id="logoutBtn" class="py-2 px-2 font-medium text-white bg-blue-500 rounded hover:bg-blue-400 transition duration-300">Log Out</a>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                             <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name</label>
                             <input type="text" id="full_name" name="full_name" class="mt-1 block w-full border rounded px-3 py-2" required>
                         </div>
-                         <div class="mb-4">
+                        <div class="mb-4">
                             <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
                             <input type="text" id="phone" name="phone" class="mt-1 block w-full border rounded px-3 py-2">
                         </div>
@@ -103,29 +103,38 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
+            // verify session
+            fetch('../../backend/api/auth/me.php', {
+                    credentials: 'same-origin'
+                })
+                .then(r => r.json())
+                .then(userData => {
+                    if (!userData.success) {
+                        window.location.href = '../login.php';
+                        return;
+                    }
 
-            fetch('../../backend/api/auth/get_profile.php', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    const profile = data.data;
-                    document.getElementById('full_name').value = profile.full_name || '';
-                    document.getElementById('phone').value = profile.phone || '';
-                    document.getElementById('address').value = profile.address || '';
-                    document.getElementById('city').value = profile.city || '';
-                    document.getElementById('state').value = profile.state || '';
-                    document.getElementById('postal_code').value = profile.postal_code || '';
-                }
-            });
+                    // load full profile (server endpoint should read session)
+                    return fetch('../../backend/api/auth/get_profile.php', {
+                        credentials: 'same-origin'
+                    });
+                })
+                .then(res => res ? res.json() : null)
+                .then(data => {
+                    if (data && data.success && data.data) {
+                        const profile = data.data;
+                        document.getElementById('full_name').value = profile.full_name || '';
+                        document.getElementById('phone').value = profile.phone || '';
+                        document.getElementById('address').value = profile.address || '';
+                        document.getElementById('city').value = profile.city || '';
+                        document.getElementById('state').value = profile.state || '';
+                        document.getElementById('postal_code').value = profile.postal_code || '';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading profile', err);
+                    window.location.href = '../login.php';
+                });
 
             document.getElementById('profileForm').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -133,56 +142,59 @@
                 const profileData = Object.fromEntries(formData.entries());
 
                 fetch('../../backend/api/auth/update_profile.php', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(profileData)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Profile updated successfully');
-                    } else {
-                        alert('Error updating profile: ' + data.message);
-                    }
-                });
+                        method: 'PUT',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(profileData)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Profile updated successfully');
+                        } else {
+                            alert('Error updating profile: ' + data.message);
+                        }
+                    });
             });
 
             document.getElementById('passwordForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const formData = new FormData(this);
                 const passwordData = Object.fromEntries(formData.entries());
-                
+
                 if (passwordData.new_password !== passwordData.confirm_new_password) {
                     alert('New passwords do not match.');
                     return;
                 }
 
                 fetch('../../backend/api/auth/change_password.php', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(passwordData)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Password changed successfully');
-                        this.reset();
-                    } else {
-                        alert('Error changing password: ' + data.message);
-                    }
-                });
+                        method: 'PUT',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(passwordData)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Password changed successfully');
+                            this.reset();
+                        } else {
+                            alert('Error changing password: ' + data.message);
+                        }
+                    });
             });
-            
+
             document.getElementById('logoutBtn').addEventListener('click', function() {
-                localStorage.removeItem('authToken');
-                 localStorage.removeItem('userName');
-                window.location.href = '../login.php';
+                fetch('../../backend/api/auth/logout.php', {
+                        method: 'POST',
+                        credentials: 'same-origin'
+                    })
+                    .then(() => window.location.href = '../login.php')
+                    .catch(() => window.location.href = '../login.php');
             });
         });
     </script>

@@ -16,7 +16,7 @@
 
     <!-- Navigation -->
     <nav class="bg-white shadow-md">
-         <div class="max-w-6xl mx-auto px-4">
+        <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between">
                 <div class="flex space-x-7">
                     <div>
@@ -25,14 +25,14 @@
                         </a>
                     </div>
                     <div class="hidden md:flex items-center space-x-1">
-                         <a href="dashboard.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Dashboard</a>
+                        <a href="dashboard.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Dashboard</a>
                         <a href="products.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Products</a>
                         <a href="orders.php" class="py-4 px-2 text-blue-500 border-b-4 border-blue-500 font-semibold">My Orders</a>
                         <a href="cart.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Cart</a>
                     </div>
                 </div>
                 <div class="hidden md:flex items-center space-x-3 ">
-                     <a href="profile.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Profile</a>
+                    <a href="profile.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Profile</a>
                     <a href="#" id="logoutBtn" class="py-2 px-2 font-medium text-white bg-blue-500 rounded hover:bg-blue-400 transition duration-300">Log Out</a>
                 </div>
             </div>
@@ -44,43 +44,50 @@
         <div class="max-w-4xl mx-auto px-4">
             <div id="orderDetailsContent" class="bg-white p-8 rounded-lg shadow-md">
                 <!-- Order details will be populated here -->
-                 <p class="text-center">Loading order details...</p>
+                <p class="text-center">Loading order details...</p>
             </div>
         </div>
     </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
+            fetch('../../backend/api/auth/me.php', {
+                    credentials: 'same-origin'
+                })
+                .then(r => r.json())
+                .then(u => {
+                    if (!u.success) {
+                        window.location.href = '../login.php';
+                        return;
+                    }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderId = urlParams.get('id');
-            if (!orderId) {
-                document.getElementById('orderDetailsContent').innerHTML = '<p class="text-center text-red-500">No order ID specified.</p>';
-                return;
-            }
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const orderId = urlParams.get('id');
+                    if (!orderId) {
+                        document.getElementById('orderDetailsContent').innerHTML = '<p class="text-center text-red-500">No order ID specified.</p>';
+                        return;
+                    }
 
-            fetch(`../../backend/api/orders/get_one.php?id=${orderId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    renderOrderDetails(data.data);
-                } else {
-                     document.getElementById('orderDetailsContent').innerHTML = `<p class="text-center text-red-500">Error: ${data.message}</p>`;
-                }
-            })
-            .catch(err => {
-                document.getElementById('orderDetailsContent').innerHTML = '<p class="text-center text-red-500">An error occurred while fetching order details.</p>';
-                console.error(err);
-            });
+                    fetch(`../../backend/api/orders/get_one.php?id=${orderId}`, {
+                            credentials: 'same-origin'
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success && data.data) {
+                                renderOrderDetails(data.data);
+                            } else {
+                                document.getElementById('orderDetailsContent').innerHTML = `<p class="text-center text-red-500">Error: ${data.message}</p>`;
+                            }
+                        })
+                        .catch(err => {
+                            document.getElementById('orderDetailsContent').innerHTML = '<p class="text-center text-red-500">An error occurred while fetching order details.</p>';
+                            console.error(err);
+                        });
+                })
+                .catch(err => {
+                    console.error('Auth check failed', err);
+                    window.location.href = '../login.php';
+                });
         });
 
         function renderOrderDetails(order) {
@@ -146,29 +153,40 @@
 
             orderDetailsContent.innerHTML = detailsHtml;
         }
-        
+
         function getStatusColor(status) {
             switch (status) {
-                case 'pending': return 'bg-yellow-200 text-yellow-800';
-                case 'processing': return 'bg-blue-200 text-blue-800';
-                case 'out_for_delivery': return 'bg-indigo-200 text-indigo-800';
-                case 'delivered': return 'bg-green-200 text-green-800';
-                case 'cancelled': return 'bg-red-200 text-red-800';
-                default: return 'bg-gray-200 text-gray-800';
+                case 'pending':
+                    return 'bg-yellow-200 text-yellow-800';
+                case 'processing':
+                    return 'bg-blue-200 text-blue-800';
+                case 'out_for_delivery':
+                    return 'bg-indigo-200 text-indigo-800';
+                case 'delivered':
+                    return 'bg-green-200 text-green-800';
+                case 'cancelled':
+                    return 'bg-red-200 text-red-800';
+                default:
+                    return 'bg-gray-200 text-gray-800';
             }
         }
 
         function getProgressBarWidth(status) {
             switch (status) {
-                case 'pending': return '25%';
-                case 'processing': return '50%';
-                case 'out_for_delivery': return '75%';
-                case 'delivered': return '100%';
-                default: return '0%';
+                case 'pending':
+                    return '25%';
+                case 'processing':
+                    return '50%';
+                case 'out_for_delivery':
+                    return '75%';
+                case 'delivered':
+                    return '100%';
+                default:
+                    return '0%';
             }
         }
-        
-         document.getElementById('logoutBtn').addEventListener('click', function() {
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
             localStorage.removeItem('authToken');
             localStorage.removeItem('userName');
             window.location.href = '../login.php';

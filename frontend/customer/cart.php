@@ -52,12 +52,22 @@
     <script src="../js/cart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
-            renderCart();
+            // detect session
+            fetch('../../backend/api/auth/me.php', {
+                    credentials: 'same-origin'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) {
+                        window.location.href = '../login.php';
+                        return;
+                    }
+                    renderCart();
+                })
+                .catch(err => {
+                    console.error('Auth check failed', err);
+                    window.location.href = '../login.php';
+                });
         });
 
         function renderCart() {
@@ -123,10 +133,13 @@
                 </div>`;
 
             cartContent.innerHTML = cartTable + summary;
-             document.getElementById('logoutBtn').addEventListener('click', function() {
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userName');
-                window.location.href = '../login.php';
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                fetch('../../backend/api/auth/logout.php', {
+                        method: 'POST',
+                        credentials: 'same-origin'
+                    })
+                    .then(() => window.location.href = '../login.php')
+                    .catch(() => window.location.href = '../login.php');
             });
         }
     </script>

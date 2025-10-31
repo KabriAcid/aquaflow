@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment - Aquaflow</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
@@ -45,45 +45,51 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const orderId = urlParams.get('order_id');
-            if (!orderId) {
-                alert('No order specified.');
-                window.location.href = 'orders.php';
-                return;
-            }
+            // session check
+            fetch('../../backend/api/auth/me.php', {
+                    credentials: 'same-origin'
+                })
+                .then(r => r.json())
+                .then(u => {
+                    if (!u.success) {
+                        window.location.href = '../login.php';
+                        return;
+                    }
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const orderId = urlParams.get('order_id');
+                    if (!orderId) {
+                        alert('No order specified.');
+                        window.location.href = 'orders.php';
+                        return;
+                    }
+                    fetch(`../../backend/api/orders/get_one.php?id=${orderId}`, {
+                            credentials: 'same-origin'
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success && data.data) {
+                                const order = data.data;
+                                document.getElementById('orderDetails').innerHTML = `
+                            <p><strong>Order Number:</strong> ${order.order_number}</p>
+                            <p><strong>Total Amount:</strong> ₦${parseFloat(order.total_amount).toFixed(2)}</p>
+                        `;
+                            } else {
+                                alert('Could not retrieve order details.');
+                            }
+                        });
 
-            fetch(`../../backend/api/orders/get_one.php?id=${orderId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    const order = data.data;
-                    document.getElementById('orderDetails').innerHTML = `
-                        <p><strong>Order Number:</strong> ${order.order_number}</p>
-                        <p><strong>Total Amount:</strong> ₦${parseFloat(order.total_amount).toFixed(2)}</p>
-                    `;
-                } else {
-                     alert('Could not retrieve order details.');
-                }
-            });
 
-
-            document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
-                // In a real application, this would redirect to a payment gateway like Flutterwave or Paystack.
-                // For this example, we will just mark the order as paid.
-                alert('Payment confirmed! Thank you for your order.');
-                window.location.href = `order-details.php?id=${orderId}`;
-            });
+                    document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
+                        // In a real application, this would redirect to a payment gateway like Flutterwave or Paystack.
+                        // For this example, we will just mark the order as paid.
+                        alert('Payment confirmed! Thank you for your order.');
+                        window.location.href = `order-details.php?id=${orderId}`;
+                    });
+                })
+                .catch(err => {
+                    console.error('Auth check failed', err);
+                    window.location.href = '../login.php';
+                });
         });
     </script>
 

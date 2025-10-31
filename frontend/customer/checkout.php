@@ -58,7 +58,7 @@
                             <label for="special_instructions" class="block text-sm font-medium text-gray-700">Special Instructions</label>
                             <textarea id="special_instructions" name="special_instructions" rows="3" class="mt-1 block w-full border rounded px-3 py-2"></textarea>
                         </div>
-                         <div class="mb-4">
+                        <div class="mb-4">
                             <h3 class="text-lg font-medium text-gray-800">Payment Method</h3>
                             <div class="mt-2 space-y-2">
                                 <label class="flex items-center">
@@ -69,7 +69,7 @@
                                     <input type="radio" name="payment_method" value="bank_transfer" class="form-radio">
                                     <span class="ml-2">Bank Transfer</span>
                                 </label>
-                                 <label class="flex items-center">
+                                <label class="flex items-center">
                                     <input type="radio" name="payment_method" value="cash_on_delivery" class="form-radio">
                                     <span class="ml-2">Cash on Delivery</span>
                                 </label>
@@ -95,21 +95,31 @@
     <script src="../js/cart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
-            renderOrderSummary();
-            populateAddress();
+            // verify session
+            fetch('../../backend/api/auth/me.php', {
+                    credentials: 'same-origin'
+                })
+                .then(r => r.json())
+                .then(u => {
+                    if (!u.success) {
+                        window.location.href = '../login.php';
+                        return;
+                    }
+                    renderOrderSummary();
+                    populateAddress();
 
-            document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
-             // Set minimum delivery date to tomorrow
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const minDate = tomorrow.toISOString().split('T')[0];
-            document.getElementById('delivery_date').setAttribute('min', minDate);
+                    document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
+                    // Set minimum delivery date to tomorrow
+                    const today = new Date();
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const minDate = tomorrow.toISOString().split('T')[0];
+                    document.getElementById('delivery_date').setAttribute('min', minDate);
+                })
+                .catch(err => {
+                    console.error('Auth check failed', err);
+                    window.location.href = '../login.php';
+                });
         });
 
         function renderOrderSummary() {
@@ -154,20 +164,17 @@
         }
 
         function populateAddress() {
-             const token = localStorage.getItem('authToken');
             fetch('../../backend/api/auth/get_profile.php', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success && data.data) {
-                    document.getElementById('address').value = data.data.address || '';
-                    document.getElementById('city').value = data.data.city || '';
-                    document.getElementById('state').value = data.data.state || '';
-                }
-            });
+                    credentials: 'same-origin'
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        document.getElementById('address').value = data.data.address || '';
+                        document.getElementById('city').value = data.data.city || '';
+                        document.getElementById('state').value = data.data.state || '';
+                    }
+                });
         }
 
         function placeOrder() {
@@ -179,7 +186,6 @@
             }
 
             const orderData = {
-                customer_id: localStorage.getItem('userId'),
                 delivery_address: document.getElementById('address').value + ', ' + document.getElementById('city').value + ', ' + document.getElementById('state').value,
                 delivery_date: document.getElementById('delivery_date').value,
                 special_instructions: document.getElementById('special_instructions').value,
@@ -191,27 +197,27 @@
             };
 
             fetch('../../backend/api/orders/create.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(orderData)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    clearCart();
-                    alert('Order placed successfully!');
-                    window.location.href = `payment.php?order_id=${data.data.order_id}`;
-                } else {
-                    alert('Failed to place order: ' + data.message);
-                }
-            })
-            .catch(err => {
-                alert('An error occurred while placing your order. Please try again.');
-                console.error(err);
-            });
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        clearCart();
+                        alert('Order placed successfully!');
+                        window.location.href = `payment.php?order_id=${data.data.order_id}`;
+                    } else {
+                        alert('Failed to place order: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    alert('An error occurred while placing your order. Please try again.');
+                    console.error(err);
+                });
         }
     </script>
 

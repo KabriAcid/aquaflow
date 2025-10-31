@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Orders - Aquaflow</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
@@ -25,14 +25,14 @@
                         </a>
                     </div>
                     <div class="hidden md:flex items-center space-x-1">
-                         <a href="dashboard.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Dashboard</a>
+                        <a href="dashboard.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Dashboard</a>
                         <a href="products.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Products</a>
                         <a href="orders.php" class="py-4 px-2 text-blue-500 border-b-4 border-blue-500 font-semibold">My Orders</a>
                         <a href="cart.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Cart</a>
                     </div>
                 </div>
                 <div class="hidden md:flex items-center space-x-3 ">
-                     <a href="profile.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Profile</a>
+                    <a href="profile.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Profile</a>
                     <a href="#" id="logoutBtn" class="py-2 px-2 font-medium text-white bg-blue-500 rounded hover:bg-blue-400 transition duration-300">Log Out</a>
                 </div>
             </div>
@@ -43,7 +43,7 @@
     <main class="py-10">
         <div class="max-w-6xl mx-auto px-4">
             <h1 class="text-3xl font-bold mb-6 text-gray-800">My Orders</h1>
-            
+
             <!-- Tabs -->
             <div class="mb-6 border-b border-gray-200">
                 <ul class="flex flex-wrap -mb-px">
@@ -56,10 +56,10 @@
                     <li class="mr-2">
                         <a href="#" class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="processing">Processing</a>
                     </li>
-                     <li class="mr-2">
+                    <li class="mr-2">
                         <a href="#" class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="delivered">Delivered</a>
                     </li>
-                     <li class="mr-2">
+                    <li class="mr-2">
                         <a href="#" class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-tab="cancelled">Cancelled</a>
                     </li>
                 </ul>
@@ -87,31 +87,35 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // detect session via server-side endpoint
-            fetch('../../backend/api/auth/me.php', { credentials: 'same-origin' })
-            .then(res => res.json())
-            .then(userData => {
-                if (!userData.success) {
-                    window.location.href = '../login.php';
-                    return Promise.reject('Not authenticated');
-                }
-                // fetch orders using session
-                return fetch('../../backend/api/orders/get_all.php', { credentials: 'same-origin' });
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    allOrders = data.data;
-                    renderOrders('all'); // Initially show all orders
-                } else {
-                     document.getElementById('ordersTable').innerHTML = '<tr><td colspan="5" class="text-center py-4">Could not load orders.</td></tr>';
-                }
-            })
-            .catch(err => {
-                if (typeof err === 'string') return; // handled redirect
-                console.error('Failed to load orders:', err);
-            });
+            fetch('../../backend/api/auth/me.php', {
+                    credentials: 'same-origin'
+                })
+                .then(res => res.json())
+                .then(userData => {
+                    if (!userData.success) {
+                        window.location.href = '../login.php';
+                        return Promise.reject('Not authenticated');
+                    }
+                    // fetch orders using session
+                    return fetch('../../backend/api/orders/get_all.php', {
+                        credentials: 'same-origin'
+                    });
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        allOrders = data.data;
+                        renderOrders('all'); // Initially show all orders
+                    } else {
+                        document.getElementById('ordersTable').innerHTML = '<tr><td colspan="5" class="text-center py-4">Could not load orders.</td></tr>';
+                    }
+                })
+                .catch(err => {
+                    if (typeof err === 'string') return; // handled redirect
+                    console.error('Failed to load orders:', err);
+                });
             let allOrders = [];
-            
+
             const tabs = document.querySelectorAll('[data-tab]');
             tabs.forEach(tab => {
                 tab.addEventListener('click', function(e) {
@@ -126,7 +130,7 @@
                 const ordersTable = document.getElementById('ordersTable');
                 ordersTable.innerHTML = '';
                 const filteredOrders = statusFilter === 'all' ? allOrders : allOrders.filter(o => o.status === statusFilter);
-                
+
                 if (filteredOrders.length === 0) {
                     ordersTable.innerHTML = `<tr><td colspan="5" class="text-center py-4">No orders found for this status.</td></tr>`;
                     return;
@@ -153,23 +157,33 @@
                 });
             }
 
-             function getStatusColor(status) {
+            function getStatusColor(status) {
                 switch (status) {
-                    case 'pending': return 'bg-yellow-200 text-yellow-800';
-                    case 'processing': return 'bg-blue-200 text-blue-800';
-                    case 'delivered': return 'bg-green-200 text-green-800';
-                    case 'cancelled': return 'bg-red-200 text-red-800';
-                    default: return 'bg-gray-200 text-gray-800';
+                    case 'pending':
+                        return 'bg-yellow-200 text-yellow-800';
+                    case 'processing':
+                        return 'bg-blue-200 text-blue-800';
+                    case 'delivered':
+                        return 'bg-green-200 text-green-800';
+                    case 'cancelled':
+                        return 'bg-red-200 text-red-800';
+                    default:
+                        return 'bg-gray-200 text-gray-800';
                 }
             }
 
-             document.getElementById('logoutBtn').addEventListener('click', function() {
-                fetch('../../backend/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' })
-                .then(res => res.json())
-                .then(() => {
-                    window.location.href = '../login.php';
-                })
-                .catch(() => { window.location.href = '../login.php'; });
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                fetch('../../backend/api/auth/logout.php', {
+                        method: 'POST',
+                        credentials: 'same-origin'
+                    })
+                    .then(res => res.json())
+                    .then(() => {
+                        window.location.href = '../login.php';
+                    })
+                    .catch(() => {
+                        window.location.href = '../login.php';
+                    });
             });
         });
 
@@ -178,24 +192,24 @@
 
             const token = localStorage.getItem('authToken');
             fetch(`../../backend/api/orders/delete.php?id=${orderId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    alert('Order cancelled successfully.');
-                    window.location.reload();
-                } else {
-                    alert('Failed to cancel order: ' + data.message);
-                }
-            })
-            .catch(err => {
-                alert('An error occurred. Please try again.');
-                console.error(err);
-            });
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order cancelled successfully.');
+                        window.location.reload();
+                    } else {
+                        alert('Failed to cancel order: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    alert('An error occurred. Please try again.');
+                    console.error(err);
+                });
         }
     </script>
 
