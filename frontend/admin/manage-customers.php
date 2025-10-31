@@ -7,11 +7,12 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
-$page_title = "Manage Orders";
+$page_title = "Manage Customers";
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,6 +22,7 @@ $page_title = "Manage Orders";
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="bg-gray-50 flex text-gray-800">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -30,34 +32,22 @@ $page_title = "Manage Orders";
 
         <main class="flex-1 p-6">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-bold text-gray-800">Orders</h1>
-                <div class="flex items-center gap-4">
-                    <input type="text" id="search-input" placeholder="Search by customer or order ID" class="form-input w-64">
-                    <select id="status-filter" class="form-select">
-                        <option value="all">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                </div>
+                <h1 class="text-3xl font-bold text-gray-800">Customers</h1>
+                <input type="text" id="search-input" placeholder="Search by name or email" class="form-input w-64">
             </div>
 
             <div class="bg-white p-6 rounded-lg multi-shadow">
-                <table class="w-full" id="orders-table">
+                <table class="w-full" id="customers-table">
                     <thead>
                         <tr class="border-b">
-                            <th class="text-left p-3 font-semibold text-gray-600">Order ID</th>
-                            <th class="text-left p-3 font-semibold text-gray-600">Customer</th>
-                            <th class="text-left p-3 font-semibold text-gray-600">Date</th>
-                            <th class="text-left p-3 font-semibold text-gray-600">Total</th>
-                            <th class="text-left p-3 font-semibold text-gray-600">Status</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Name</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Email</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Registered On</th>
                             <th class="text-left p-3 font-semibold text-gray-600">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Order rows will be inserted here -->
+                        <!-- Customer rows will be inserted here -->
                     </tbody>
                 </table>
             </div>
@@ -66,7 +56,8 @@ $page_title = "Manage Orders";
         <?php include 'partials/footer.php'; ?>
     </div>
 
-    <script src="../js/admin-orders.js"></script>
+    <script src="../js/admin-customers.js"></script>
 
 </body>
+
 </html>
