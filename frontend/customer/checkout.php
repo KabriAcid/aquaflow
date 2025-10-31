@@ -34,12 +34,16 @@
                             <input type="text" id="address" name="address" class="mt-1 block w-full border rounded px-3 py-2" required>
                         </div>
                         <div class="mb-4">
-                            <label for="city" class="block text-sm font-medium text-gray-700">City</label>
-                            <input type="text" id="city" name="city" class="mt-1 block w-full border rounded px-3 py-2" required>
+                            <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                            <select id="state" name="state" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                <option value="">Select state</option>
+                            </select>
                         </div>
                         <div class="mb-4">
-                            <label for="state" class="block text-sm font-medium text-gray-700">State</label>
-                            <input type="text" id="state" name="state" class="mt-1 block w-full border rounded px-3 py-2" required>
+                            <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                            <select id="city" name="city" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                <option value="">Select city</option>
+                            </select>
                         </div>
                         <div class="mb-4">
                             <label for="delivery_date" class="block text-sm font-medium text-gray-700">Delivery Date</label>
@@ -54,11 +58,7 @@
                             <div class="mt-2 space-y-2">
                                 <label class="flex items-center">
                                     <input type="radio" name="payment_method" value="card" class="form-radio" checked>
-                                    <span class="ml-2">Credit Card</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="payment_method" value="bank_transfer" class="form-radio">
-                                    <span class="ml-2">Bank Transfer</span>
+                                    <span class="ml-2">Credit/Debit Card (Flutterwave)</span>
                                 </label>
                                 <label class="flex items-center">
                                     <input type="radio" name="payment_method" value="cash_on_delivery" class="form-radio">
@@ -84,7 +84,11 @@
     </main>
 
     <script src="../js/cart.js"></script>
+    <!-- Flutterwave inline script -->
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
     <script>
+        // Flutterwave public key from env (set FLW_PUBLIC_KEY in your environment or replace below)
+        const FLW_PUBLIC_KEY = '<?= htmlspecialchars("FLWPUBK_TEST-14973597272a7c26e4c3dc1f63affa33-X") ?>';
         document.addEventListener('DOMContentLoaded', function() {
             // verify session
             fetch('../../backend/api/auth/me.php', {
@@ -98,6 +102,7 @@
                     }
                     renderOrderSummary();
                     populateAddress();
+                    populateStatesAndCities();
 
                     document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
                     // Set minimum delivery date to tomorrow
@@ -162,9 +167,70 @@
                 .then(data => {
                     if (data.success && data.data) {
                         document.getElementById('address').value = data.data.address || '';
-                        document.getElementById('city').value = data.data.city || '';
-                        document.getElementById('state').value = data.data.state || '';
+                        // select state and city once options are populated
+                        const setStateCity = () => {
+                            const stateSel = document.getElementById('state');
+                            const citySel = document.getElementById('city');
+                            if (stateSel.options.length > 1) {
+                                if (data.data.state) stateSel.value = data.data.state;
+                                // trigger change to populate cities
+                                const evt = new Event('change');
+                                stateSel.dispatchEvent(evt);
+                                if (data.data.city) citySel.value = data.data.city;
+                            } else {
+                                // try again shortly
+                                setTimeout(setStateCity, 150);
+                            }
+                        };
+                        setStateCity();
                     }
+                });
+        }
+
+        function populateStatesAndCities() {
+            fetch('../../backend/api/location/states_cities.php')
+                .then(r => r.json())
+                .then(data => {
+                    // data may be raw JSON object (not wrapped) depending on API — handle both
+                    const mapping = data && data.data ? data.data : data;
+                    const stateSel = document.getElementById('state');
+                    const citySel = document.getElementById('city');
+                    // clear existing options except first
+                    stateSel.innerHTML = '<option value="">Select state</option>';
+                    citySel.innerHTML = '<option value="">Select city</option>';
+                    for (const key in mapping) {
+                        if (!mapping.hasOwnProperty(key)) continue;
+                        const stateObj = mapping[key];
+                        const opt = document.createElement('option');
+                        opt.value = stateObj.name || key;
+                        opt.textContent = stateObj.name || key;
+                        stateSel.appendChild(opt);
+                    }
+
+                    stateSel.addEventListener('change', function() {
+                        const s = stateSel.value;
+                        citySel.innerHTML = '<option value="">Select city</option>';
+                        // find state object
+                        let found = null;
+                        for (const k in mapping) {
+                            if (!mapping.hasOwnProperty(k)) continue;
+                            if ((mapping[k].name || k) === s) {
+                                found = mapping[k];
+                                break;
+                            }
+                        }
+                        if (found && Array.isArray(found.cities)) {
+                            found.cities.forEach(c => {
+                                const o = document.createElement('option');
+                                o.value = c.name || c.id;
+                                o.textContent = c.name || c.id;
+                                citySel.appendChild(o);
+                            });
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error('Failed to load states/cities mapping', err);
                 });
         }
 
@@ -175,9 +241,9 @@
                 alert('Your cart is empty.');
                 return;
             }
-
+            const deliveryAddress = [document.getElementById('address').value, document.getElementById('city').value, document.getElementById('state').value].filter(Boolean).join(', ');
             const orderData = {
-                delivery_address: document.getElementById('address').value + ', ' + document.getElementById('city').value + ', ' + document.getElementById('state').value,
+                delivery_address: deliveryAddress,
                 delivery_date: document.getElementById('delivery_date').value,
                 special_instructions: document.getElementById('special_instructions').value,
                 payment_method: document.querySelector('input[name="payment_method"]:checked').value,
@@ -187,6 +253,7 @@
                 total_amount: calculateTotal() + 500
             };
 
+            // create order on server first
             fetch('../../backend/api/orders/create.php', {
                     method: 'POST',
                     credentials: 'same-origin',
@@ -197,12 +264,75 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
+                    if (!data.success) {
+                        alert('Failed to create order: ' + data.message);
+                        return;
+                    }
+                    // payload structure: { order: {order_id,...}, user: {email,..} }
+                    const payload = data.data || {};
+                    const order = payload.order || payload;
+                    const user = payload.user || {};
+                    const orderId = order.order_id;
+                    const amount = parseFloat(order.total_amount || order.total_amount || 0);
+
+                    if (orderData.payment_method === 'card') {
+                        if (!FLW_PUBLIC_KEY || FLW_PUBLIC_KEY.includes('REPLACE_ME')) {
+                            alert('Flutterwave public key is not configured. Set FLW_PUBLIC_KEY in your environment variables.');
+                            return;
+                        }
+
+                        // open Flutterwave checkout
+                        FlutterwaveCheckout({
+                            public_key: FLW_PUBLIC_KEY,
+                            tx_ref: `order-${orderId}-${Date.now()}`,
+                            amount: amount,
+                            currency: 'NGN',
+                            payment_options: 'card,ussd,qr',
+                            customer: {
+                                email: user.email || '',
+                                phonenumber: user.phone || '',
+                                name: user.full_name || ''
+                            },
+                            customizations: {
+                                title: 'Aquaflow Order',
+                                description: `Payment for order #${orderId}`
+                            },
+                            callback: function(res) {
+                                // res.status === 'successful' normally
+                                // send data to backend to verify
+                                fetch('../../backend/api/payments/verify.php', {
+                                    method: 'POST',
+                                    credentials: 'same-origin',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        tx_ref: res.tx_ref,
+                                        transaction_id: res.transaction_id,
+                                        order_id: orderId
+                                    })
+                                }).then(r => r.json()).then(v => {
+                                    if (v.success) {
+                                        clearCart();
+                                        window.location.href = `payment.php?order_id=${orderId}`;
+                                    } else {
+                                        alert('Payment verification failed: ' + v.message);
+                                    }
+                                }).catch(err => {
+                                    console.error('Verification error', err);
+                                    alert('Payment completed but verification failed. Contact support.');
+                                });
+                            },
+                            onclose: function() {
+                                // user closed the modal
+                                console.log('Flutterwave modal closed');
+                            }
+                        });
+                    } else {
+                        // Cash on delivery — order already created
                         clearCart();
                         alert('Order placed successfully!');
-                        window.location.href = `payment.php?order_id=${data.data.order_id}`;
-                    } else {
-                        alert('Failed to place order: ' + data.message);
+                        window.location.href = `payment.php?order_id=${orderId}`;
                     }
                 })
                 .catch(err => {

@@ -100,8 +100,8 @@
 
             let summary = `
                 <div class="mt-6 text-right">
-                    <p class="text-lg">Subtotal: <span class="font-semibold">₦${total.toFixed(2)}</span></p>
-                    <p class="text-lg">Delivery Fee: <span class="font-semibold">₦${deliveryFee.toFixed(2)}</span></p>
+                    <p class="text-lg mb-3">Subtotal: <span>₦${total.toFixed(2)}</span></p>
+                    <p class="text-lg mb-3">Delivery Fee: <span>₦${deliveryFee.toFixed(2)}</span></p>
                     <p class="text-2xl font-bold">Total: <span class="text-blue-600">₦${grandTotal.toFixed(2)}</span></p>
                     <div class="mt-6 flex justify-end space-x-4">
                         <a href="products.php" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300">Continue Shopping</a>
