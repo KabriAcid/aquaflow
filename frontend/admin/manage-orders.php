@@ -21,7 +21,7 @@ $page_title = "Manage Orders";
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-100 flex text-gray-800">
+<body class="bg-gray-50 flex text-gray-800">
 
     <?php include 'partials/sidebar.php'; ?>
 
@@ -30,7 +30,7 @@ $page_title = "Manage Orders";
 
         <main class="flex-1 p-6">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Customer Orders</h3>
+                <h1 class="text-3xl font-bold text-gray-800">Customer Orders</h1>
                 <div class="flex items-center gap-4">
                     <input type="text" id="search-input" placeholder="Search by Order ID or Customer" class="form-input w-64">
                     <select id="status-filter" class="form-input">
@@ -44,16 +44,16 @@ $page_title = "Manage Orders";
                 </div>
             </div>
 
-            <div class="bg-card p-6 rounded-lg shadow-md">
+            <div class="bg-white p-6 rounded-lg multi-shadow">
                 <table class="w-full" id="orders-table">
                     <thead>
                         <tr class="border-b">
-                            <th class="text-left p-3">Order ID</th>
-                            <th class="text-left p-3">Customer</th>
-                            <th class="text-left p-3">Date</th>
-                            <th class="text-left p-3">Total</th>
-                            <th class="text-left p-3">Status</th>
-                            <th class="text-left p-3">Actions</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Order ID</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Customer</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Date</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Total</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Status</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,10 +68,10 @@ $page_title = "Manage Orders";
 
     <!-- Order Details Modal -->
     <div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center hidden">
-        <div class="bg-card p-8 rounded-lg shadow-xl w-full max-w-2xl">
+        <div class="bg-white p-8 rounded-lg multi-shadow w-full max-w-2xl">
             <div class="flex justify-between items-center mb-6">
                  <h2 class="text-2xl font-bold">Order Details</h2>
-                 <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800">&times;</button>
+                 <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
             </div>
             <div id="modal-content">
                 <!-- Order details will be loaded here -->

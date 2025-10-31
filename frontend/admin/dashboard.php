@@ -21,7 +21,7 @@ $page_title = "Admin Dashboard";
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 flex text-gray-800">
+<body class="bg-gray-50 flex text-gray-800">
 
     <?php include 'partials/sidebar.php'; ?>
 
@@ -30,25 +30,25 @@ $page_title = "Admin Dashboard";
 
         <main class="flex-1 p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div class="bg-card p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-muted-foreground">Total Sales</h3>
-                    <p id="total-sales" class="text-3xl font-bold">$0</p>
+                <div class="bg-white p-6 rounded-lg multi-shadow">
+                    <h2 class="text-lg font-semibold text-gray-600">Total Sales</h2>
+                    <p id="total-sales" class="text-3xl font-bold text-blue-600 mt-2">$0</p>
                 </div>
-                <div class="bg-card p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-muted-foreground">Total Customers</h3>
-                    <p id="total-customers" class="text-3xl font-bold">0</p>
+                <div class="bg-white p-6 rounded-lg multi-shadow">
+                    <h2 class="text-lg font-semibold text-gray-600">Total Customers</h2>
+                    <p id="total-customers" class="text-3xl font-bold text-green-600 mt-2">0</p>
                 </div>
-                <div class="bg-card p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-muted-foreground">Total Orders</h3>
-                    <p id="total-orders" class="text-3xl font-bold">0</p>
+                <div class="bg-white p-6 rounded-lg multi-shadow">
+                    <h2 class="text-lg font-semibold text-gray-600">Total Orders</h2>
+                    <p id="total-orders" class="text-3xl font-bold text-yellow-600 mt-2">0</p>
                 </div>
-                <div class="bg-card p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-medium text-muted-foreground">Sales Managers</h3>
-                    <p id="total-sales-managers" class="text-3xl font-bold">0</p>
+                <div class="bg-white p-6 rounded-lg multi-shadow">
+                    <h2 class="text-lg font-semibold text-gray-600">Sales Managers</h2>
+                    <p id="total-sales-managers" class="text-3xl font-bold text-red-600 mt-2">0</p>
                 </div>
             </div>
 
-            <div class="bg-card p-6 rounded-lg shadow-md">
+            <div class="bg-white p-6 rounded-lg multi-shadow">
                 <h3 class="text-xl font-bold mb-4">Sales Over Time</h3>
                 <canvas id="sales-chart"></canvas>
             </div>

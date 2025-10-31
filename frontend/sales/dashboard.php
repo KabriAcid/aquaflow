@@ -132,9 +132,7 @@ $page_title = "Sales Dashboard";
                     </table>
                 </div>
             </div>
-
         </main>
-
         <?php include 'partials/footer.php'; ?>
     </div>
 
