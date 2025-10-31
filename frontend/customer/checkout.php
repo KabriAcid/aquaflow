@@ -18,19 +18,7 @@
 <body class="bg-gray-100">
 
     <!-- Navigation -->
-    <nav class="bg-white shadow-md">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between">
-                <div class="flex space-x-7">
-                    <div>
-                        <a href="../index.php" class="flex items-center py-4 px-2">
-                            <span class="font-bold text-gray-700 text-lg">Aquaflow</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <?php require_once __DIR__ . '/partials/topbar.php'; ?>
 
     <!-- Checkout Content -->
     <main class="py-10">

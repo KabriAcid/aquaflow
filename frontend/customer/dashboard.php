@@ -17,30 +17,7 @@
 
 <body class="bg-gray-100">
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow-md">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between">
-                <div class="flex space-x-7">
-                    <div>
-                        <a href="../index.php" class="flex items-center py-4 px-2">
-                            <span class="font-bold text-gray-700 text-lg">Aquaflow</span>
-                        </a>
-                    </div>
-                    <div class="hidden md:flex items-center space-x-1">
-                        <a href="dashboard.php" class="py-4 px-2 text-blue-500 border-b-4 border-blue-500 font-semibold">Dashboard</a>
-                        <a href="products.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Products</a>
-                        <a href="orders.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">My Orders</a>
-                        <a href="cart.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Cart</a>
-                    </div>
-                </div>
-                <div class="hidden md:flex items-center space-x-3 ">
-                    <a href="profile.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Profile</a>
-                    <a href="#" id="logoutBtn" class="py-2 px-2 font-medium text-white bg-blue-500 rounded hover:bg-blue-400 transition duration-300">Log Out</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <?php require_once __DIR__ . '/partials/topbar.php'; ?>
 
     <!-- Dashboard Content -->
     <main class="py-10">
