@@ -68,11 +68,17 @@ try {
     if (session_status() === PHP_SESSION_NONE) session_start();
     session_regenerate_id(true);
 
-    // Store only the user id in session
-    $_SESSION['user_id'] = (int)$user['id'];
+    // Determine role and store a role-specific session key (e.g. customer_id, admin_id)
+    $role = strtolower(trim($user['role'] ?? 'customer'));
+    // sanitize role to safe identifier (letters, numbers, underscore)
+    $roleKey = preg_replace('/[^a-z0-9_]/', '', $role) . '_id';
 
-    // Return success with only the user id (frontend will fetch remaining profile info from dashboard endpoints)
-    $payload = ['id' => (int)$user['id']];
+    // Store only a role-scoped id in session and keep the role name so we can later destroy the right key
+    $_SESSION[$roleKey] = (int)$user['id'];
+    $_SESSION['user_role'] = $role;
+
+    // Return success with the user id and role so the frontend can perform a role-based redirect
+    $payload = ['id' => (int)$user['id'], 'role' => $role];
     success_response('Login successful', $payload);
 } catch (PDOException $ex) {
     error_log('Login error: ' . $ex->getMessage());

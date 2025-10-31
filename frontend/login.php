@@ -108,10 +108,12 @@
         if (res.ok && data && data.success) {
           msgEl.textContent = data.message || 'Login successful';
           msgEl.className = 'mt-3 text-sm text-green-600';
-          // redirect to customer dashboard or home
+          // If backend returns role, redirect to role-specific dashboard (frontend/{role}/dashboard.php)
+          const role = (data.data && data.data.role) ? String(data.data.role).toLowerCase().replace(/[^a-z0-9_]/g, '') : 'customer';
           setTimeout(() => {
-            window.location.href = 'index.php';
-          }, 800);
+            // relative path from this page: customer/dashboard.php
+            window.location.href = role + '/dashboard.php';
+          }, 600);
         } else {
           msgEl.textContent = (data && data.message) ? data.message : 'Login failed';
           msgEl.className = 'mt-3 text-sm text-red-600';

@@ -1,0 +1,62 @@
+{
+  "lagos": {
+    "name": "Lagos",
+    "cities": [
+      { "id": "ikeja", "name": "Ikeja" },
+      { "id": "surulere", "name": "Surulere" },
+      { "id": "lekki", "name": "Lekki" },
+      { "id": "oshodi", "name": "Oshodi" },
+      { "id": "badagry", "name": "Badagry" }
+    ]
+  },
+  "kano": {
+    "name": "Kano",
+    "cities": [
+      { "id": "kano_municipal", "name": "Kano Municipal" },
+      { "id": "gwale", "name": "Gwale" },
+      { "id": "nassarawa", "name": "Nassarawa" },
+      { "id": "tudun_wada", "name": "Tudun Wada" },
+      { "id": "karaye", "name": "Karaye" }
+    ]
+  },
+  "rivers": {
+    "name": "Rivers",
+    "cities": [
+      { "id": "port_harcourt", "name": "Port Harcourt" },
+      { "id": "obio_akpor", "name": "Obio-Akpor" },
+      { "id": "bonny", "name": "Bonny" },
+      { "id": "eleme", "name": "Eleme" },
+      { "id": "gokana", "name": "Gokana" }
+    ]
+  },
+  "kaduna": {
+    "name": "Kaduna",
+    "cities": [
+      { "id": "kaduna_north", "name": "Kaduna North" },
+      { "id": "kaduna_south", "name": "Kaduna South" },
+      { "id": "zaria", "name": "Zaria" },
+      { "id": "kagarko", "name": "Kagarko" },
+      { "id": "kachia", "name": "Kachia" }
+    ]
+  },
+  "adamawa": {
+    "name": "Adamawa",
+    "cities": [
+      { "id": "yola_north", "name": "Yola North" },
+      { "id": "yola_south", "name": "Yola South" },
+      { "id": "girei", "name": "Girei" },
+      { "id": "demsa", "name": "Demsa" },
+      { "id": "jada", "name": "Jada" }
+    ]
+  },
+  "taraba": {
+    "name": "Taraba",
+    "cities": [
+      { "id": "jalingo", "name": "Jalingo" },
+      { "id": "wukari", "name": "Wukari" },
+      { "id": "ussa", "name": "Ussa" },
+      { "id": "donga", "name": "Donga" },
+      { "id": "karin_lamido", "name": "Karin-Lamido" }
+    ]
+  }
+}

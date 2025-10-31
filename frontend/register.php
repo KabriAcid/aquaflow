@@ -51,12 +51,24 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
-                        <label class="block text-sm font-medium">City</label>
-                        <input type="text" name="city" id="city" placeholder="Lagos" class="mt-1 block w-full border rounded px-3 py-2">
+                        <label class="block text-sm font-medium">State</label>
+                        <select name="state" id="state" class="mt-1 block w-full border rounded px-3 py-2">
+                            <option value="">Select state</option>
+                            <option value="lagos">Lagos</option>
+                            <option value="kano">Kano</option>
+                            <option value="rivers">Rivers</option>
+                            <option value="kaduna">Kaduna</option>
+                            <option value="adamawa">Adamawa</option>
+                            <option value="taraba">Taraba</option>
+                        </select>
+                        <p class="text-xs text-red-600 mt-1 hidden" data-error-for="state"></p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">State</label>
-                        <input type="text" name="state" id="state" placeholder="Rivers State" class="mt-1 block w-full border rounded px-3 py-2">
+                        <label class="block text-sm font-medium">City / LGA</label>
+                        <select name="city" id="city" class="mt-1 block w-full border rounded px-3 py-2">
+                            <option value="">Select city / LGA</option>
+                        </select>
+                        <p class="text-xs text-red-600 mt-1 hidden" data-error-for="city"></p>
                     </div>
                 </div>
 
@@ -116,8 +128,8 @@
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const address = document.getElementById('address').value.trim();
-            const city = document.getElementById('city').value.trim();
-            const state = document.getElementById('state').value.trim();
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
             const postal_code = document.getElementById('postal_code').value.trim();
             const password = document.getElementById('password').value;
             const confirm_password = document.getElementById('confirm_password').value;
@@ -143,6 +155,16 @@
             }
             if (password !== confirm_password) {
                 showError('confirm_password', 'Passwords do not match');
+                hasError = true;
+            }
+
+            // validate selects
+            if (!state) {
+                showError('state', 'Please select a state');
+                hasError = true;
+            }
+            if (!city) {
+                showError('city', 'Please select a city or LGA');
                 hasError = true;
             }
 
@@ -203,6 +225,86 @@
                 submitBtn.textContent = 'Register';
             }
         });
+    </script>
+    <script>
+        const stateSelect = document.getElementById('state');
+        const citySelect = document.getElementById('city');
+
+        // populate cities given the loaded mapping object
+        function populateCitiesFromData(stateKey, data) {
+            citySelect.innerHTML = '<option value="">Select city / LGA</option>';
+            if (!stateKey || !data || !data[stateKey]) return;
+            const list = data[stateKey].cities || [];
+            list.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.name;
+                citySelect.appendChild(opt);
+            });
+        }
+
+        // populate state select from data
+        function populateStates(data) {
+            // keep the first default option
+            stateSelect.innerHTML = '<option value="">Select state</option>';
+            for (const key of Object.keys(data)) {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = data[key].name || key;
+                stateSelect.appendChild(opt);
+            }
+        }
+
+        // fallback small mapping (used if API fetch fails)
+        const fallback = {
+            "lagos": {
+                "name": "Lagos",
+                "cities": [{
+                    "id": "ikeja",
+                    "name": "Ikeja"
+                }, {
+                    "id": "surulere",
+                    "name": "Surulere"
+                }]
+            },
+            "kano": {
+                "name": "Kano",
+                "cities": [{
+                    "id": "kano_municipal",
+                    "name": "Kano Municipal"
+                }, {
+                    "id": "gwale",
+                    "name": "Gwale"
+                }]
+            }
+        };
+
+        // Load mapping from backend API, then wire up events
+        async function loadStateCityData() {
+            try {
+                const res = await fetch('../backend/api/location/states_cities.php');
+                if (!res.ok) throw new Error('Failed to fetch');
+                const data = await res.json();
+                // If the data shape is nested object (our file), use it
+                if (data && typeof data === 'object' && Object.keys(data).length) {
+                    populateStates(data);
+                    stateSelect.addEventListener('change', () => populateCitiesFromData(stateSelect.value, data));
+                    // pre-populate if browser autofilled state
+                    if (stateSelect.value) populateCitiesFromData(stateSelect.value, data);
+                    return;
+                }
+            } catch (err) {
+                console.warn('Could not load states JSON, using fallback', err);
+            }
+
+            // fallback path
+            populateStates(fallback);
+            stateSelect.addEventListener('change', () => populateCitiesFromData(stateSelect.value, fallback));
+            if (stateSelect.value) populateCitiesFromData(stateSelect.value, fallback);
+        }
+
+        // start
+        loadStateCityData();
     </script>
 </body>
 
