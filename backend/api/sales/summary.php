@@ -1,55 +1,45 @@
 <?php
+// backend/api/sales/summary.php
 
-require_once __DIR__ . '/../../../config/database.php';
-require_once __DIR__ . '/../../utils/response.php';
-require_once __DIR__ . '/../../utils/auth.php';
+include_once '../../config/database.php';
+include_once '../../utils/response.php';
+include_once '../../utils/auth.php';
 
-set_json_headers();
+// Headers
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
 
-// Require sales_manager role
-$user_id = require_role(['sales_manager']);
+$conn = connect_db();
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
+// Require admin role for this endpoint
+require_role('admin');
 
 try {
-    $pdo = get_db_connection();
-    
-    // 1. Total Sales (Delivered Orders)
-    $stmt = $pdo->prepare("SELECT SUM(total_amount) as total_sales FROM orders WHERE status = 'delivered'");
-    $stmt->execute();
-    $total_sales = $stmt->fetchColumn() ?: 0;
+    // --- Get Total Sales --- //
+    // It's assumed that there is a table named 'orders' with a column 'total_amount'
+    $query_sales = "SELECT SUM(total_amount) as total_sales FROM orders";
+    $stmt_sales = $conn->prepare($query_sales);
+    $stmt_sales->execute();
+    $sales_row = $stmt_sales->fetch(PDO::FETCH_ASSOC);
+    $total_sales = $sales_row['total_sales'] ?? 0;
 
-    // 2. Total Orders
-    $stmt = $pdo->prepare("SELECT COUNT(*) as total_orders FROM orders");
-    $stmt->execute();
-    $total_orders = $stmt->fetchColumn() ?: 0;
+    // --- Get Total Orders --- //
+    $query_orders = "SELECT COUNT(id) as total_orders FROM orders";
+    $stmt_orders = $conn->prepare($query_orders);
+    $stmt_orders->execute();
+    $orders_row = $stmt_orders->fetch(PDO::FETCH_ASSOC);
+    $total_orders = $orders_row['total_orders'] ?? 0;
 
-    // 3. New Customers (e.g., in the last 30 days)
-    $stmt = $pdo->prepare("SELECT COUNT(*) as new_customers FROM users WHERE role = 'customer' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-    $stmt->execute();
-    $new_customers = $stmt->fetchColumn() ?: 0;
-
-    // 4. Pending Deliveries
-    $stmt = $pdo->prepare("SELECT COUNT(*) as pending_deliveries FROM orders WHERE status = 'out_for_delivery'");
-    $stmt->execute();
-    $pending_deliveries = $stmt->fetchColumn() ?: 0;
-
-    $summary_data = [
-        'total_sales' => $total_sales,
-        'total_orders' => $total_orders,
-        'new_customers' => $new_customers,
-        'pending_deliveries' => $pending_deliveries
+    // Prepare the summary data
+    $summary = [
+        'total_sales' => number_format((float)$total_sales, 2, '.', ''),
+        'total_orders' => (int)$total_orders,
     ];
 
-    success_response('Sales summary fetched successfully', $summary_data);
+    // Return a success response with the data
+    success_response($summary);
 
-} catch (PDOException $e) {
-    error_log('Database error fetching sales summary: ' . $e->getMessage());
-    error_response('A database error occurred while fetching the summary.', null, 500);
 } catch (Exception $e) {
-    error_log('Error fetching sales summary: ' . $e->getMessage());
-    error_response($e->getMessage(), null, $e->getCode() ?: 500);
+    // Return an error response if something goes wrong
+    error_response('Failed to retrieve sales summary: ' . $e->getMessage());
 }
