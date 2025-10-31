@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'sales') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'sales_manager') {
     header("Location: ../login.php");
     exit;
 }
@@ -24,7 +24,14 @@ $page_title = "Manage Customers";
         <?php include 'partials/topbar.php'; ?>
 
         <main class="flex-1 p-6">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Customers</h1>
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Manage Customers</h1>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="mb-6">
+                <input type="text" id="searchInput" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Search by name or email...">
+            </div>
 
             <!-- Customers Table -->
             <div class="bg-white p-8 rounded-lg shadow-md">
@@ -51,42 +58,62 @@ $page_title = "Manage Customers";
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
+            let allCustomers = [];
+
+            fetchCustomers();
+
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredCustomers = allCustomers.filter(customer => 
+                    customer.full_name.toLowerCase().includes(searchTerm) || 
+                    customer.email.toLowerCase().includes(searchTerm)
+                );
+                renderCustomers(filteredCustomers);
+            });
+
+            function fetchCustomers() {
+                fetch('../../backend/api/customers/get_all.php')
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '../login.php';
+                        return Promise.reject('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        allCustomers = data.data;
+                        renderCustomers(allCustomers);
+                    } else {
+                        alert('Failed to load customers: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    if (error !== 'Unauthorized') {
+                        console.error('Error fetching customers:', error);
+                        alert('An error occurred while fetching customers.');
+                    }
+                });
             }
 
-            fetch('../../backend/api/customers/get_all.php', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const tableBody = document.getElementById('customersTableBody');
-                    tableBody.innerHTML = ''; // Clear existing rows
-                    data.data.forEach(customer => {
-                        const row = `
-                            <tr>
-                                <td class="py-2 px-4 border-b">${customer.id}</td>
-                                <td class="py-2 px-4 border-b">${customer.name}</td>
-                                <td class="py-2 px-4 border-b">${customer.email}</td>
-                                <td class="py-2 px-4 border-b">${customer.phone}</td>
-                                <td class="py-2 px-4 border-b"><a href="customer-details.php?id=${customer.id}" class="text-blue-500 hover:underline">View Details</a></td>
-                            </tr>
-                        `;
-                        tableBody.innerHTML += row;
-                    });
-                } else {
-                    alert('Failed to load customers: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching customers:', error);
-                alert('An error occurred while fetching customers.');
-            });
+            function renderCustomers(customers) {
+                const tableBody = document.getElementById('customersTableBody');
+                tableBody.innerHTML = ''; // Clear existing rows
+                customers.forEach(customer => {
+                    const row = `
+                        <tr>
+                            <td class="py-2 px-4 border-b">${customer.id}</td>
+                            <td class="py-2 px-4 border-b">${customer.full_name}</td>
+                            <td class="py-2 px-4 border-b">${customer.email}</td>
+                            <td class="py-2 px-4 border-b">${customer.phone}</td>
+                            <td class="py-2 px-4 border-b">
+                                <a href="customer-details.php?id=${customer.id}" class="text-blue-500 hover:underline">View Details</a>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }
         });
     </script>
 

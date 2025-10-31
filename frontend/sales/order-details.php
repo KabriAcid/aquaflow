@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'sales') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'sales_manager') {
     header("Location: ../login.php");
     exit;
 }
@@ -46,21 +46,16 @@ if (!$order_id) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
-
             const orderId = <?php echo json_encode($order_id); ?>;
 
-            fetch(`../../backend/api/orders/get_by_id.php?id=${orderId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            fetch(`../../backend/api/orders/get_single.php?id=${orderId}`)
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = '../login.php';
+                    return Promise.reject('Unauthorized');
                 }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const order = data.data;
@@ -107,18 +102,24 @@ if (!$order_id) {
                 }
             })
             .catch(error => {
-                console.error('Error fetching order details:', error);
-                alert('An error occurred while fetching order details.');
+                if (error !== 'Unauthorized') {
+                    console.error('Error fetching order details:', error);
+                    alert('An error occurred while fetching order details.');
+                }
             });
 
             function getStatusClass(status) {
-                switch (status.toLowerCase()) {
+                 switch (status.toLowerCase()) {
                     case 'pending':
                         return 'bg-yellow-500';
                     case 'delivered':
                         return 'bg-green-500';
                     case 'cancelled':
                         return 'bg-red-500';
+                    case 'processing':
+                        return 'bg-blue-500';
+                    case 'out_for_delivery':
+                        return 'bg-purple-500';
                     default:
                         return 'bg-gray-500';
                 }

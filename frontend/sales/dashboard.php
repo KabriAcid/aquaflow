@@ -1,6 +1,8 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'sales') {
+// Check if the user is a sales manager
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'sales_manager') {
+    // Redirect to login if not a sales manager
     header("Location: ../login.php");
     exit;
 }
@@ -56,19 +58,17 @@ $page_title = "Sales Dashboard";
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
+            // The PHP session check at the top handles authentication.
+            // The browser will automatically send the session cookie with the fetch request.
 
-            // Fetch dashboard summary data
-            fetch('../../backend/api/sales/summary.php', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            fetch('../../backend/api/sales/summary.php')
+            .then(response => {
+                if (response.status === 401) { // Unauthorized
+                    window.location.href = '../login.php';
+                    return Promise.reject('Unauthorized');
                 }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     document.getElementById('totalSales').textContent = `₦${parseFloat(data.data.total_sales).toLocaleString()}`;
@@ -80,8 +80,10 @@ $page_title = "Sales Dashboard";
                 }
             })
             .catch(error => {
-                console.error('Error fetching dashboard data:', error);
-                alert('An error occurred while fetching dashboard data.');
+                if (error !== 'Unauthorized') {
+                    console.error('Error fetching dashboard data:', error);
+                    alert('An error occurred while fetching dashboard data.');
+                }
             });
         });
     </script>

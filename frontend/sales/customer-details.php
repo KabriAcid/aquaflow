@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'sales') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'sales_manager') {
     header("Location: ../login.php");
     exit;
 }
@@ -66,32 +66,27 @@ if (!$customer_id) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
-
             const customerId = <?php echo json_encode($customer_id); ?>;
 
             // Fetch customer details
-            fetch(`../../backend/api/customers/get_by_id.php?id=${customerId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            fetch(`../../backend/api/customers/get_single.php?id=${customerId}`)
+            .then(response => {
+                if (response.status === 401) {
+                    window.location.href = '../login.php';
+                    return Promise.reject('Unauthorized');
                 }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const customer = data.data;
                     const customerDetailsDiv = document.getElementById('customerDetails');
                     customerDetailsDiv.innerHTML = `
                         <div class="grid grid-cols-2 gap-4">
-                            <div><strong>Name:</strong> ${customer.name}</div>
+                            <div><strong>Name:</strong> ${customer.full_name}</div>
                             <div><strong>Email:</strong> ${customer.email}</div>
                             <div><strong>Phone:</strong> ${customer.phone}</div>
-                            <div><strong>Address:</strong> ${customer.address}</div>
+                            <div><strong>Address:</strong> ${customer.address || 'N/A'}</div>
                         </div>
                     `;
                 } else {
@@ -99,20 +94,23 @@ if (!$customer_id) {
                 }
             })
             .catch(error => {
-                console.error('Error fetching customer details:', error);
-                alert('An error occurred while fetching customer details.');
+                if (error !== 'Unauthorized') {
+                    console.error('Error fetching customer details:', error);
+                    alert('An error occurred while fetching customer details.');
+                }
             });
 
-            // Fetch order history
-            fetch(`../../backend/api/orders/get_by_customer.php?customer_id=${customerId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            // Fetch order history for this customer
+            fetch(`../../backend/api/orders/get_all.php?customer_id=${customerId}`)
+            .then(response => {
+                if (response.status === 401) {
+                    // Don't redirect here, just show no orders
+                    return Promise.reject('Unauthorized');
                 }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.success && data.data.length > 0) {
                     const tableBody = document.getElementById('orderHistoryTableBody');
                     tableBody.innerHTML = ''; // Clear existing rows
                     data.data.forEach(order => {
@@ -129,23 +127,28 @@ if (!$customer_id) {
                         tableBody.innerHTML += row;
                     });
                 } else {
-                    // No need to alert, as it might be that the customer has no orders
                     document.getElementById('orderHistoryTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4">No orders found for this customer.</td></tr>';
                 }
             })
             .catch(error => {
-                console.error('Error fetching order history:', error);
-                alert('An error occurred while fetching order history.');
+                 if (error !== 'Unauthorized') {
+                    console.error('Error fetching order history:', error);
+                    document.getElementById('orderHistoryTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4">Error loading order history.</td></tr>';
+                }
             });
 
             function getStatusClass(status) {
-                switch (status.toLowerCase()) {
+                 switch (status.toLowerCase()) {
                     case 'pending':
                         return 'bg-yellow-500';
                     case 'delivered':
                         return 'bg-green-500';
                     case 'cancelled':
                         return 'bg-red-500';
+                    case 'processing':
+                        return 'bg-blue-500';
+                    case 'out_for_delivery':
+                        return 'bg-purple-500';
                     default:
                         return 'bg-gray-500';
                 }
