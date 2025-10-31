@@ -10,8 +10,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
 
     <!-- Local styles (tailwind.css optional prebuilt + custom style) -->
-    <link rel="stylesheet" href="css/tailwind.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="frontend/css/tailwind.css">
+    <link rel="stylesheet" href="frontend/css/style.css">
 </head>
 
 <body class="bg-gray-50 text-gray-800">
