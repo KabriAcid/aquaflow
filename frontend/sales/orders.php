@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'sales') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'sales_manager') {
     header("Location: ../login.php");
     exit;
 }
@@ -24,7 +24,21 @@ $page_title = "Manage Orders";
         <?php include 'partials/topbar.php'; ?>
 
         <main class="flex-1 p-6">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Manage Orders</h1>
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">Manage Orders</h1>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="flex justify-between items-center mb-6">
+                <input type="text" id="searchInput" class="w-1/2 p-3 border border-gray-300 rounded-lg" placeholder="Search by Customer Name or Order ID...">
+                <select id="statusFilter" class="w-1/4 p-3 border border-gray-300 rounded-lg">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
 
             <!-- Orders Table -->
             <div class="bg-white p-8 rounded-lg shadow-md">
@@ -52,57 +66,84 @@ $page_title = "Manage Orders";
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
+            let allOrders = [];
+
+            fetchOrders();
+
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+            function applyFilters() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const statusFilter = document.getElementById('statusFilter').value;
+
+                const filteredOrders = allOrders.filter(order => {
+                    const customerName = order.customer_name ? order.customer_name.toLowerCase() : '';
+                    const orderId = order.id.toString();
+                    const matchesSearch = customerName.includes(searchTerm) || orderId.includes(searchTerm);
+                    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+                    return matchesSearch && matchesStatus;
+                });
+
+                renderOrders(filteredOrders);
             }
 
-            fetch('../../backend/api/orders/get_all.php', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const tableBody = document.getElementById('ordersTableBody');
-                    tableBody.innerHTML = ''; // Clear existing rows
-                    data.data.forEach(order => {
-                        const statusClass = getStatusClass(order.status);
-                        const row = `
-                            <tr>
-                                <td class="py-2 px-4 border-b">${order.order_number}</td>
-                                <td class="py-2 px-4 border-b">${order.customer_name}</td>
-                                <td class="py-2 px-4 border-b">${new Date(order.order_date).toLocaleDateString()}</td>
-                                <td class="py-2 px-4 border-b">₦${parseFloat(order.total_amount).toFixed(2)}</td>
-                                <td class="py-2 px-4 border-b"><span class="${statusClass} text-white py-1 px-3 rounded-full text-xs">${order.status}</span></td>
-                                <td class="py-2 px-4 border-b"><a href="order-details.php?id=${order.id}" class="text-blue-500 hover:underline">View</a></td>
-                            </tr>
-                        `;
-                        tableBody.innerHTML += row;
-                    });
-                } else {
-                    alert('Failed to load orders: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching orders:', error);
-                alert('An error occurred while fetching orders.');
-            });
+            function fetchOrders() {
+                fetch('../../backend/api/orders/get_all.php')
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '../login.php';
+                        return Promise.reject('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        allOrders = data.data;
+                        renderOrders(allOrders);
+                    } else {
+                        alert('Failed to load orders: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    if (error !== 'Unauthorized') {
+                        console.error('Error fetching orders:', error);
+                        alert('An error occurred while fetching orders.');
+                    }
+                });
+            }
 
-            function getStatusClass(status) {
-                switch (status.toLowerCase()) {
-                    case 'pending':
-                        return 'bg-yellow-500';
-                    case 'delivered':
-                        return 'bg-green-500';
-                    case 'cancelled':
-                        return 'bg-red-500';
-                    default:
-                        return 'bg-gray-500';
+            function renderOrders(orders) {
+                const tableBody = document.getElementById('ordersTableBody');
+                tableBody.innerHTML = ''; // Clear existing rows
+                orders.forEach(order => {
+                    const row = `
+                        <tr>
+                            <td class="py-2 px-4 border-b">${order.id}</td>
+                            <td class="py-2 px-4 border-b">${order.customer_name || 'N/A'}</td>
+                            <td class="py-2 px-4 border-b">${new Date(order.created_at).toLocaleDateString()}</td>
+                            <td class="py-2 px-4 border-b">₦${parseFloat(order.total_amount).toFixed(2)}</td>
+                            <td class="py-2 px-4 border-b">
+                                <span class="px-2 py-1 font-semibold leading-tight text-white bg-${getStatusColor(order.status)} rounded-full">
+                                    ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                </span>
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                <a href="order-details.php?id=${order.id}" class="text-blue-500 hover:underline">View Details</a>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            }
+
+            function getStatusColor(status) {
+                switch (status) {
+                    case 'pending': return 'yellow-500';
+                    case 'shipped': return 'blue-500';
+                    case 'delivered': return 'green-500';
+                    case 'cancelled': return 'red-500';
+                    default: return 'gray-500';
                 }
             }
         });
