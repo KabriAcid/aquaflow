@@ -17,6 +17,10 @@
 <body class="bg-gray-50 text-gray-800">
   <div class="min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-md bg-white rounded p-6 multi-shadow">
+      <div class="flex items-center justify-center py-6">
+        <img src="../favicon.png" alt="Aquaflow" class="h-12">
+        <span class="text-blue-500 font-semibold font-2xl block text-center">AquaFlow</span>
+      </div>
       <h1 class="text-2xl font-semibold mb-2">Sign in to your account</h1>
       <p class="form-note mb-4">Enter your credentials to access your dashboard.</p>
 

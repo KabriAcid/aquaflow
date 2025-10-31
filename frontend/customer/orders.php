@@ -86,17 +86,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
-            let allOrders = [];
-
-            fetch('../../backend/api/orders/get_all.php', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            // detect session via server-side endpoint
+            fetch('../../backend/api/auth/me.php', { credentials: 'same-origin' })
+            .then(res => res.json())
+            .then(userData => {
+                if (!userData.success) {
+                    window.location.href = '../login.php';
+                    return Promise.reject('Not authenticated');
                 }
+                // fetch orders using session
+                return fetch('../../backend/api/orders/get_all.php', { credentials: 'same-origin' });
             })
             .then(res => res.json())
             .then(data => {
@@ -106,7 +105,12 @@
                 } else {
                      document.getElementById('ordersTable').innerHTML = '<tr><td colspan="5" class="text-center py-4">Could not load orders.</td></tr>';
                 }
+            })
+            .catch(err => {
+                if (typeof err === 'string') return; // handled redirect
+                console.error('Failed to load orders:', err);
             });
+            let allOrders = [];
             
             const tabs = document.querySelectorAll('[data-tab]');
             tabs.forEach(tab => {
@@ -160,9 +164,12 @@
             }
 
              document.getElementById('logoutBtn').addEventListener('click', function() {
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userName');
-                window.location.href = '../login.php';
+                fetch('../../backend/api/auth/logout.php', { method: 'POST', credentials: 'same-origin' })
+                .then(res => res.json())
+                .then(() => {
+                    window.location.href = '../login.php';
+                })
+                .catch(() => { window.location.href = '../login.php'; });
             });
         });
 

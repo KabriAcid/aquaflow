@@ -17,6 +17,10 @@
 <body class="bg-gray-50 text-gray-800">
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-lg bg-white rounded multi-shadow p-6">
+            <div class="flex items-center justify-center py-6">
+                <img src="../favicon.png" alt="Aquaflow" class="h-12">
+                <span class="text-blue-500 font-semibold font-2xl block text-center">AquaFlow</span>
+            </div>
             <h1 class="text-2xl font-semibold mb-4">Create an account</h1>
             <form id="registerForm" novalidate>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

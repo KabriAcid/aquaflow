@@ -20,9 +20,13 @@
             <div class="flex justify-between">
                 <div class="flex space-x-7">
                     <div>
-                        <a href="index.php" class="flex items-center py-4 px-2">
-                            <span class="font-bold text-gray-700 text-lg">Aquaflow</span>
-                        </a>
+                        <!-- AAdd the favicon brand icon  -->
+                        <div class="flex items-center">
+                            <img src="favicon.png" alt="Aquaflow" class="h-8">
+                            <a href="index.php" class="flex items-center py-4 px-2">
+                                <span class="font-bold text-gray-700 text-lg">Aquaflow</span>
+                            </a>
+                        </div>
                     </div>
                     <div class="hidden md:flex items-center space-x-1">
                         <a href="index.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Home</a>

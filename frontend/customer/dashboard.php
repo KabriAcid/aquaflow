@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="hidden md:flex items-center space-x-3 ">
-                     <a href="profile.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Profile</a>
+                    <a href="profile.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Profile</a>
                     <a href="#" id="logoutBtn" class="py-2 px-2 font-medium text-white bg-blue-500 rounded hover:bg-blue-400 transition duration-300">Log Out</a>
                 </div>
             </div>
@@ -83,31 +83,40 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                window.location.href = '../login.php';
-                return;
-            }
+            // Detect session by calling the server-side me endpoint. This uses the PHP session cookie.
+            fetch('../../backend/api/auth/me.php', {
+                    credentials: 'same-origin'
+                })
+                .then(res => res.json())
+                .then(userData => {
+                    if (!userData.success) {
+                        // not authenticated -> redirect to login
+                        window.location.href = '../login.php';
+                        return Promise.reject('Not authenticated');
+                    }
 
-            const userName = localStorage.getItem('userName');
-            if (userName) {
-                document.getElementById('userName').textContent = userName;
-            }
+                    // show user's name
+                    const profile = userData.data || {};
+                    if (profile.full_name) document.getElementById('userName').textContent = profile.full_name;
 
-            fetch('../../backend/api/orders/get_all.php', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.data) {
-                    populateDashboard(data.data);
-                } else {
-                    console.error('Failed to fetch dashboard data:', data.message);
-                }
-            })
-            .catch(err => console.error('Error fetching dashboard data:', err));
+                    // now fetch orders (server endpoints should read session to determine user)
+                    return fetch('../../backend/api/orders/get_all.php', {
+                        credentials: 'same-origin'
+                    });
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data) return;
+                    if (data.success && data.data) {
+                        populateDashboard(data.data);
+                    } else {
+                        console.error('Failed to fetch dashboard data:', data.message);
+                    }
+                })
+                .catch(err => {
+                    if (typeof err === 'string') return; // handled earlier
+                    console.error('Error fetching dashboard data:', err);
+                });
 
             function populateDashboard(orders) {
                 const totalOrders = orders.length;
@@ -119,7 +128,7 @@
                 document.getElementById('totalSpent').textContent = `₦${totalSpent.toFixed(2)}`;
 
                 const recentOrdersTable = document.getElementById('recentOrdersTable');
-                recentOrdersTable.innerHTML = ''; 
+                recentOrdersTable.innerHTML = '';
                 const recentOrders = orders.slice(0, 5);
 
                 if (recentOrders.length === 0) {
@@ -147,16 +156,21 @@
                 });
             }
 
-             function getStatusColor(status) {
+            function getStatusColor(status) {
                 switch (status) {
-                    case 'pending': return 'bg-yellow-200 text-yellow-800';
-                    case 'processing': return 'bg-blue-200 text-blue-800';
-                    case 'delivered': return 'bg-green-200 text-green-800';
-                    case 'cancelled': return 'bg-red-200 text-red-800';
-                    default: return 'bg-gray-200 text-gray-800';
+                    case 'pending':
+                        return 'bg-yellow-200 text-yellow-800';
+                    case 'processing':
+                        return 'bg-blue-200 text-blue-800';
+                    case 'delivered':
+                        return 'bg-green-200 text-green-800';
+                    case 'cancelled':
+                        return 'bg-red-200 text-red-800';
+                    default:
+                        return 'bg-gray-200 text-gray-800';
                 }
             }
-            
+
             document.getElementById('logoutBtn').addEventListener('click', function() {
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('userName');
