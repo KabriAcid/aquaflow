@@ -12,6 +12,7 @@ $page_title = "Manage Sales Managers";
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,8 +20,8 @@ $page_title = "Manage Sales Managers";
     <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 flex text-gray-800">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -34,7 +35,7 @@ $page_title = "Manage Sales Managers";
                 <button id="add-manager-btn" class="btn-primary">Add Sales Manager</button>
             </div>
 
-            <div class="bg-card p-6 rounded-lg shadow-md">
+            <div class="bg-white p-6 rounded-lg multi-shadow">
                 <table class="w-full" id="sales-managers-table">
                     <thead>
                         <tr class="border-b">
@@ -81,4 +82,5 @@ $page_title = "Manage Sales Managers";
     <script src="../js/admin-sales-managers.js"></script>
 
 </body>
+
 </html>
