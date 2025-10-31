@@ -21,9 +21,7 @@ $page_title = "Manage Sales Managers";
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
-
-<body class="bg-gray-100 flex text-gray-800">
-
+<body class="bg-gray-50 flex text-gray-800">
     <?php include 'partials/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col">
@@ -31,7 +29,7 @@ $page_title = "Manage Sales Managers";
 
         <main class="flex-1 p-6">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Sales Managers</h3>
+                <h1 class="text-3xl font-bold text-gray-800">Sales Managers</h1>
                 <button id="add-manager-btn" class="btn-primary">Add Sales Manager</button>
             </div>
 
@@ -39,9 +37,9 @@ $page_title = "Manage Sales Managers";
                 <table class="w-full" id="sales-managers-table">
                     <thead>
                         <tr class="border-b">
-                            <th class="text-left p-3">Name</th>
-                            <th class="text-left p-3">Email</th>
-                            <th class="text-left p-3">Actions</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Name</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Email</th>
+                            <th class="text-left p-3 font-semibold text-gray-600">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,19 +54,19 @@ $page_title = "Manage Sales Managers";
 
     <!-- Add Sales Manager Modal -->
     <div id="add-manager-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center hidden">
-        <div class="bg-card p-8 rounded-lg shadow-xl w-full max-w-md">
+        <div class="bg-white p-8 rounded-lg multi-shadow w-full max-w-md">
             <h2 class="text-2xl font-bold mb-6">Add Sales Manager</h2>
             <form id="add-manager-form">
                 <div class="mb-4">
-                    <label for="name" class="block text-sm font-medium text-muted-foreground">Name</label>
+                    <label for="name" class="block text-sm font-medium text-gray-600">Name</label>
                     <input type="text" id="name" name="name" class="form-input mt-1 block w-full" required>
                 </div>
                 <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-muted-foreground">Email</label>
+                    <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
                     <input type="email" id="email" name="email" class="form-input mt-1 block w-full" required>
                 </div>
                 <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-muted-foreground">Password</label>
+                    <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
                     <input type="password" id="password" name="password" class="form-input mt-1 block w-full" required>
                 </div>
                 <div class="flex justify-end gap-4">
