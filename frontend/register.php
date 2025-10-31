@@ -8,6 +8,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Register — Aquaflow</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../favicon.png">
     <link rel="stylesheet" href="css/tailwind.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -20,53 +22,53 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium">Full name</label>
-                        <input type="text" name="full_name" id="full_name" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        <input type="text" name="full_name" id="full_name" placeholder="John Doe" class="mt-1 block w-full border rounded px-3 py-2" required>
                         <p class="text-xs text-red-600 mt-1 hidden" data-error-for="full_name"></p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium">Email</label>
-                        <input type="email" name="email" id="email" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        <input type="email" name="email" id="email" placeholder="you@example.com" class="mt-1 block w-full border rounded px-3 py-2" required>
                         <p class="text-xs text-red-600 mt-1 hidden" data-error-for="email"></p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium">Phone</label>
-                        <input type="tel" name="phone" id="phone" class="mt-1 block w-full border rounded px-3 py-2">
+                        <input type="tel" name="phone" id="phone" placeholder="+2348000000000" class="mt-1 block w-full border rounded px-3 py-2">
                         <p class="text-xs text-red-600 mt-1 hidden" data-error-for="phone"></p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium">Postal code</label>
-                        <input type="text" name="postal_code" id="postal_code" class="mt-1 block w-full border rounded px-3 py-2">
+                        <input type="text" name="postal_code" id="postal_code" placeholder="100001" class="mt-1 block w-full border rounded px-3 py-2">
                         <p class="text-xs text-red-600 mt-1 hidden" data-error-for="postal_code"></p>
                     </div>
                 </div>
 
                 <div class="mt-4">
                     <label class="block text-sm font-medium">Address</label>
-                    <textarea name="address" id="address" rows="2" class="mt-1 block w-full border rounded px-3 py-2"></textarea>
+                    <textarea name="address" id="address" rows="2" placeholder="Street address, area" class="mt-1 block w-full border rounded px-3 py-2"></textarea>
                     <p class="text-xs text-red-600 mt-1 hidden" data-error-for="address"></p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
                         <label class="block text-sm font-medium">City</label>
-                        <input type="text" name="city" id="city" class="mt-1 block w-full border rounded px-3 py-2">
+                        <input type="text" name="city" id="city" placeholder="Lagos" class="mt-1 block w-full border rounded px-3 py-2">
                     </div>
                     <div>
                         <label class="block text-sm font-medium">State</label>
-                        <input type="text" name="state" id="state" class="mt-1 block w-full border rounded px-3 py-2">
+                        <input type="text" name="state" id="state" placeholder="Rivers State" class="mt-1 block w-full border rounded px-3 py-2">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
                         <label class="block text-sm font-medium">Password</label>
-                        <input type="password" name="password" id="password" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        <input type="password" name="password" id="password" placeholder="At least 8 characters" class="mt-1 block w-full border rounded px-3 py-2" required>
                         <p class="text-xs text-red-600 mt-1 hidden" data-error-for="password"></p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium">Confirm Password</label>
-                        <input type="password" name="confirm_password" id="confirm_password" class="mt-1 block w-full border rounded px-3 py-2" required>
+                        <input type="password" name="confirm_password" id="confirm_password" placeholder="Repeat your password" class="mt-1 block w-full border rounded px-3 py-2" required>
                         <p class="text-xs text-red-600 mt-1 hidden" data-error-for="confirm_password"></p>
                     </div>
                 </div>

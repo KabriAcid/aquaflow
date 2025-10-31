@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - Aquaflow</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <link rel="stylesheet" href="css/tailwind.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -39,9 +41,8 @@
                             stroke-linejoin="round"
                             stroke-width="2"
                             viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                        <path d="M4 6h16M4 12h16m-7 6h7"></path>
+                            stroke="currentColor">
+                            <path d="M4 6h16M4 12h16m-7 6h7"></path>
                         </svg>
                     </button>
                 </div>

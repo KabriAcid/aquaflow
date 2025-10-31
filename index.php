@@ -6,24 +6,58 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Aquaflow — Water & Beverage Factory Management</title>
     <meta name="description" content="Aquaflow — Manage products, orders, production and inventory for a water & beverage factory">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
 
     <!-- Local styles (tailwind.css optional prebuilt + custom style) -->
-    <link rel="stylesheet" href="frontend/css/tailwind.css">
-    <link rel="stylesheet" href="frontend/css/style.css">
+    <link rel="stylesheet" href="css/tailwind.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body class="bg-gray-50 text-gray-800">
-    <header class="bg-white shadow-sm">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-            <a href="/aquaflow/index.php" class="text-xl font-semibold">Aquaflow</a>
-            <nav class="space-x-4">
-                <a href="frontend/products.php" class="text-gray-600 hover:text-blue-600">Products</a>
-                <a href="frontend/contact.php" class="text-gray-600 hover:text-blue-600">Contact</a>
-                <a href="frontend/login.php" class="text-gray-600 hover:text-blue-600">Login</a>
-                <a href="frontend/register.php" class="bg-blue-600 text-white px-3 py-1 rounded">Register</a>
-            </nav>
+    <nav class="bg-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <div>
+                        <a href="index.php" class="flex items-center py-4 px-2">
+                            <span class="font-bold text-gray-700 text-lg">Aquaflow</span>
+                        </a>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a href="index.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Home</a>
+                        <a href="frontend/products.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Products</a>
+                        <a href="frontend/contact.php" class="py-4 px-2 text-gray-500 font-semibold hover:text-blue-500 transition duration-300">Contact</a>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-3 ">
+                    <a href="frontend/login.php" class="py-2 px-2 font-medium text-gray-500 rounded hover:bg-blue-500 hover:text-white transition duration-300">Log In</a>
+                    <a href="frontend/register.php" class="py-2 px-2 font-medium text-white bg-blue-500 rounded hover:bg-blue-400 transition duration-300">Register</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="outline-none mobile-menu-button">
+                        <svg class=" w-6 h-6 text-gray-500 hover:text-blue-500 "
+                            x-show="!showMenu"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
-    </header>
+        <div class="hidden mobile-menu">
+            <ul class="">
+                <li><a href="index.php" class="block text-sm px-2 py-4 text-white bg-blue-500 font-semibold">Home</a></li>
+                <li><a href="frontend/products.php" class="block text-sm px-2 py-4 hover:bg-blue-500 transition duration-300">Products</a></li>
+                <li><a href="frontend/contact.php" class="block text-sm px-2 py-4 hover:bg-blue-500 transition duration-300">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
 
     <main class="max-w-6xl mx-auto px-4 py-10">
         <!-- Section 1: Hero -->
