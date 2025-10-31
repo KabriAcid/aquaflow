@@ -5,9 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - Aquaflow</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../favicon.png">
-    <link rel="stylesheet" href="css/tailwind.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -41,8 +39,9 @@
                             stroke-linejoin="round"
                             stroke-width="2"
                             viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path d="M4 6h16M4 12h16m-7 6h7"></path>
+                            stroke="currentColor"
+                        >
+                        <path d="M4 6h16M4 12h16m-7 6h7"></path>
                         </svg>
                     </button>
                 </div>
@@ -61,29 +60,33 @@
         <div class="max-w-6xl mx-auto px-4">
             <div class="bg-white p-8 rounded-lg shadow-md">
                 <h1 class="text-3xl font-bold mb-6 text-gray-800">Contact Us</h1>
-                <p class="text-gray-600 mb-8">We'd love to hear from you. Please fill out the form below and we'll get back to you as soon as possible.</p>
+                <p class="text-gray-600 mb-8">We\'d love to hear from you. Please fill out the form below and we\'ll get back to you as soon as possible.</p>
 
-                <form action="#" method="POST">
+                <form id="contactForm" novalidate>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                            <input type="text" name="name" id="name" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Your Name">
+                            <input type="text" name="name" id="name" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Your Name" required>
+                             <p class="text-xs text-red-600 mt-1 hidden" data-error-for="name"></p>
                         </div>
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="you@example.com">
+                            <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="you@example.com" required>
+                            <p class="text-xs text-red-600 mt-1 hidden" data-error-for="email"></p>
                         </div>
                         <div class="md:col-span-2">
                             <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
-                            <textarea name="message" id="message" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Your message..."></textarea>
+                            <textarea name="message" id="message" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Your message..." required></textarea>
+                            <p class="text-xs text-red-600 mt-1 hidden" data-error-for="message"></p>
                         </div>
                     </div>
 
                     <div class="mt-6">
-                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <button id="submitBtn" type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Send Message
                         </button>
                     </div>
+                     <div id="formMessage" class="mt-3 text-sm"></div>
                 </form>
             </div>
         </div>
@@ -100,6 +103,100 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Simple utilities
+        const showError = (field, message) => {
+            const el = document.querySelector('[data-error-for="' + field + '"]');
+            if (el) {
+                el.textContent = message;
+                el.classList.remove('hidden');
+            }
+        };
+        const clearErrors = () => {
+            document.querySelectorAll('[data-error-for]').forEach(e => {
+                e.textContent = '';
+                e.classList.add('hidden');
+            });
+            const msg = document.getElementById('formMessage');
+            if (msg) {
+                msg.textContent = '';
+                msg.className = 'mt-3 text-sm';
+            }
+        };
+
+        const validateEmail = (email) => {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        };
+
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            let hasError = false;
+            if (!name) {
+                showError('name', 'Name is required');
+                hasError = true;
+            }
+            if (!email) {
+                showError('email', 'Email is required');
+                hasError = true;
+            } else if (!validateEmail(email)) {
+                showError('email', 'Invalid email address');
+                hasError = true;
+            }
+            if (!message) {
+                showError('message', 'Message is required');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            const payload = { name, email, message };
+
+            try {
+                // Default endpoint: backend API relative to frontend folder
+                const res = await fetch('../backend/api/contact/submit.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                const msgEl = document.getElementById('formMessage');
+                if (res.ok && data && data.success) {
+                    msgEl.textContent = data.message || 'Your message has been sent successfully.';
+                    msgEl.className = 'mt-3 text-sm text-green-600';
+                    document.getElementById('contactForm').reset();
+                } else {
+                    const message = (data && data.message) ? data.message : 'Failed to send message.';
+                    msgEl.textContent = message;
+                    msgEl.className = 'mt-3 text-sm text-red-600';
+                     if (data && data.errors) {
+                        for (const key in data.errors) {
+                            if (data.errors.hasOwnProperty(key)) showError(key, data.errors[key]);
+                        }
+                    }
+                }
+            } catch (err) {
+                const msgEl = document.getElementById('formMessage');
+                msgEl.textContent = 'A network or server error occurred. Please try again later.';
+                msgEl.className = 'mt-3 text-sm text-red-600';
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+            }
+        });
+    </script>
 
 </body>
 
