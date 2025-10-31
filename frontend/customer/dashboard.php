@@ -102,8 +102,8 @@
                     const profile = userData.data || {};
                     if (profile.full_name) document.getElementById('userName').textContent = profile.full_name;
 
-                    // now fetch orders (server endpoints should read session to determine user)
-                    return fetch('../../backend/api/orders/get_all.php', {
+                    // now fetch dashboard data (server reads session to determine user)
+                    return fetch('../../backend/api/dashboard/customer.php', {
                         credentials: 'same-origin'
                     });
                 })
@@ -111,7 +111,14 @@
                 .then(data => {
                     if (!data) return;
                     if (data.success && data.data) {
-                        populateDashboard(data.data);
+                        // data.data contains { orders: [...], stats: { total_orders, pending_orders, total_spent } }
+                        const orders = data.data.orders || [];
+                        const stats = data.data.stats || {};
+                        // populate numeric cards from stats
+                        document.getElementById('totalOrders').textContent = stats.total_orders ?? orders.length;
+                        document.getElementById('pendingOrders').textContent = stats.pending_orders ?? orders.filter(o => o.status === 'pending').length;
+                        document.getElementById('totalSpent').textContent = `₦${(stats.total_spent ?? orders.reduce((a,o)=>a+parseFloat(o.total_amount||0),0)).toFixed(2)}`;
+                        populateDashboard(orders);
                     } else {
                         console.error('Failed to fetch dashboard data:', data.message);
                     }

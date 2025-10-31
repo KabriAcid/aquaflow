@@ -1,9 +1,27 @@
--- =============================================
--- Water and Beverage Factory Management System
--- Database Schema (No Foreign Keys)
--- =============================================
+-- Reset (drop) all aquaflow tables and recreate schema + seed sample data
+-- WARNING: This will destroy existing data in the aquaflow database. Run only on dev.
 
--- Create Database
+-- Disable foreign key checks to allow clean drops (no FKs in schema but safe)
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Drop tables in dependency-safe order (reverse of creation)
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS activity_logs;
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS production_schedule;
+DROP TABLE IF EXISTS material_usage;
+DROP TABLE IF EXISTS materials;
+DROP TABLE IF EXISTS production;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS inventory;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS users;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Create database and use it
 CREATE DATABASE IF NOT EXISTS aquaflow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE aquaflow;
 
@@ -273,7 +291,7 @@ INSERT INTO settings (setting_key, setting_value, setting_type) VALUES
 ('payment_methods', 'credit_card,debit_card,bank_transfer,cash_on_delivery', 'payment');
 
 -- =============================================
--- Insert Sample Products
+-- Insert Sample Products (core set)
 -- =============================================
 INSERT INTO products (name, category, size, volume, unit_price, minimum_order_quantity, description, status) VALUES
 ('Pure Life Water', 'bottled_water', 'Small', '500ml', 50.00, 50, 'Pure drinking water in 500ml bottles', 'active'),
@@ -314,5 +332,41 @@ INSERT INTO materials (material_name, unit, current_stock, reorder_level, unit_c
 ('Preservatives', 'Kilograms', 100.00, 20.00, 500.00, 'Chemical Suppliers');
 
 -- =============================================
--- End of Schema
+-- Insert sample products + inventory from sample_products.sql
 -- =============================================
+-- (The following INSERTs add extra demo products and inventory rows)
+INSERT INTO products (name, category, size, volume, unit_price, minimum_order_quantity, description, status) VALUES
+('Sparkling Water - Lime', 'bottled_water', 'Regular', '500ml', 75.00, 24, 'Sparkling water with a hint of lime', 'active'),
+('Sparkling Water - Berry', 'bottled_water', 'Regular', '500ml', 80.00, 24, 'Sparkling water with mixed berry flavor', 'active'),
+('Mineral Water - Still', 'bottled_water', 'Large', '2L', 180.00, 12, 'Mineral still water - 2L bottle', 'active'),
+('Natural Spring Water', 'bottled_water', 'Small', '330ml', 40.00, 60, 'Small 330ml natural spring water', 'active'),
+('Tropical Punch', 'beverage', 'Regular', '500ml', 160.00, 24, 'Tropical fruit punch drink', 'active'),
+('Iced Tea - Lemon', 'beverage', 'Regular', '500ml', 140.00, 24, 'Refreshing iced lemon tea', 'active'),
+('ElectroBoost - Mango', 'beverage', 'Standard', '330ml', 210.00, 24, 'Electrolyte beverage - mango flavor', 'active'),
+('Family Mega Pack Water', 'package', 'Pack of 48', '500ml x 48', 1900.00, 2, 'Bulk pack of 48 x 500ml bottles', 'active'),
+('Office Starter Pack', 'package', 'Pack of 36', '500ml x 36', 1400.00, 2, 'Office starter pack - 36 bottles', 'active'),
+('Party Pack - Mixed', 'package', 'Pack of 60', 'various', 3500.00, 1, 'Large party pack with mixed beverages', 'active');
+
+-- initialize inventory for the newly inserted sample products by looking them up
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 300, 50 FROM products WHERE name = 'Sparkling Water - Lime' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 250, 50 FROM products WHERE name = 'Sparkling Water - Berry' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 120, 30 FROM products WHERE name = 'Mineral Water - Still' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 600, 100 FROM products WHERE name = 'Natural Spring Water' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 200, 40 FROM products WHERE name = 'Tropical Punch' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 220, 40 FROM products WHERE name = 'Iced Tea - Lemon' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 180, 30 FROM products WHERE name = 'ElectroBoost - Mango' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 60, 10 FROM products WHERE name = 'Family Mega Pack Water' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 80, 10 FROM products WHERE name = 'Office Starter Pack' LIMIT 1;
+INSERT INTO inventory (product_id, current_stock, minimum_stock_level)
+SELECT id, 30, 5 FROM products WHERE name = 'Party Pack - Mixed' LIMIT 1;
+
+-- End of reset and seed script
