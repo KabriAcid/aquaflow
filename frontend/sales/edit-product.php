@@ -16,12 +16,16 @@ if (!$product_id) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> - Aquaflow</title>
+    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="bg-gray-100 flex">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -112,28 +116,29 @@ if (!$product_id) {
                 };
 
                 fetch('../../backend/api/products/update.php', {
-                    method: 'POST', // Using POST to handle the update
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(productData),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Product updated successfully!');
-                        window.location.href = 'products.php';
-                    } else {
-                        alert('Failed to update product: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating product:', error);
-                    alert('An error occurred while updating the product.');
-                });
+                        method: 'POST', // Using POST to handle the update
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(productData),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Product updated successfully!');
+                            window.location.href = 'products.php';
+                        } else {
+                            alert('Failed to update product: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating product:', error);
+                        alert('An error occurred while updating the product.');
+                    });
             });
         });
     </script>
 
 </body>
+
 </html>

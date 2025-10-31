@@ -10,12 +10,16 @@ $page_title = "Manage Products";
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> - Aquaflow</title>
+    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="bg-gray-100 flex">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -71,27 +75,27 @@ $page_title = "Manage Products";
 
             function fetchProducts() {
                 fetch('../../backend/api/products/get_all.php')
-                .then(response => {
-                    if (response.status === 401) {
-                        window.location.href = '../login.php';
-                        return Promise.reject('Unauthorized');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        allProducts = data.data;
-                        renderProducts(allProducts);
-                    } else {
-                        alert('Failed to load products: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    if (error !== 'Unauthorized') {
-                        console.error('Error fetching products:', error);
-                        alert('An error occurred while fetching products.');
-                    }
-                });
+                    .then(response => {
+                        if (response.status === 401) {
+                            window.location.href = '../login.php';
+                            return Promise.reject('Unauthorized');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            allProducts = data.data;
+                            renderProducts(allProducts);
+                        } else {
+                            alert('Failed to load products: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        if (error !== 'Unauthorized') {
+                            console.error('Error fetching products:', error);
+                            alert('An error occurred while fetching products.');
+                        }
+                    });
             }
 
             function renderProducts(products) {
@@ -126,28 +130,31 @@ $page_title = "Manage Products";
 
             function deleteProduct(productId) {
                 fetch('../../backend/api/products/delete.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ id: productId }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Product deleted successfully!');
-                        fetchProducts(); // Refresh the product list
-                    } else {
-                        alert('Failed to delete product: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting product:', error);
-                    alert('An error occurred while deleting the product.');
-                });
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            id: productId
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Product deleted successfully!');
+                            fetchProducts(); // Refresh the product list
+                        } else {
+                            alert('Failed to delete product: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error deleting product:', error);
+                        alert('An error occurred while deleting the product.');
+                    });
             }
         });
     </script>
 
 </body>
+
 </html>

@@ -112,11 +112,18 @@
         if (res.ok && data && data.success) {
           msgEl.textContent = data.message || 'Login successful';
           msgEl.className = 'mt-3 text-sm text-green-600';
-          // If backend returns role, redirect to role-specific dashboard (frontend/{role}/dashboard.php)
-          const role = (data.data && data.data.role) ? String(data.data.role).toLowerCase().replace(/[^a-z0-9_]/g, '') : 'customer';
+          // If backend returns role, redirect to role-specific dashboard (frontend/{folder}/dashboard.php)
+          let role = (data.data && data.data.role) ? String(data.data.role).toLowerCase().replace(/[^a-z0-9_]/g, '') : 'customer';
+          // map backend role names to frontend folders where they differ
+          const roleFolderMap = {
+            'sales_manager': 'sales',
+            'production_manager': 'production',
+            'customer': 'customer',
+            'admin': 'admin'
+          };
+          const folder = roleFolderMap[role] || role;
           setTimeout(() => {
-            // relative path from this page: customer/dashboard.php
-            window.location.href = role + '/dashboard.php';
+            window.location.href = folder + '/dashboard.php';
           }, 600);
         } else {
           msgEl.textContent = (data && data.message) ? data.message : 'Login failed';

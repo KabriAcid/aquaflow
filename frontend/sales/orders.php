@@ -10,12 +10,16 @@ $page_title = "Manage Orders";
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> - Aquaflow</title>
+    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="bg-gray-100 flex">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -90,27 +94,27 @@ $page_title = "Manage Orders";
 
             function fetchOrders() {
                 fetch('../../backend/api/orders/get_all.php')
-                .then(response => {
-                    if (response.status === 401) {
-                        window.location.href = '../login.php';
-                        return Promise.reject('Unauthorized');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        allOrders = data.data;
-                        renderOrders(allOrders);
-                    } else {
-                        alert('Failed to load orders: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    if (error !== 'Unauthorized') {
-                        console.error('Error fetching orders:', error);
-                        alert('An error occurred while fetching orders.');
-                    }
-                });
+                    .then(response => {
+                        if (response.status === 401) {
+                            window.location.href = '../login.php';
+                            return Promise.reject('Unauthorized');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            allOrders = data.data;
+                            renderOrders(allOrders);
+                        } else {
+                            alert('Failed to load orders: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        if (error !== 'Unauthorized') {
+                            console.error('Error fetching orders:', error);
+                            alert('An error occurred while fetching orders.');
+                        }
+                    });
             }
 
             function renderOrders(orders) {
@@ -139,15 +143,21 @@ $page_title = "Manage Orders";
 
             function getStatusColor(status) {
                 switch (status) {
-                    case 'pending': return 'yellow-500';
-                    case 'shipped': return 'blue-500';
-                    case 'delivered': return 'green-500';
-                    case 'cancelled': return 'red-500';
-                    default: return 'gray-500';
+                    case 'pending':
+                        return 'yellow-500';
+                    case 'shipped':
+                        return 'blue-500';
+                    case 'delivered':
+                        return 'green-500';
+                    case 'cancelled':
+                        return 'red-500';
+                    default:
+                        return 'gray-500';
                 }
             }
         });
     </script>
 
 </body>
+
 </html>

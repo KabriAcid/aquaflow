@@ -10,12 +10,16 @@ $page_title = "Add New Product";
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> - Aquaflow</title>
+    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="bg-gray-100 flex">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -80,27 +84,28 @@ $page_title = "Add New Product";
             };
 
             fetch('../../backend/api/products/create.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(productData),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Product added successfully!');
-                    window.location.href = 'products.php';
-                } else {
-                    alert('Failed to add product: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error adding product:', error);
-                alert('An error occurred while adding the product.');
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Product added successfully!');
+                        window.location.href = 'products.php';
+                    } else {
+                        alert('Failed to add product: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding product:', error);
+                    alert('An error occurred while adding the product.');
+                });
         });
     </script>
 
 </body>
+
 </html>

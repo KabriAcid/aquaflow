@@ -16,12 +16,16 @@ if (!$order_id) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> - Aquaflow</title>
+    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="bg-gray-100 flex">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -49,20 +53,20 @@ if (!$order_id) {
             const orderId = <?php echo json_encode($order_id); ?>;
 
             fetch(`../../backend/api/orders/get_single.php?id=${orderId}`)
-            .then(response => {
-                if (response.status === 401) {
-                    window.location.href = '../login.php';
-                    return Promise.reject('Unauthorized');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const order = data.data;
-                    const orderDetailsDiv = document.getElementById('orderDetails');
-                    let itemsHtml = '';
-                    order.items.forEach(item => {
-                        itemsHtml += `
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '../login.php';
+                        return Promise.reject('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const order = data.data;
+                        const orderDetailsDiv = document.getElementById('orderDetails');
+                        let itemsHtml = '';
+                        order.items.forEach(item => {
+                            itemsHtml += `
                             <tr>
                                 <td class="py-2 px-4 border-b">${item.product_name}</td>
                                 <td class="py-2 px-4 border-b">${item.quantity}</td>
@@ -70,9 +74,9 @@ if (!$order_id) {
                                 <td class="py-2 px-4 border-b">₦${(item.quantity * item.unit_price).toFixed(2)}</td>
                             </tr>
                         `;
-                    });
+                        });
 
-                    orderDetailsDiv.innerHTML = `
+                        orderDetailsDiv.innerHTML = `
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div><strong>Order ID:</strong> ${order.order_number}</div>
                             <div><strong>Order Date:</strong> ${new Date(order.order_date).toLocaleDateString()}</div>
@@ -97,19 +101,19 @@ if (!$order_id) {
                             <h2 class="text-2xl font-bold">Total: ₦${parseFloat(order.total_amount).toFixed(2)}</h2>
                         </div>
                     `;
-                } else {
-                    alert('Failed to load order details: ' + data.message);
-                }
-            })
-            .catch(error => {
-                if (error !== 'Unauthorized') {
-                    console.error('Error fetching order details:', error);
-                    alert('An error occurred while fetching order details.');
-                }
-            });
+                    } else {
+                        alert('Failed to load order details: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    if (error !== 'Unauthorized') {
+                        console.error('Error fetching order details:', error);
+                        alert('An error occurred while fetching order details.');
+                    }
+                });
 
             function getStatusClass(status) {
-                 switch (status.toLowerCase()) {
+                switch (status.toLowerCase()) {
                     case 'pending':
                         return 'bg-yellow-500';
                     case 'delivered':
@@ -128,4 +132,5 @@ if (!$order_id) {
     </script>
 
 </body>
+
 </html>

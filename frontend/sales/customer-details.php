@@ -16,12 +16,16 @@ if (!$customer_id) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> - Aquaflow</title>
+    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="bg-gray-100 flex">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -70,18 +74,18 @@ if (!$customer_id) {
 
             // Fetch customer details
             fetch(`../../backend/api/customers/get_single.php?id=${customerId}`)
-            .then(response => {
-                if (response.status === 401) {
-                    window.location.href = '../login.php';
-                    return Promise.reject('Unauthorized');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const customer = data.data;
-                    const customerDetailsDiv = document.getElementById('customerDetails');
-                    customerDetailsDiv.innerHTML = `
+                .then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '../login.php';
+                        return Promise.reject('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const customer = data.data;
+                        const customerDetailsDiv = document.getElementById('customerDetails');
+                        customerDetailsDiv.innerHTML = `
                         <div class="grid grid-cols-2 gap-4">
                             <div><strong>Name:</strong> ${customer.full_name}</div>
                             <div><strong>Email:</strong> ${customer.email}</div>
@@ -89,33 +93,33 @@ if (!$customer_id) {
                             <div><strong>Address:</strong> ${customer.address || 'N/A'}</div>
                         </div>
                     `;
-                } else {
-                    alert('Failed to load customer details: ' + data.message);
-                }
-            })
-            .catch(error => {
-                if (error !== 'Unauthorized') {
-                    console.error('Error fetching customer details:', error);
-                    alert('An error occurred while fetching customer details.');
-                }
-            });
+                    } else {
+                        alert('Failed to load customer details: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    if (error !== 'Unauthorized') {
+                        console.error('Error fetching customer details:', error);
+                        alert('An error occurred while fetching customer details.');
+                    }
+                });
 
             // Fetch order history for this customer
             fetch(`../../backend/api/orders/get_all.php?customer_id=${customerId}`)
-            .then(response => {
-                if (response.status === 401) {
-                    // Don't redirect here, just show no orders
-                    return Promise.reject('Unauthorized');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success && data.data.length > 0) {
-                    const tableBody = document.getElementById('orderHistoryTableBody');
-                    tableBody.innerHTML = ''; // Clear existing rows
-                    data.data.forEach(order => {
-                        const statusClass = getStatusClass(order.status);
-                        const row = `
+                .then(response => {
+                    if (response.status === 401) {
+                        // Don't redirect here, just show no orders
+                        return Promise.reject('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        const tableBody = document.getElementById('orderHistoryTableBody');
+                        tableBody.innerHTML = ''; // Clear existing rows
+                        data.data.forEach(order => {
+                            const statusClass = getStatusClass(order.status);
+                            const row = `
                             <tr>
                                 <td class="py-2 px-4 border-b">${order.order_number}</td>
                                 <td class="py-2 px-4 border-b">${new Date(order.order_date).toLocaleDateString()}</td>
@@ -124,21 +128,21 @@ if (!$customer_id) {
                                 <td class="py-2 px-4 border-b"><a href="order-details.php?id=${order.id}" class="text-blue-500 hover:underline">View</a></td>
                             </tr>
                         `;
-                        tableBody.innerHTML += row;
-                    });
-                } else {
-                    document.getElementById('orderHistoryTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4">No orders found for this customer.</td></tr>';
-                }
-            })
-            .catch(error => {
-                 if (error !== 'Unauthorized') {
-                    console.error('Error fetching order history:', error);
-                    document.getElementById('orderHistoryTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4">Error loading order history.</td></tr>';
-                }
-            });
+                            tableBody.innerHTML += row;
+                        });
+                    } else {
+                        document.getElementById('orderHistoryTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4">No orders found for this customer.</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    if (error !== 'Unauthorized') {
+                        console.error('Error fetching order history:', error);
+                        document.getElementById('orderHistoryTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4">Error loading order history.</td></tr>';
+                    }
+                });
 
             function getStatusClass(status) {
-                 switch (status.toLowerCase()) {
+                switch (status.toLowerCase()) {
                     case 'pending':
                         return 'bg-yellow-500';
                     case 'delivered':
@@ -157,4 +161,5 @@ if (!$customer_id) {
     </script>
 
 </body>
+
 </html>

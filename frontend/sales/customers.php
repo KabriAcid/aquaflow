@@ -10,12 +10,16 @@ $page_title = "Manage Customers";
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> - Aquaflow</title>
+    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body class="bg-gray-100 flex">
 
     <?php include 'partials/sidebar.php'; ?>
@@ -64,8 +68,8 @@ $page_title = "Manage Customers";
 
             document.getElementById('searchInput').addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
-                const filteredCustomers = allCustomers.filter(customer => 
-                    customer.full_name.toLowerCase().includes(searchTerm) || 
+                const filteredCustomers = allCustomers.filter(customer =>
+                    customer.full_name.toLowerCase().includes(searchTerm) ||
                     customer.email.toLowerCase().includes(searchTerm)
                 );
                 renderCustomers(filteredCustomers);
@@ -73,27 +77,27 @@ $page_title = "Manage Customers";
 
             function fetchCustomers() {
                 fetch('../../backend/api/customers/get_all.php')
-                .then(response => {
-                    if (response.status === 401) {
-                        window.location.href = '../login.php';
-                        return Promise.reject('Unauthorized');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        allCustomers = data.data;
-                        renderCustomers(allCustomers);
-                    } else {
-                        alert('Failed to load customers: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    if (error !== 'Unauthorized') {
-                        console.error('Error fetching customers:', error);
-                        alert('An error occurred while fetching customers.');
-                    }
-                });
+                    .then(response => {
+                        if (response.status === 401) {
+                            window.location.href = '../login.php';
+                            return Promise.reject('Unauthorized');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            allCustomers = data.data;
+                            renderCustomers(allCustomers);
+                        } else {
+                            alert('Failed to load customers: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        if (error !== 'Unauthorized') {
+                            console.error('Error fetching customers:', error);
+                            alert('An error occurred while fetching customers.');
+                        }
+                    });
             }
 
             function renderCustomers(customers) {
@@ -118,4 +122,5 @@ $page_title = "Manage Customers";
     </script>
 
 </body>
+
 </html>
