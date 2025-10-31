@@ -22,7 +22,7 @@
     <!-- Payment Content -->
     <main class="py-10">
         <div class="max-w-lg mx-auto px-4">
-            <div class="bg-white p-8 rounded-lg shadow-md text-center">
+            <div class="bg-white p-8 rounded-lg multi-shadow text-center">
                 <h1 class="text-2xl font-bold mb-4">Confirm Your Payment</h1>
                 <p class="text-gray-600 mb-6">You will be redirected to our secure payment gateway to complete your purchase.</p>
                 <div id="orderDetails" class="text-left mb-6">

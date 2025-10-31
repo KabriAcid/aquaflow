@@ -45,7 +45,7 @@
                 </ul>
             </div>
 
-            <div class="bg-white p-8 rounded-lg shadow-md">
+            <div class="bg-white p-8 rounded-lg multi-shadow">
                 <table class="min-w-full bg-white">
                     <thead>
                         <tr>

@@ -2,7 +2,7 @@
 // frontend/customer/partials/topbar.php
 ?>
 <!-- Topbar (reusable) -->
-<nav class="bg-white shadow-md">
+<nav class="bg-white multi-shadow">
     <div class="max-w-6xl mx-auto px-4">
         <div class="flex justify-between">
             <div class="flex space-x-7">

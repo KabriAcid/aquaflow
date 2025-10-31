@@ -26,7 +26,7 @@
             <h1 class="text-3xl font-bold mb-6 text-gray-800">Checkout</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Delivery Information -->
-                <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="bg-white p-8 rounded-lg multi-shadow">
                     <h2 class="text-2xl font-bold mb-6">Delivery Information</h2>
                     <form id="checkoutForm">
                         <div class="mb-4">
@@ -70,7 +70,7 @@
                 </div>
 
                 <!-- Order Summary -->
-                <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="bg-white p-8 rounded-lg multi-shadow">
                     <h2 class="text-2xl font-bold mb-6">Order Summary</h2>
                     <div id="orderSummary">
                         <!-- Order summary will be populated here -->

@@ -26,22 +26,22 @@
 
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="bg-white p-6 rounded-lg multi-shadow">
                     <h2 class="text-lg font-semibold text-gray-700 mb-2">Total Orders</h2>
                     <p id="totalOrders" class="text-3xl font-bold text-blue-500">0</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="bg-white p-6 rounded-lg multi-shadow">
                     <h2 class="text-lg font-semibold text-gray-700 mb-2">Pending Orders</h2>
                     <p id="pendingOrders" class="text-3xl font-bold text-yellow-500">0</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="bg-white p-6 rounded-lg multi-shadow">
                     <h2 class="text-lg font-semibold text-gray-700 mb-2">Total Spent</h2>
                     <p id="totalSpent" class="text-3xl font-bold text-green-500">₦0.00</p>
                 </div>
             </div>
 
             <!-- Recent Orders -->
-            <div class="bg-white p-8 rounded-lg shadow-md">
+            <div class="bg-white p-8 rounded-lg multi-shadow">
                 <h2 class="text-2xl font-bold mb-6 text-gray-800">Recent Orders</h2>
                 <table class="min-w-full bg-white">
                     <thead>

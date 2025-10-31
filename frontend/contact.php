@@ -11,7 +11,7 @@
 
 <body class="bg-gray-50">
 
-    <nav class="bg-white shadow-md">
+    <nav class="bg-white multi-shadow">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between">
                 <div class="flex space-x-7">
@@ -39,9 +39,8 @@
                             stroke-linejoin="round"
                             stroke-width="2"
                             viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                        <path d="M4 6h16M4 12h16m-7 6h7"></path>
+                            stroke="currentColor">
+                            <path d="M4 6h16M4 12h16m-7 6h7"></path>
                         </svg>
                     </button>
                 </div>
@@ -58,7 +57,7 @@
 
     <main class="py-10">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="bg-white p-8 rounded-lg shadow-md">
+            <div class="bg-white p-8 rounded-lg multi-shadow">
                 <h1 class="text-3xl font-bold mb-6 text-gray-800">Contact Us</h1>
                 <p class="text-gray-600 mb-8">We\'d love to hear from you. Please fill out the form below and we\'ll get back to you as soon as possible.</p>
 
@@ -67,7 +66,7 @@
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
                             <input type="text" name="name" id="name" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Your Name" required>
-                             <p class="text-xs text-red-600 mt-1 hidden" data-error-for="name"></p>
+                            <p class="text-xs text-red-600 mt-1 hidden" data-error-for="name"></p>
                         </div>
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -86,7 +85,7 @@
                             Send Message
                         </button>
                     </div>
-                     <div id="formMessage" class="mt-3 text-sm"></div>
+                    <div id="formMessage" class="mt-3 text-sm"></div>
                 </form>
             </div>
         </div>
@@ -136,7 +135,7 @@
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const message = document.getElementById('message').value.trim();
-            
+
             let hasError = false;
             if (!name) {
                 showError('name', 'Name is required');
@@ -160,13 +159,19 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
 
-            const payload = { name, email, message };
+            const payload = {
+                name,
+                email,
+                message
+            };
 
             try {
                 // Default endpoint: backend API relative to frontend folder
                 const res = await fetch('../backend/api/contact/submit.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
@@ -180,7 +185,7 @@
                     const message = (data && data.message) ? data.message : 'Failed to send message.';
                     msgEl.textContent = message;
                     msgEl.className = 'mt-3 text-sm text-red-600';
-                     if (data && data.errors) {
+                    if (data && data.errors) {
                         for (const key in data.errors) {
                             if (data.errors.hasOwnProperty(key)) showError(key, data.errors[key]);
                         }

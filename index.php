@@ -15,7 +15,7 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800">
-    <nav class="bg-white shadow-md">
+    <nav class="bg-white multi-shadow">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between">
                 <div class="flex space-x-7">

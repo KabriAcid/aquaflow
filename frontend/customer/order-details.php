@@ -20,7 +20,7 @@
     <!-- Order Details Content -->
     <main class="py-10">
         <div class="max-w-4xl mx-auto px-4">
-            <div id="orderDetailsContent" class="bg-white p-8 rounded-lg shadow-md">
+            <div id="orderDetailsContent" class="bg-white p-8 rounded-lg multi-shadow">
                 <!-- Order details will be populated here -->
                 <p class="text-center">Loading order details...</p>
             </div>

@@ -92,7 +92,7 @@
                             const btnClasses = inCart ? 'bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed' : 'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600';
 
                             const productCard = `
-                            <div class="bg-white rounded-lg shadow-md p-4">
+                            <div class="bg-white rounded-lg multi-shadow p-4">
                                  <div class="h-40 bg-gray-200 rounded-md mb-4 flex items-center justify-center">
                                     <img src="${product.image_url || '../../assets/images/default.png'}" alt="${product.name}" class="h-full w-full object-cover rounded-md">
                                 </div>
@@ -171,7 +171,8 @@
                                 btn.disabled = false;
                             }
                         } catch (e2) {
-                            /* ignore */ }
+                            /* ignore */
+                        }
                         alert('Failed to add item to cart. Please try again.');
                         return;
                     }

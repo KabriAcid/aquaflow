@@ -18,7 +18,7 @@
 <body class="bg-gray-50">
 
     <!-- Navigation -->
-    <nav class="bg-white shadow-md">
+    <nav class="bg-white multi-shadow">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between">
                 <div class="flex space-x-7">
@@ -96,7 +96,7 @@
                 }
                 products.forEach(product => {
                     const productCard = `
-                        <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="bg-white rounded-lg multi-shadow p-4">
                             <div class="h-40 bg-gray-200 rounded-md mb-4 flex items-center justify-center">
                                 <img src="${product.image_url || '../assets/images/product_placeholder.png'}" alt="${product.name}" class="h-full w-full object-cover rounded-md">
                             </div>

@@ -16,14 +16,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 try {
     $pdo = get_db_connection();
-    
-    // The query is simple and doesn't need role-based adjustments
-    $stmt = $pdo->prepare("SELECT * FROM products ORDER BY name");
-    $stmt->execute();
+
+    // Support optional limit parameter for lightweight lists
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 0;
+    $sql = "SELECT p.*, IFNULL(i.current_stock,0) AS current_stock FROM products p LEFT JOIN inventory i ON i.product_id = p.id ORDER BY p.created_at DESC";
+    if ($limit > 0) {
+        $sql .= " LIMIT :limit";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+    } else {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+    }
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     success_response('Products fetched successfully', $products);
-
 } catch (PDOException $e) {
     error_log('Database error fetching products: ' . $e->getMessage());
     error_response('A database error occurred.', null, 500);

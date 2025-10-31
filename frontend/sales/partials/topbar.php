@@ -1,7 +1,7 @@
 <?php
 // sales/partials/topbar.php
 ?>
-<header class="bg-white shadow-md p-4 flex justify-between items-center">
+<header class="bg-white multi-shadow p-4 flex justify-between items-center">
     <div>
         <h1 class="text-xl font-bold">Sales Dashboard</h1>
     </div>

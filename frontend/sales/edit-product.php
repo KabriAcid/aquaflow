@@ -39,7 +39,7 @@ if (!$product_id) {
                 <a href="products.php" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back to Products</a>
             </div>
 
-            <div class="bg-white p-8 rounded-lg shadow-md">
+            <div class="bg-white p-4 md:p-8 rounded-lg multi-shadow">
                 <form id="editProductForm">
                     <input type="hidden" id="productId" name="productId" value="<?php echo htmlspecialchars($product_id); ?>">
                     <div class="mb-4">

@@ -45,19 +45,19 @@ $page_title = "Manage Orders";
             </div>
 
             <!-- Orders Table -->
-            <div class="bg-white p-8 rounded-lg shadow-md">
-                <table class="min-w-full bg-white">
-                    <thead>
+            <div class="bg-white p-4 md:p-8 rounded-lg multi-shadow overflow-auto">
+                <table class="min-w-full w-full table-auto">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th class="py-2 px-4 border-b">Order ID</th>
-                            <th class="py-2 px-4 border-b">Customer</th>
-                            <th class="py-2 px-4 border-b">Date</th>
-                            <th class="py-2 px-4 border-b">Total</th>
-                            <th class="py-2 px-4 border-b">Status</th>
-                            <th class="py-2 px-4 border-b">Actions</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order ID</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                            <th class="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="ordersTableBody">
+                    <tbody id="ordersTableBody" class="bg-white divide-y divide-gray-100">
                         <!-- Order rows will be inserted here -->
                     </tbody>
                 </table>
@@ -121,39 +121,58 @@ $page_title = "Manage Orders";
                 const tableBody = document.getElementById('ordersTableBody');
                 tableBody.innerHTML = ''; // Clear existing rows
                 orders.forEach(order => {
-                    const row = `
-                        <tr>
-                            <td class="py-2 px-4 border-b">${order.id}</td>
-                            <td class="py-2 px-4 border-b">${order.customer_name || 'N/A'}</td>
-                            <td class="py-2 px-4 border-b">${new Date(order.created_at).toLocaleDateString()}</td>
-                            <td class="py-2 px-4 border-b">₦${parseFloat(order.total_amount).toFixed(2)}</td>
-                            <td class="py-2 px-4 border-b">
-                                <span class="px-2 py-1 font-semibold leading-tight text-white bg-${getStatusColor(order.status)} rounded-full">
-                                    ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                </span>
-                            </td>
-                            <td class="py-2 px-4 border-b">
-                                <a href="order-details.php?id=${order.id}" class="text-blue-500 hover:underline">View Details</a>
-                            </td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50';
+                    const dateVal = order.order_date || order.created_at || '';
+                    const dateStr = dateVal ? new Date(dateVal).toLocaleDateString() : '';
+                    const total = (parseFloat(order.total_amount) || 0).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    const statusLabel = (order.status || '').charAt(0).toUpperCase() + (order.status || '').slice(1);
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-sm text-gray-700">${escapeHtml(String(order.id))}</td>
+                        <td class="py-3 px-4 text-sm text-gray-800">${escapeHtml(order.customer_name || 'N/A')}</td>
+                        <td class="py-3 px-4 text-sm text-gray-700">${escapeHtml(dateStr)}</td>
+                        <td class="py-3 px-4 text-sm text-gray-700 text-right">₦${total}</td>
+                        <td class="py-3 px-4 text-sm text-center">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${getStatusClasses(order.status)}">${escapeHtml(statusLabel)}</span>
+                        </td>
+                        <td class="py-3 px-4 text-sm text-center">
+                            <a href="order-details.php?id=${encodeURIComponent(order.id)}" class="text-blue-600 hover:underline">View Details</a>
+                        </td>
                     `;
-                    tableBody.innerHTML += row;
+                    tableBody.appendChild(tr);
                 });
             }
 
-            function getStatusColor(status) {
+            function getStatusClasses(status) {
                 switch (status) {
                     case 'pending':
-                        return 'yellow-500';
+                        return 'bg-yellow-100 text-yellow-800';
                     case 'shipped':
-                        return 'blue-500';
+                        return 'bg-blue-100 text-blue-800';
                     case 'delivered':
-                        return 'green-500';
+                        return 'bg-green-100 text-green-800';
                     case 'cancelled':
-                        return 'red-500';
+                        return 'bg-red-100 text-red-800';
                     default:
-                        return 'gray-500';
+                        return 'bg-gray-100 text-gray-800';
                 }
+            }
+
+            function escapeHtml(text) {
+                if (text === null || text === undefined) return '';
+                return String(text).replace(/[&<>"'`]/g, function(s) {
+                    return ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": "&#39;",
+                        '`': '&#96;'
+                    })[s];
+                });
             }
         });
     </script>

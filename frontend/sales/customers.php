@@ -38,18 +38,18 @@ $page_title = "Manage Customers";
             </div>
 
             <!-- Customers Table -->
-            <div class="bg-white p-8 rounded-lg shadow-md">
-                <table class="min-w-full bg-white">
-                    <thead>
+            <div class="bg-white p-4 md:p-8 rounded-lg multi-shadow overflow-auto">
+                <table class="min-w-full w-full table-auto">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th class="py-2 px-4 border-b">Customer ID</th>
-                            <th class="py-2 px-4 border-b">Name</th>
-                            <th class="py-2 px-4 border-b">Email</th>
-                            <th class="py-2 px-4 border-b">Phone</th>
-                            <th class="py-2 px-4 border-b">Actions</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Phone</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="customersTableBody">
+                    <tbody id="customersTableBody" class="bg-white divide-y divide-gray-100">
                         <!-- Customer rows will be inserted here -->
                     </tbody>
                 </table>
@@ -104,18 +104,32 @@ $page_title = "Manage Customers";
                 const tableBody = document.getElementById('customersTableBody');
                 tableBody.innerHTML = ''; // Clear existing rows
                 customers.forEach(customer => {
-                    const row = `
-                        <tr>
-                            <td class="py-2 px-4 border-b">${customer.id}</td>
-                            <td class="py-2 px-4 border-b">${customer.full_name}</td>
-                            <td class="py-2 px-4 border-b">${customer.email}</td>
-                            <td class="py-2 px-4 border-b">${customer.phone}</td>
-                            <td class="py-2 px-4 border-b">
-                                <a href="customer-details.php?id=${customer.id}" class="text-blue-500 hover:underline">View Details</a>
-                            </td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-sm text-gray-700">${escapeHtml(String(customer.id))}</td>
+                        <td class="py-3 px-4 text-sm text-gray-800">${escapeHtml(customer.full_name || '')}</td>
+                        <td class="py-3 px-4 text-sm text-gray-700">${escapeHtml(customer.email || '')}</td>
+                        <td class="py-3 px-4 text-sm text-gray-700 text-center">${escapeHtml(customer.phone || '')}</td>
+                        <td class="py-3 px-4 text-sm text-center">
+                            <a href="customer-details.php?id=${encodeURIComponent(customer.id)}" class="text-blue-600 hover:underline">View Details</a>
+                        </td>
                     `;
-                    tableBody.innerHTML += row;
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            function escapeHtml(text) {
+                if (text === null || text === undefined) return '';
+                return String(text).replace(/[&<>"'`]/g, function(s) {
+                    return ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": "&#39;",
+                        '`': '&#96;'
+                    })[s];
                 });
             }
         });

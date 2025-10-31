@@ -39,18 +39,18 @@ $page_title = "Manage Products";
             </div>
 
             <!-- Products Table -->
-            <div class="bg-white p-8 rounded-lg shadow-md">
-                <table class="min-w-full bg-white">
-                    <thead>
+            <div class="bg-white p-4 md:p-8 rounded-lg multi-shadow overflow-auto">
+                <table class="min-w-full w-full table-auto">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th class="py-2 px-4 border-b">Product ID</th>
-                            <th class="py-2 px-4 border-b">Name</th>
-                            <th class="py-2 px-4 border-b">Price</th>
-                            <th class="py-2 px-4 border-b">Stock</th>
-                            <th class="py-2 px-4 border-b">Actions</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                            <th class="py-3 px-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="productsTableBody">
+                    <tbody id="productsTableBody" class="bg-white divide-y divide-gray-100">
                         <!-- Product rows will be inserted here -->
                     </tbody>
                 </table>
@@ -102,19 +102,19 @@ $page_title = "Manage Products";
                 const tableBody = document.getElementById('productsTableBody');
                 tableBody.innerHTML = ''; // Clear existing rows
                 products.forEach(product => {
-                    const row = `
-                        <tr>
-                            <td class="py-2 px-4 border-b">${product.id}</td>
-                            <td class="py-2 px-4 border-b">${product.name}</td>
-                            <td class="py-2 px-4 border-b">₦${parseFloat(product.unit_price).toFixed(2)}</td>
-                            <td class="py-2 px-4 border-b">${product.current_stock}</td>
-                            <td class="py-2 px-4 border-b">
-                                <a href="edit-product.php?id=${product.id}" class="text-blue-500 hover:underline mr-2">Edit</a>
-                                <button data-id="${product.id}" class="text-red-500 hover:underline delete-btn">Delete</button>
-                            </td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-sm text-gray-700">${escapeHtml(String(product.id))}</td>
+                        <td class="py-3 px-4 text-sm text-gray-800">${escapeHtml(product.name || '')}</td>
+                        <td class="py-3 px-4 text-sm text-gray-700 text-right">₦${(parseFloat(product.unit_price) || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                        <td class="py-3 px-4 text-sm text-gray-700 text-center">${escapeHtml(String(product.current_stock || 0))}</td>
+                        <td class="py-3 px-4 text-sm text-center">
+                            <a href="edit-product.php?id=${encodeURIComponent(product.id)}" class="text-blue-600 hover:underline mr-3">Edit</a>
+                            <button data-id="${encodeURIComponent(product.id)}" class="text-red-600 hover:underline delete-btn">Delete</button>
+                        </td>
                     `;
-                    tableBody.innerHTML += row;
+                    tableBody.appendChild(tr);
                 });
 
                 // Add event listeners to delete buttons
@@ -125,6 +125,20 @@ $page_title = "Manage Products";
                             deleteProduct(productId);
                         }
                     });
+                });
+            }
+
+            function escapeHtml(text) {
+                if (text === null || text === undefined) return '';
+                return String(text).replace(/[&<>"'`]/g, function(s) {
+                    return ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": "&#39;",
+                        '`': '&#96;'
+                    })[s];
                 });
             }
 

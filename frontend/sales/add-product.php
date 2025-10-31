@@ -33,7 +33,7 @@ $page_title = "Add New Product";
                 <a href="products.php" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Back to Products</a>
             </div>
 
-            <div class="bg-white p-8 rounded-lg shadow-md">
+            <div class="bg-white p-4 md:p-8 rounded-lg multi-shadow">
                 <form id="addProductForm">
                     <div class="mb-4">
                         <label for="productName" class="block text-gray-700 text-sm font-bold mb-2">Product Name</label>

@@ -23,7 +23,7 @@
     <main class="py-10">
         <div class="max-w-6xl mx-auto px-4">
             <h1 class="text-3xl font-bold mb-6 text-gray-800">Shopping Cart</h1>
-            <div id="cartContent" class="bg-white p-8 rounded-lg shadow-md">
+            <div id="cartContent" class="bg-white p-8 rounded-lg multi-shadow">
                 <!-- Cart items will be populated here -->
             </div>
         </div>
