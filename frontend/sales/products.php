@@ -41,30 +41,8 @@ $page_title = "Manage Products";
                             <th class="py-2 px-4 border-b">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Sample Row 1 -->
-                        <tr>
-                            <td class="py-2 px-4 border-b">PROD-001</td>
-                            <td class="py-2 px-4 border-b">25-Litre Bottle</td>
-                            <td class="py-2 px-4 border-b">₦1,500</td>
-                            <td class="py-2 px-4 border-b">150</td>
-                            <td class="py-2 px-4 border-b">
-                                <a href="#" class="text-blue-500 hover:underline mr-2">Edit</a>
-                                <a href="#" class="text-red-500 hover:underline">Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Sample Row 2 -->
-                        <tr>
-                            <td class="py-2 px-4 border-b">PROD-002</td>
-                            <td class="py-2 px-4 border-b">50-Litre Bottle</td>
-                            <td class="py-2 px-4 border-b">₦2,800</td>
-                            <td class="py-2 px-4 border-b">75</td>
-                            <td class="py-2 px-4 border-b">
-                                <a href="#" class="text-blue-500 hover:underline mr-2">Edit</a>
-                                <a href="#" class="text-red-500 hover:underline">Delete</a>
-                            </td>
-                        </tr>
-                        <!-- Add more rows as needed -->
+                    <tbody id="productsTableBody">
+                        <!-- Product rows will be inserted here -->
                     </tbody>
                 </table>
             </div>
@@ -73,6 +51,50 @@ $page_title = "Manage Products";
 
         <?php include 'partials/footer.php'; ?>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '../login.php';
+                return;
+            }
+
+            fetch('../../backend/api/products/get_all.php', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tableBody = document.getElementById('productsTableBody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    data.data.forEach(product => {
+                        const row = `
+                            <tr>
+                                <td class="py-2 px-4 border-b">${product.id}</td>
+                                <td class="py-2 px-4 border-b">${product.name}</td>
+                                <td class="py-2 px-4 border-b">₦${parseFloat(product.price).toFixed(2)}</td>
+                                <td class="py-2 px-4 border-b">${product.stock_quantity}</td>
+                                <td class="py-2 px-4 border-b">
+                                    <a href="#" class="text-blue-500 hover:underline mr-2">Edit</a>
+                                    <a href="#" class="text-red-500 hover:underline">Delete</a>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    alert('Failed to load products: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                alert('An error occurred while fetching products.');
+            });
+        });
+    </script>
 
 </body>
 </html>

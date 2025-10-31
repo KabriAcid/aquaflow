@@ -39,26 +39,8 @@ $page_title = "Manage Orders";
                             <th class="py-2 px-4 border-b">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Sample Row 1 -->
-                        <tr>
-                            <td class="py-2 px-4 border-b">1001</td>
-                            <td class="py-2 px-4 border-b">John Doe</td>
-                            <td class="py-2 px-4 border-b">2024-07-28</td>
-                            <td class="py-2 px-4 border-b">₦15,000</td>
-                            <td class="py-2 px-4 border-b"><span class="bg-yellow-500 text-white py-1 px-3 rounded-full text-xs">Pending</span></td>
-                            <td class="py-2 px-4 border-b"><a href="#" class="text-blue-500 hover:underline">View</a></td>
-                        </tr>
-                        <!-- Sample Row 2 -->
-                        <tr>
-                            <td class="py-2 px-4 border-b">1002</td>
-                            <td class="py-2 px-4 border-b">Jane Smith</td>
-                            <td class="py-2 px-4 border-b">2024-07-27</td>
-                            <td class="py-2 px-4 border-b">₦25,500</td>
-                            <td class="py-2 px-4 border-b"><span class="bg-green-500 text-white py-1 px-3 rounded-full text-xs">Delivered</span></td>
-                             <td class="py-2 px-4 border-b"><a href="#" class="text-blue-500 hover:underline">View</a></td>
-                        </tr>
-                        <!-- Add more rows as needed -->
+                    <tbody id="ordersTableBody">
+                        <!-- Order rows will be inserted here -->
                     </tbody>
                 </table>
             </div>
@@ -67,6 +49,64 @@ $page_title = "Manage Orders";
 
         <?php include 'partials/footer.php'; ?>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '../login.php';
+                return;
+            }
+
+            fetch('../../backend/api/orders/get_all.php', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tableBody = document.getElementById('ordersTableBody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    data.data.forEach(order => {
+                        const statusClass = getStatusClass(order.status);
+                        const row = `
+                            <tr>
+                                <td class="py-2 px-4 border-b">${order.order_number}</td>
+                                <td class="py-2 px-4 border-b">${order.customer_name}</td>
+                                <td class="py-2 px-4 border-b">${new Date(order.order_date).toLocaleDateString()}</td>
+                                <td class="py-2 px-4 border-b">₦${parseFloat(order.total_amount).toFixed(2)}</td>
+                                <td class="py-2 px-4 border-b"><span class="${statusClass} text-white py-1 px-3 rounded-full text-xs">${order.status}</span></td>
+                                <td class="py-2 px-4 border-b"><a href="order-details.php?id=${order.id}" class="text-blue-500 hover:underline">View</a></td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    alert('Failed to load orders: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                alert('An error occurred while fetching orders.');
+            });
+
+            function getStatusClass(status) {
+                switch (status.toLowerCase()) {
+                    case 'pending':
+                        return 'bg-yellow-500';
+                    case 'delivered':
+                        return 'bg-green-500';
+                    case 'cancelled':
+                        return 'bg-red-500';
+                    default:
+                        return 'bg-gray-500';
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>

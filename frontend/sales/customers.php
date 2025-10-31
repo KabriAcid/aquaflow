@@ -38,24 +38,8 @@ $page_title = "Manage Customers";
                             <th class="py-2 px-4 border-b">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Sample Row 1 -->
-                        <tr>
-                            <td class="py-2 px-4 border-b">CUST-001</td>
-                            <td class="py-2 px-4 border-b">John Doe</td>
-                            <td class="py-2 px-4 border-b">john.doe@example.com</td>
-                            <td class="py-2 px-4 border-b">08012345678</td>
-                            <td class="py-2 px-4 border-b"><a href="#" class="text-blue-500 hover:underline">View Details</a></td>
-                        </tr>
-                        <!-- Sample Row 2 -->
-                        <tr>
-                            <td class="py-2 px-4 border-b">CUST-002</td>
-                            <td class="py-2 px-4 border-b">Jane Smith</td>
-                            <td class="py-2 px-4 border-b">jane.smith@example.com</td>
-                            <td class="py-2 px-4 border-b">08098765432</td>
-                            <td class="py-2 px-4 border-b"><a href="#" class="text-blue-500 hover:underline">View Details</a></td>
-                        </tr>
-                        <!-- Add more rows as needed -->
+                    <tbody id="customersTableBody">
+                        <!-- Customer rows will be inserted here -->
                     </tbody>
                 </table>
             </div>
@@ -64,6 +48,47 @@ $page_title = "Manage Customers";
 
         <?php include 'partials/footer.php'; ?>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '../login.php';
+                return;
+            }
+
+            fetch('../../backend/api/customers/get_all.php', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tableBody = document.getElementById('customersTableBody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    data.data.forEach(customer => {
+                        const row = `
+                            <tr>
+                                <td class="py-2 px-4 border-b">${customer.id}</td>
+                                <td class="py-2 px-4 border-b">${customer.name}</td>
+                                <td class="py-2 px-4 border-b">${customer.email}</td>
+                                <td class="py-2 px-4 border-b">${customer.phone}</td>
+                                <td class="py-2 px-4 border-b"><a href="customer-details.php?id=${customer.id}" class="text-blue-500 hover:underline">View Details</a></td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    alert('Failed to load customers: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching customers:', error);
+                alert('An error occurred while fetching customers.');
+            });
+        });
+    </script>
 
 </body>
 </html>

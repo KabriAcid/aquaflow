@@ -26,27 +26,26 @@ $page_title = "Sales Dashboard";
         <main class="flex-1 p-6">
             <h1 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>
             
-            <!-- Main Content Goes Here -->
-             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div id="dashboard-summary" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Total Sales -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-lg font-semibold text-gray-600">Total Sales</h2>
-                    <p class="text-3xl font-bold text-blue-600 mt-2">₦1,250,000</p>
+                    <p id="totalSales" class="text-3xl font-bold text-blue-600 mt-2">Loading...</p>
                 </div>
                 <!-- Total Orders -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-lg font-semibold text-gray-600">Total Orders</h2>
-                    <p class="text-3xl font-bold text-green-600 mt-2">350</p>
+                    <p id="totalOrders" class="text-3xl font-bold text-green-600 mt-2">Loading...</p>
                 </div>
                 <!-- New Customers -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-lg font-semibold text-gray-600">New Customers</h2>
-                    <p class="text-3xl font-bold text-yellow-600 mt-2">25</p>
+                    <p id="newCustomers" class="text-3xl font-bold text-yellow-600 mt-2">Loading...</p>
                 </div>
                 <!-- Pending Deliveries -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-lg font-semibold text-gray-600">Pending Deliveries</h2>
-                    <p class="text-3xl font-bold text-red-600 mt-2">12</p>
+                    <p id="pendingDeliveries" class="text-3xl font-bold text-red-600 mt-2">Loading...</p>
                 </div>
             </div>
 
@@ -54,6 +53,38 @@ $page_title = "Sales Dashboard";
 
         <?php include 'partials/footer.php'; ?>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '../login.php';
+                return;
+            }
+
+            // Fetch dashboard summary data
+            fetch('../../backend/api/sales/summary.php', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('totalSales').textContent = `₦${parseFloat(data.data.total_sales).toLocaleString()}`;
+                    document.getElementById('totalOrders').textContent = data.data.total_orders;
+                    document.getElementById('newCustomers').textContent = data.data.new_customers;
+                    document.getElementById('pendingDeliveries').textContent = data.data.pending_deliveries;
+                } else {
+                    alert('Failed to load dashboard data: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching dashboard data:', error);
+                alert('An error occurred while fetching dashboard data.');
+            });
+        });
+    </script>
 
 </body>
 </html>
