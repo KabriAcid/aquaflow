@@ -1,8 +1,10 @@
 <?php
-/**
+
+/*
  * Session-based login endpoint
  * Expects JSON body: { email, password, remember } or form fields.
- * On success: starts session and sets $_SESSION['user_id'], $_SESSION['user_email'], $_SESSION['user_name'], $_SESSION['user_role']
+ * On success: starts session and sets only $_SESSION['user_id'].
+ * The API response returns only the user id so dashboard pages can query the users table.
  */
 
 require_once __DIR__ . '/../../../config/database.php';
@@ -58,25 +60,21 @@ try {
     // If remember requested, extend cookie lifetime (e.g., 30 days)
     if ($remember) {
         $lifetime = 60 * 60 * 24 * 30; // 30 days
-        session_set_cookie_params([ 'lifetime' => $lifetime, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax' ]);
+        session_set_cookie_params(['lifetime' => $lifetime, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
     } else {
-        session_set_cookie_params([ 'lifetime' => 0, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax' ]);
+        session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'httponly' => true, 'samesite' => 'Lax']);
     }
 
     if (session_status() === PHP_SESSION_NONE) session_start();
     session_regenerate_id(true);
 
+    // Store only the user id in session
     $_SESSION['user_id'] = (int)$user['id'];
-    $_SESSION['user_email'] = $user['email'];
-    $_SESSION['user_name'] = $user['full_name'];
-    $_SESSION['user_role'] = $user['role'];
 
-    // Return success with minimal user info
-    $payload = [ 'id' => (int)$user['id'], 'email' => $user['email'], 'full_name' => $user['full_name'], 'role' => $user['role'] ];
+    // Return success with only the user id (frontend will fetch remaining profile info from dashboard endpoints)
+    $payload = ['id' => (int)$user['id']];
     success_response('Login successful', $payload);
-
 } catch (PDOException $ex) {
     error_log('Login error: ' . $ex->getMessage());
     error_response('Server error during login', null, 500);
 }
- 

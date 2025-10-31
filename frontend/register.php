@@ -16,7 +16,7 @@
 
 <body class="bg-gray-50 text-gray-800">
     <div class="min-h-screen flex items-center justify-center px-4">
-        <div class="w-full max-w-lg bg-white rounded shadow p-6">
+        <div class="w-full max-w-lg bg-white rounded multi-shadow p-6">
             <h1 class="text-2xl font-semibold mb-4">Create an account</h1>
             <form id="registerForm" novalidate>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

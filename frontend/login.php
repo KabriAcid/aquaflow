@@ -36,9 +36,9 @@
 
         <div class="flex items-center justify-between mb-4">
           <label class="flex items-center text-sm">
-            <input type="checkbox" id="remember" name="remember" class="mr-2"> Remember me
+            <a href="#" class="text-sm text-gray-700 hover:underline">Forgot password?</a>
           </label>
-          <a href="#" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
+          <a href="register.php" class="text-sm text-blue-600 hover:underline">Register Here</a>
         </div>
 
         <div>
