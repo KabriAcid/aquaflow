@@ -107,6 +107,11 @@
                         `;
                             productsGrid.innerHTML += productCard;
                         });
+
+                        // ensure buttons reflect current cart after render
+                        if (typeof updateProductButtons === 'function') {
+                            updateProductButtons();
+                        }
                     }
 
                     function filterAndRender() {
@@ -139,25 +144,70 @@
                 });
 
             function addToCart(product) {
-                // The actual addToCart function is in cart.js
+                // Immediately update UI to prevent duplicate clicks
+                try {
+                    const btn = document.getElementById(`add-btn-${product.id}`);
+                    if (btn) {
+                        btn.textContent = 'In Cart';
+                        btn.className = 'bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed';
+                        btn.disabled = true;
+                    }
+                } catch (e) {
+                    console.error('Failed to update add button', e);
+                }
+
+                // Then perform cart logic (non-blocking)
                 if (window.addToCart && typeof window.addToCart === 'function') {
-                    window.addToCart(product, 1);
-                    // update UI button state
                     try {
-                        const btn = document.getElementById(`add-btn-${product.id}`);
-                        if (btn) {
+                        window.addToCart(product, 1);
+                    } catch (err) {
+                        console.error('Error adding to cart:', err);
+                        // revert button if add failed
+                        try {
+                            const btn = document.getElementById(`add-btn-${product.id}`);
+                            if (btn) {
+                                btn.textContent = 'Add to Cart';
+                                btn.className = 'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600';
+                                btn.disabled = false;
+                            }
+                        } catch (e2) {
+                            /* ignore */ }
+                        alert('Failed to add item to cart. Please try again.');
+                        return;
+                    }
+
+                    // update badge and other UI
+                    if (typeof updateCartBadge === 'function') updateCartBadge();
+                    if (typeof updateProductButtons === 'function') updateProductButtons();
+                    // lightweight confirmation
+                    try {
+                        // non-blocking small UI cue could be implemented; keep alert for now
+                        alert(`${product.name} has been added to your cart.`);
+                    } catch (e) {}
+                } else {
+                    console.error('cart.js is not loaded or addToCart function is not available.');
+                }
+            }
+
+            // Refresh all Add-to-Cart buttons to reflect current cart contents
+            function updateProductButtons() {
+                try {
+                    const cartNow = (typeof getCart === 'function') ? getCart() : [];
+                    const idsInCart = new Set(cartNow.map(i => String(i.id)));
+                    document.querySelectorAll('[id^="add-btn-"]').forEach(btn => {
+                        const idAttr = btn.id.replace('add-btn-', '');
+                        if (idsInCart.has(String(idAttr))) {
                             btn.textContent = 'In Cart';
                             btn.className = 'bg-gray-400 text-white px-4 py-2 rounded-md cursor-not-allowed';
                             btn.disabled = true;
+                        } else {
+                            btn.textContent = 'Add to Cart';
+                            btn.className = 'bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600';
+                            btn.disabled = false;
                         }
-                    } catch (e) {
-                        console.error('Failed to update add button', e);
-                    }
-                    // update badge
-                    if (typeof updateCartBadge === 'function') updateCartBadge();
-                    alert(`${product.name} has been added to your cart.`);
-                } else {
-                    console.error('cart.js is not loaded or addToCart function is not available.');
+                    });
+                } catch (e) {
+                    console.error('Failed to refresh product buttons', e);
                 }
             }
         });
