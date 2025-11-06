@@ -6,106 +6,70 @@ Aquaflow is a web application designed to facilitate the sale and delivery of bo
 
 ## Project Structure
 
-```
-/
-|-- backend/
-|   |-- api/
-|   |   |-- admin/
-|   |   |-- auth/
-|   |   |   |-- login.php
-|   |   |   `-- logout.php
-|   |   |-- sales/
-|   |   `-- ... (other API folders)
-|   |-- config/
-|   |   `-- database.php
-|   `-- utils/
-|       |-- auth.php
-|       `-- response.php
-|-- frontend/
-|   |-- css/
-|   |   |-- style.css
-|   |   `-- tailwind.css
-|   |-- js/
-|   |   |-- admin-dashboard.js
-|   |   |-- main.js
-|   |   `-- sales-dashboard.js
-|   |-- admin/
-|   |   |-- partials/
-|   |   |   |-- footer.php
-|   |   |   |-- header.php
-|   |   |   `-- sidebar.php
-|   |   |-- dashboard.php
-|   |   |-- settings.php
-|   |   `-- users.php
-|   |-- sales/
-|   |   |-- partials/
-|   |   |   |-- footer.php
-|   |   |   |-- header.php
-|   |   |   `-- sidebar.php
-|   |   |-- customers.php
-|   |   |-- dashboard.php
-|   |   |-- orders.php
-|   |   `-- products.php
-|   `-- login.php
-`-- index.php
-```
+The project is organized into a `frontend` for the user interface and a `backend` for the API logic and database interactions.
+
+-   **`backend/`**: Contains all server-side PHP scripts.
+    -   `api/`: The core of the backend, with subdirectories for different functionalities (`admin`, `auth`, `products`, `reports`, `sales`, `users`).
+    -   `config/`: Includes the `database.php` file for establishing a database connection.
+    -   `utils/`: Contains helper scripts for handling authentication (`auth.php`) and formatting JSON responses (`response.php`).
+-   **`frontend/`**: Contains all client-side assets.
+    -   `css/`: `tailwind.css` for utility classes and a custom `style.css`.
+    -   `js/`: JavaScript files for dynamic frontend behavior, prefixed with the portal name (e.g., `admin-dashboard.js`).
+    -   `admin/`: The interface for administrators, including pages for the dashboard, inventory, reports, profile, and settings. It uses shared `partials` for the header, footer, and sidebar.
+    -   `sales/`: The interface for the sales team.
+    -   `login.php`: The main login page for all users.
+-   **`index.php`**: The application's main entry point, which directs users to the appropriate portal or login page.
 
 ## Style, Design, and Features
 
 ### General
-*   **Styling**: The UI is built with Tailwind CSS for a utility-first approach. A global `style.css` file (`frontend/css/style.css`) adds base styles, custom fonts (Inter), and utility classes like `multi-shadow` for a consistent, modern aesthetic.
-*   **Standardized Portals**: Both the Admin and Sales portals have been refactored to use a consistent structure, including a shared header (`header.php`), a dynamic sidebar (`sidebar.php`), and a footer (`footer.php`). This creates a unified user experience across the application.
+
+*   **Styling**: The UI is built with Tailwind CSS. A global `style.css` file adds base styles, custom fonts (Inter), and utility classes like `multi-shadow` for a consistent, modern aesthetic.
+*   **Standardized Portals**: Both the Admin and Sales portals use a consistent structure with a shared header, a dynamic sidebar, and a footer to create a unified user experience.
 
 ### Admin Portal (`frontend/admin/`)
+
 *   **Authentication**: Access is restricted to users with the 'admin' role.
-*   **Dashboard (`dashboard.php`)**: This is the central hub for administrators.
-    *   **Design**: It features a clean, card-based layout with `multi-shadow` effects for depth.
-    *   **Stats Cards**: At-a-glance metrics for "Total Sales," "New Customers," "Pending Orders," and "Revenue." Cards include relevant icons and bold typography.
-    *   **Data Visualization**: Includes two charts for visual analysis:
-        *   A line chart for "Sales Overview".
-        *   A doughnut chart for "Top Products".
-    *   **Interactivity**: Chart data is dynamically loaded via `admin-dashboard.js`, which fetches data from the backend (currently using dummy data).
-*   **Pages**:
-    *   `users.php`: For managing system users.
-    *   `settings.php`: For configuring application settings.
+*   **Dashboard (`dashboard.php`)**: The central hub for administrators, connected to a live API endpoint (`backend/api/admin/dashboard_summary.php`).
+    *   **Design**: A clean, card-based layout with `multi-shadow` effects for depth.
+    *   **Stats Cards**: At-a-glance metrics for "Total Sales," "New Customers," "Pending Orders," and "Revenue."
+    *   **Data Visualization**: Includes a line chart for "Sales Overview" and a doughnut chart for "Top Products," with data dynamically loaded via `admin-dashboard.js`.
+*   **Inventory Management (`inventory.php`)**: Allows admins to monitor and manage product stock levels.
+    *   **Functionality**: Displays a table of all products with their current stock. Admins can update stock quantities directly. The page is powered by `admin-inventory.js`, which communicates with `backend/api/products/get_all.php` and `backend/api/products/update.php`.
+*   **Sales Reports (`reports.php`)**: For generating and viewing sales data.
+    *   **Functionality**: Users can generate a report that displays the top-selling products (bar chart) and sales over time (line chart). It also includes a table of recent orders. The page uses `admin-reports.js` and fetches data from `backend/api/reports/get_sales_report.php`.
+*   **Profile Management (`profile.php`)**: Allows the logged-in admin to manage their personal information.
+    *   **Functionality**: Admins can update their email address and change their password. The page is handled by `admin-profile.js` and interacts with `backend/api/users/get.php` and `backend/api/users/update.php`.
+*   **Settings (`settings.php`)**: A placeholder page for future application-wide settings.
 
 ### Sales Portal (`frontend/sales/`)
-*   **Authentication**: Access is restricted to users with the 'sales' role.
+
+*   **Authentication**: Access is restricted to users with the 'sales_manager' role.
 *   **Dashboard (`dashboard.php`)**: Provides sales managers with a summary of their performance.
-    *   **Design**: Follows the same clean, card-based design as the admin portal.
-    *   **Stats Cards**: Key metrics tailored to the sales manager, including "My Pending Orders," "My Sales," and "New Customers."
-    *   **Data Visualization**: Features a line chart for "My Recent Activity" to track sales performance over time.
-    *   **Interactivity**: The chart is powered by `sales-dashboard.js`, which will fetch data specific to the logged-in sales manager.
+    *   **Current State**: The dashboard is visually designed but currently uses hardcoded placeholder data.
+    *   **Stats Cards**: Includes key metrics like "My Pending Orders," "My Sales," and "New Customers."
+    *   **Data Visualization**: Features a line chart for "My Recent Activity."
 *   **Pages**:
     *   `orders.php`: To manage customer orders.
     *   `products.php`: To manage product listings.
     *   `customers.php`: To manage their customer list.
 
-## Current Task: Connect Dashboards to Live Data
+## Plan for Current Request
 
-The dashboards have been designed and are visually complete, but they currently rely on hardcoded placeholder data in the JavaScript files. The next critical step is to replace this dummy data with live data from the backend API.
+The user requested assistance. This was interpreted as a general request to continue building out the application based on the existing structure and hierarchy of needs.
 
-**Plan:**
+**Completed Steps:**
 
-1.  **Create Admin Dashboard API Endpoint:**
-    *   Develop a new API script at `backend/api/admin/dashboard_summary.php`.
-    *   This endpoint will perform database queries to aggregate and return the following metrics:
-        *   Total sales revenue.
-        *   Count of new customers (e.g., registered in the last 30 days).
-        *   Count of orders with a 'pending' status.
-        *   Data points for the "Sales Overview" line chart (e.g., monthly sales totals).
-        *   Data for the "Top Products" doughnut chart (e.g., sales count per product).
-2.  **Create Sales Dashboard API Endpoint:**
-    *   Develop a new API script at `backend/api/sales/dashboard_summary.php`.
-    *   This endpoint will be context-aware, fetching data only for the currently logged-in sales manager. It will return:
-        *   Count of pending orders assigned to the manager.
-        *   Total sales revenue generated by the manager.
-        *   Count of new customers acquired by the manager.
-        *   Data for the "My Recent Activity" line chart (e.g., daily or weekly orders).
-3.  **Update Frontend JavaScript:**
-    *   Modify `frontend/js/admin-dashboard.js`:
-        *   Replace the dummy data objects with a `fetch` call to the new `dashboard_summary.php` API endpoint.
-        *   Parse the JSON response and use the data to dynamically populate the stats cards and render the charts.
-    *   Modify `frontend/js/sales-dashboard.js`:
-        *   Perform a `fetch` call to its respective `dashboard_summary.php` endpoint.
-        *   Update the sales dashboard cards and activity chart with the fetched data.
+1.  **Implemented Admin Inventory Page:**
+    *   Created `frontend/admin/inventory.php` to display product stock.
+    *   Modified `backend/api/products/update.php` to allow partial updates (specifically for stock quantity) and added access for the 'admin' role.
+    *   Created `frontend/js/admin-inventory.js` to fetch inventory data and handle stock update logic.
+2.  **Implemented Admin Profile Page:**
+    *   Created `frontend/admin/profile.php` with a form for updating user details.
+    *   Created `backend/api/users/get.php` to fetch the current user's data.
+    *   Created `backend/api/users/update.php` to handle email and password changes.
+    *   Created `frontend/js/admin-profile.js` to manage fetching and updating profile information.
+3.  **Implemented Admin Settings Page:**
+    *   Created `frontend/admin/settings.php` as a placeholder for future development.
+4.  **Finalized Blueprint:**
+    *   Updated this `blueprint.md` file to accurately reflect all the newly added features and the current project status.
