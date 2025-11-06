@@ -8,65 +8,90 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_man
     exit;
 }
 
-$page_title = "Manage Production";
+$page_title = "Manage Products";
+include './partials/header.php';
 ?>
 
-<?php include './partials/header.php'; ?>
-
 <div class="flex-1 flex">
-    <!-- Sidebar -->
     <?php include './partials/sidebar.php'; ?>
 
     <!-- Main Content -->
     <main class="flex-1 bg-gray-100 p-6 md:p-10">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-3xl font-bold text-gray-800 mb-8">Record Daily Production</h1>
-
-            <!-- Production Recording Form -->
-            <div class="bg-white p-8 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-bold mb-6">New Production Log</h2>
-
-                <form id="manage-production-form">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Product Selection -->
-                        <div>
-                            <label for="product-id" class="block text-sm font-medium text-gray-700 mb-1">Product</label>
-                            <select id="product-id" name="product-id" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-                                <option value="">Loading products...</option>
-                            </select>
-                        </div>
-
-                        <!-- Quantity -->
-                        <div>
-                            <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity Produced</label>
-                            <input type="number" id="quantity" name="quantity" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required min="1">
-                        </div>
-
-                        <!-- Shift -->
-                        <div>
-                            <label for="shift" class="block text-sm font-medium text-gray-700 mb-1">Shift</label>
-                            <select id="shift" name="shift" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-                                <option value="">Select a shift...</option>
-                                <option value="morning">Morning</option>
-                                <option value="afternoon">Afternoon</option>
-                                <option value="night">Night</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Submission Feedback -->
-                    <div id="form-feedback" class="mt-6 hidden p-4 rounded-md"></div>
-
-                    <!-- Submit Button -->
-                    <div class="mt-8 text-right">
-                        <button type="submit" class="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Record Production</button>
-                    </div>
-                </form>
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Manage Products</h1>
+                <button id="add-product-btn" class="btn-primary inline-flex items-center gap-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    Add Product
+                </button>
             </div>
 
+            <!-- Products Grid -->
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Product cards will be dynamically inserted here -->
+            </div>
         </div>
     </main>
 </div>
+
+<!-- Add/Edit Product Modal -->
+<div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6" id="product-modal-title">Add New Product</h2>
+        <form id="product-form">
+            <input type="hidden" id="product_id" name="product_id">
+            <div class="mb-4">
+                <label for="product_name" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                <input type="text" id="product_name" name="product_name" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea id="description" name="description" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="price" class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                <input type="number" step="0.01" id="price" name="price" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="image_url" class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                <input type="url" id="image_url" name="image_url" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="flex justify-end gap-4">
+                <button type="button" id="cancel-product-btn" class="btn-secondary">Cancel</button>
+                <button type="submit" class="btn-primary">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Record Production Modal -->
+<div id="record-production-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6">Record Production for <span id="record-product-name"></span></h2>
+        <form id="record-production-form">
+            <input type="hidden" id="record_product_id" name="product_id">
+            <div class="mb-4">
+                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity Produced</label>
+                <input type="number" id="quantity" name="quantity" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required min="1">
+            </div>
+            <div class="mb-4">
+                <label for="shift" class="block text-sm font-medium text-gray-700 mb-1">Shift</label>
+                <select id="shift" name="shift" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    <option value="">Select a shift...</option>
+                    <option value="morning">Morning</option>
+                    <option value="afternoon">Afternoon</option>
+                    <option value="night">Night</option>
+                </select>
+            </div>
+            <div id="record-feedback" class="mt-4 hidden p-3 rounded-md"></div>
+            <div class="flex justify-end gap-4 mt-6">
+                <button type="button" id="cancel-record-btn" class="btn-secondary">Cancel</button>
+                <button type="submit" class="btn-primary">Record</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <script src="../js/manage-production.js"></script>
 
