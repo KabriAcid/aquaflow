@@ -28,11 +28,15 @@ include 'partials/sidebar.php';
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-gray-50 p-4 rounded-lg">
                 <h4 class="text-md font-semibold text-gray-600 mb-2">Top Selling Products</h4>
-                <canvas id="topProductsChart"></canvas>
+                <div class="h-64">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
                 <h4 class="text-md font-semibold text-gray-600 mb-2">Sales Over Time</h4>
-                <canvas id="salesOverTimeChart"></canvas>
+                <div class="h-64">
+                    <canvas id="salesOverTimeChart"></canvas>
+                </div>
             </div>
         </div>
         <div id="reportTable" class="mt-6"></div>

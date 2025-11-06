@@ -83,11 +83,15 @@ include 'partials/sidebar.php';
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
                 <div class="lg:col-span-3 bg-white p-6 rounded-lg multi-shadow">
                     <h3 class="text-lg font-medium text-gray-600 mb-4">Sales Overview</h3>
-                    <canvas id="salesOverviewChart"></canvas>
+                    <div class="h-64">
+                        <canvas id="salesOverviewChart"></canvas>
+                    </div>
                 </div>
                 <div class="lg:col-span-2 bg-white p-6 rounded-lg multi-shadow">
                     <h3 class="text-lg font-medium text-gray-600 mb-4">Top Products</h3>
-                    <canvas id="topProductsChart"></canvas>
+                    <div class="h-64">
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
                 </div>
             </div>
 

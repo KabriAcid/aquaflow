@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ?.getContext("2d");
   if (salesOverviewCtx) {
     new Chart(salesOverviewCtx, {
-      type: "line",
+      type: "bar",
       data: salesData,
       options: {
         responsive: true,
@@ -129,7 +129,20 @@ document.addEventListener("DOMContentLoaded", function () {
         scales: {
           y: {
             beginAtZero: true,
+            ticks: {
+              // show thousands separator for axis labels
+              callback: function (value) {
+                return value.toLocaleString();
+              },
+            },
           },
+          x: {
+            // improve bar width on different breakpoints
+            ticks: { autoSkip: false },
+          },
+        },
+        plugins: {
+          legend: { display: false },
         },
       },
     });
