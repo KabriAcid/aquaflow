@@ -2,21 +2,22 @@
 
 ## Overview
 
-Aquaflow is a web application designed to facilitate the sale and delivery of bottled water. The application provides two main user-facing portals: an Admin Portal for overall system management and a Sales Portal for sales managers to handle their customers and orders.
+Aquaflow is a web application designed to facilitate the sale and delivery of bottled water. The application provides three main user-facing portals: an Admin Portal for overall system management, a Sales Portal for sales managers, and a Production Portal for production managers.
 
 ## Project Structure
 
 The project is organized into a `frontend` for the user interface and a `backend` for the API logic and database interactions.
 
 -   **`backend/`**: Contains all server-side PHP scripts.
-    -   `api/`: The core of the backend, with subdirectories for different functionalities (`admin`, `auth`, `products`, `reports`, `sales`, `users`).
+    -   `api/`: The core of the backend, with subdirectories for different functionalities (`admin`, `auth`, `products`, `reports`, `sales`, `users`, `production`).
     -   `config/`: Includes the `database.php` file for establishing a database connection.
     -   `utils/`: Contains helper scripts for handling authentication (`auth.php`) and formatting JSON responses (`response.php`).
 -   **`frontend/`**: Contains all client-side assets.
     -   `css/`: `tailwind.css` for utility classes and a custom `style.css`.
-    -   `js/`: JavaScript files for dynamic frontend behavior, prefixed with the portal name (e.g., `admin-dashboard.js`).
-    -   `admin/`: The interface for administrators, including pages for the dashboard, inventory, reports, profile, and settings. It uses shared `partials` for the header, footer, and sidebar.
+    -   `js/`: JavaScript files for dynamic frontend behavior, prefixed with the portal name (e.g., `admin-dashboard.js`, `production-dashboard.js`).
+    -   `admin/`: The interface for administrators.
     -   `sales/`: The interface for the sales team.
+    -   `production/`: The interface for the production team.
     -   `login.php`: The main login page for all users.
 -   **`index.php`**: The application's main entry point, which directs users to the appropriate portal or login page.
 
@@ -25,51 +26,49 @@ The project is organized into a `frontend` for the user interface and a `backend
 ### General
 
 *   **Styling**: The UI is built with Tailwind CSS. A global `style.css` file adds base styles, custom fonts (Inter), and utility classes like `multi-shadow` for a consistent, modern aesthetic.
-*   **Standardized Portals**: Both the Admin and Sales portals use a consistent structure with a shared header, a dynamic sidebar, and a footer to create a unified user experience.
+*   **Standardized Portals**: All portals (Admin, Sales, Production) use a consistent structure with a shared header, a dynamic sidebar, and a footer to create a unified user experience.
 
 ### Admin Portal (`frontend/admin/`)
 
 *   **Authentication**: Access is restricted to users with the 'admin' role.
-*   **Dashboard (`dashboard.php`)**: The central hub for administrators, connected to a live API endpoint (`backend/api/admin/dashboard_summary.php`).
-    *   **Design**: A clean, card-based layout with `multi-shadow` effects for depth.
-    *   **Stats Cards**: At-a-glance metrics for "Total Sales," "New Customers," "Pending Orders," and "Revenue."
-    *   **Data Visualization**: Includes a line chart for "Sales Overview" and a doughnut chart for "Top Products," with data dynamically loaded via `admin-dashboard.js`.
+*   **Dashboard (`dashboard.php`)**: A central hub with live data on sales, customers, and revenue.
 *   **Inventory Management (`inventory.php`)**: Allows admins to monitor and manage product stock levels.
-    *   **Functionality**: Displays a table of all products with their current stock. Admins can update stock quantities directly. The page is powered by `admin-inventory.js`, which communicates with `backend/api/products/get_all.php` and `backend/api/products/update.php`.
 *   **Sales Reports (`reports.php`)**: For generating and viewing sales data.
-    *   **Functionality**: Users can generate a report that displays the top-selling products (bar chart) and sales over time (line chart). It also includes a table of recent orders. The page uses `admin-reports.js` and fetches data from `backend/api/reports/get_sales_report.php`.
-*   **Profile Management (`profile.php`)**: Allows the logged-in admin to manage their personal information.
-    *   **Functionality**: Admins can update their email address and change their password. The page is handled by `admin-profile.js` and interacts with `backend/api/users/get.php` and `backend/api/users/update.php`.
+*   **Profile Management (`profile.php`)**: Allows admins to manage their personal information.
 *   **Settings (`settings.php`)**: A placeholder page for future application-wide settings.
 
 ### Sales Portal (`frontend/sales/`)
 
 *   **Authentication**: Access is restricted to users with the 'sales_manager' role.
-*   **Dashboard (`dashboard.php`)**: Provides sales managers with a summary of their performance.
-    *   **Current State**: The dashboard is visually designed but currently uses hardcoded placeholder data.
-    *   **Stats Cards**: Includes key metrics like "My Pending Orders," "My Sales," and "New Customers."
-    *   **Data Visualization**: Features a line chart for "My Recent Activity."
-*   **Pages**:
-    *   `orders.php`: To manage customer orders.
-    *   `products.php`: To manage product listings.
-    *   `customers.php`: To manage their customer list.
+*   **Dashboard (`dashboard.php`)**: Provides sales managers with a summary of their performance. Uses hardcoded data.
+*   **Pages**: `orders.php`, `products.php`, `customers.php`.
+
+### Production Portal (`frontend/production/`)
+
+*   **Authentication**: Access will be restricted to users with the 'production_manager' role.
+*   **Dashboard (`dashboard.php`)**: Will provide a real-time overview of production metrics, including daily output and current stock levels.
+*   **Inventory Management (`manage-inventory.php`)**: Will allow production managers to view and update stock quantities to synchronize with the sales and inventory systems.
+*   **Production Recording (`manage-production.php`)**: Will feature a form to record daily production quantities of bottled water and other beverages.
 
 ## Plan for Current Request
 
-The user requested assistance. This was interpreted as a general request to continue building out the application based on the existing structure and hierarchy of needs.
+The user has requested the creation of a new **Production Manager Portal**. The portal must be consistent with the existing admin and sales portals and include functionality for recording production, managing inventory, and viewing a dedicated dashboard.
 
-**Completed Steps:**
+**Planned Steps:**
 
-1.  **Implemented Admin Inventory Page:**
-    *   Created `frontend/admin/inventory.php` to display product stock.
-    *   Modified `backend/api/products/update.php` to allow partial updates (specifically for stock quantity) and added access for the 'admin' role.
-    *   Created `frontend/js/admin-inventory.js` to fetch inventory data and handle stock update logic.
-2.  **Implemented Admin Profile Page:**
-    *   Created `frontend/admin/profile.php` with a form for updating user details.
-    *   Created `backend/api/users/get.php` to fetch the current user's data.
-    *   Created `backend/api/users/update.php` to handle email and password changes.
-    *   Created `frontend/js/admin-profile.js` to manage fetching and updating profile information.
-3.  **Implemented Admin Settings Page:**
-    *   Created `frontend/admin/settings.php` as a placeholder for future development.
-4.  **Finalized Blueprint:**
-    *   Updated this `blueprint.md` file to accurately reflect all the newly added features and the current project status.
+1.  **Create File Structure**:
+    *   Create the `frontend/production/` directory.
+    *   Create `partials/` within it for `header.php`, `sidebar.php`, and `footer.php`, adapting them from the admin portal.
+2.  **Build the Dashboard (`dashboard.php`)**:
+    *   Design a dashboard with summary cards and charts.
+    *   Create a new API endpoint (`backend/api/production/dashboard.php`).
+    *   Implement `frontend/js/production-dashboard.js` to fetch and render the data.
+3.  **Implement Inventory Management (`manage-inventory.php`)**:
+    *   Create the page to display and update product stock.
+    *   Ensure the 'production_manager' role has permissions for the relevant product API endpoints.
+    *   Create `frontend/js/production-inventory.js`.
+4.  **Develop Production Recording (`manage-production.php`)**:
+    *   Create the page with a form to submit daily production data.
+    *   Create a new API endpoint (`backend/api/production/create.php`) to handle the data submission and update inventory.
+5.  **Update Authentication**:
+    *   Modify `index.php` to handle routing for the 'production_manager' role.
