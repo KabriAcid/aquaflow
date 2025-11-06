@@ -1,62 +1,61 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     const generateReportBtn = document.getElementById('generateReportBtn');
     const reportSpinner = document.getElementById('reportSpinner');
     const reportContent = document.getElementById('reportContent');
-    const reportTable = document.getElementById('reportTable');
-    const topProductsChartCanvas = document.getElementById('topProductsChart').getContext('2d');
-    const salesOverTimeChartCanvas = document.getElementById('salesOverTimeChart').getContext('2d');
+    const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+    const salesOverTimeCtx = document.getElementById('salesOverTimeChart').getContext('2d');
+    const reportTableContainer = document.getElementById('reportTable');
 
-    let topProductsChart;
-    let salesOverTimeChart;
+    let topProductsChart, salesOverTimeChart;
 
-    generateReportBtn.addEventListener('click', generateReport);
+    const API_URL = '../../backend/api/reports/get_sales_report.php';
 
-    async function generateReport() {
+    const generateReport = async () => {
         reportSpinner.classList.remove('hidden');
-        reportTable.innerHTML = '';
+        generateReportBtn.disabled = true;
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/sales_report');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            const response = await fetch(API_URL);
+            const { data } = await response.json();
+            
+            if (data) {
+                renderCharts(data);
+                renderTable(data.recent_orders);
+                reportContent.classList.remove('hidden');
+            } else {
+                reportContent.innerHTML = '<p class="text-center text-gray-500">No data available to generate a report.</p>';
             }
-            const data = await response.json();
-
-            renderCharts(data);
-            renderReportTable(data.sales_data);
 
         } catch (error) {
-            console.error('Error fetching sales report:', error);
-            reportContent.innerHTML = `<p class="text-red-500">Error generating report: ${error.message}</p>`;
+            console.error('Error generating report:', error);
+            reportContent.innerHTML = '<p class="text-center text-red-500">Failed to generate report. Please try again.</p>';
         } finally {
             reportSpinner.classList.add('hidden');
+            generateReportBtn.disabled = false;
         }
-    }
+    };
 
-    function renderCharts(data) {
+    const renderCharts = (data) => {
         // Destroy existing charts if they exist
-        if (topProductsChart) {
-            topProductsChart.destroy();
-        }
-        if (salesOverTimeChart) {
-            salesOverTimeChart.destroy();
-        }
+        if (topProductsChart) topProductsChart.destroy();
+        if (salesOverTimeChart) salesOverTimeChart.destroy();
 
         // Top Selling Products Chart
-        const topProducts = data.top_products;
-        topProductsChart = new Chart(topProductsChartCanvas, {
+        topProductsChart = new Chart(topProductsCtx, {
             type: 'bar',
             data: {
-                labels: topProducts.map(p => p.product_name),
+                labels: data.top_products.map(p => p.name),
                 datasets: [{
-                    label: 'Total Quantity Sold',
-                    data: topProducts.map(p => p.total_quantity_sold),
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    label: 'Quantity Sold',
+                    data: data.top_products.map(p => p.total_quantity),
+                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
                     borderWidth: 1
                 }]
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true
@@ -66,66 +65,63 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Sales Over Time Chart
-        const salesOverTime = data.sales_over_time;
-        salesOverTimeChart = new Chart(salesOverTimeChartCanvas, {
+        salesOverTimeChart = new Chart(salesOverTimeCtx, {
             type: 'line',
             data: {
-                labels: salesOverTime.map(s => s.date),
+                labels: data.sales_over_time.map(s => s.date),
                 datasets: [{
                     label: 'Total Sales',
-                    data: salesOverTime.map(s => s.total_sales),
+                    data: data.sales_over_time.map(s => s.total_sales),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1
                 }]
             },
             options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+                responsive: true,
+                maintainAspectRatio: false,
             }
         });
-    }
+    };
 
-    function renderReportTable(salesData) {
-        if (salesData.length === 0) {
-            reportTable.innerHTML = '<p class="text-gray-500">No sales data available for the selected period.</p>';
+    const renderTable = (orders) => {
+        if (!orders || orders.length === 0) {
+            reportTableContainer.innerHTML = '<p class="text-center text-gray-500">No recent orders to display.</p>';
             return;
         }
 
-        const table = document.createElement('table');
-        table.className = 'min-w-full divide-y divide-gray-200';
-
-        const thead = document.createElement('thead');
-        thead.className = 'bg-gray-50';
-        thead.innerHTML = `
-            <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
-                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Date</th>
-            </tr>
+        const table = `
+            <h4 class="text-md font-semibold text-gray-600 mb-2 mt-6">Recent Orders</h4>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left p-2">Order ID</th>
+                            <th class="text-left p-2">Customer</th>
+                            <th class="text-left p-2">Date</th>
+                            <th class="text-left p-2">Total</th>
+                            <th class="text-left p-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${orders.map(order => `
+                            <tr class="border-b">
+                                <td class="p-2">#${order.order_id}</td>
+                                <td class="p-2">${order.customer_name}</td>
+                                <td class="p-2">${new Date(order.order_date).toLocaleDateString()}</td>
+                                <td class="p-2">$${parseFloat(order.total_amount).toFixed(2)}</td>
+                                <td class="p-2">${order.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
         `;
-        table.appendChild(thead);
+        reportTableContainer.innerHTML = table;
+    };
 
-        const tbody = document.createElement('tbody');
-        tbody.className = 'bg-white divide-y divide-gray-200';
-        salesData.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap">${item.order_id}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.product_name}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.quantity}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.total_price}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${item.order_date}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-        table.appendChild(tbody);
-
-        reportTable.appendChild(table);
-    }
+    generateReportBtn.addEventListener('click', generateReport);
+    
+    // Initially, hide the report content until a report is generated.
+    reportContent.classList.add('hidden');
 });

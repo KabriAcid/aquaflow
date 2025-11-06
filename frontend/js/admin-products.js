@@ -1,139 +1,140 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     const addProductBtn = document.getElementById('add-product-btn');
     const productModal = document.getElementById('product-modal');
     const cancelBtn = document.getElementById('cancel-btn');
     const productForm = document.getElementById('product-form');
     const modalTitle = document.getElementById('modal-title');
     const saveBtn = document.getElementById('save-btn');
-    const productsTable = document.getElementById('products-table').querySelector('tbody');
 
-    const showModal = (title, buttonText) => {
-        modalTitle.textContent = title;
-        saveBtn.textContent = buttonText;
-        productModal.classList.remove('hidden');
+    const deleteProductModal = document.getElementById('delete-product-modal');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const deleteProductForm = document.getElementById('delete-product-form');
+
+    const productsTbody = document.getElementById('products-tbody');
+
+    const API_URL = '../../backend/api/products/get_all.php';
+    const CREATE_URL = '../../backend/api/products/create.php';
+    const UPDATE_URL = '../../backend/api/products/update.php';
+    const DELETE_URL = '../../backend/api/products/delete.php';
+
+    const openModal = (modal) => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     };
 
-    const hideModal = () => {
-        productModal.classList.add('hidden');
+    const closeModal = (modal) => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    };
+
+    addProductBtn.addEventListener('click', () => {
+        modalTitle.textContent = 'Add Product';
+        saveBtn.textContent = 'Save';
         productForm.reset();
-        document.getElementById('product-id').value = '';
-    };
+        openModal(productModal);
+    });
 
-    addProductBtn.addEventListener('click', () => showModal('Add Product', 'Add Product'));
-    cancelBtn.addEventListener('click', hideModal);
+    cancelBtn.addEventListener('click', () => closeModal(productModal));
+    cancelDeleteBtn.addEventListener('click', () => closeModal(deleteProductModal));
 
-    // Handle form submission (Add/Edit)
-    productForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const productId = document.getElementById('product-id').value;
-        const isEditing = !!productId;
-        const endpoint = isEditing ? `../backend/api/products/update.php?id=${productId}` : '../backend/api/products/create.php';
-        const method = isEditing ? 'PUT' : 'POST';
-
-        const formData = new FormData(productForm);
-        const data = Object.fromEntries(formData.entries());
-
+    const fetchProducts = async () => {
         try {
-            const res = await fetch(endpoint, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+            const response = await fetch(API_URL);
+            const { data } = await response.json();
+            
+            productsTbody.innerHTML = '';
+            data.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3 border-b">${product.name}</td>
+                    <td class="p-3 border-b">${product.price}</td>
+                    <td class="p-3 border-b">${product.stock_quantity}</td>
+                    <td class="p-3 border-b">${new Date(product.created_at).toLocaleDateString()}</td>
+                    <td class="p-3 border-b">
+                        <button class="edit-btn text-blue-500 hover:text-blue-700" data-id="${product.product_id}"><i class="fas fa-edit"></i></button>
+                        <button class="delete-btn text-red-500 hover:text-red-700 ml-2" data-id="${product.product_id}"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                productsTbody.appendChild(tr);
             });
-
-            if (res.ok) {
-                hideModal();
-                fetchProducts();
-            } else {
-                const error = await res.json();
-                alert(`Error: ${error.message}`);
-            }
-        } catch (error) {
-            console.error('Form submission error:', error);
-            alert('An unexpected error occurred.');
-        }
-    });
-
-    // Event delegation for Edit and Delete buttons
-    productsTable.addEventListener('click', (e) => {
-        const target = e.target;
-        const productId = target.dataset.id;
-
-        if (target.classList.contains('edit-btn')) {
-            handleEdit(productId);
-        }
-        if (target.classList.contains('delete-btn')) {
-            handleDelete(productId);
-        }
-    });
-
-    const handleEdit = async (id) => {
-        try {
-            const res = await fetch(`../backend/api/products/get_single.php?id=${id}`);
-            const product = await res.json();
-            if (product.success) {
-                document.getElementById('product-id').value = product.data.id;
-                document.getElementById('product-name').value = product.data.name;
-                document.getElementById('product-description').value = product.data.description;
-                document.getElementById('product-price').value = product.data.price;
-                document.getElementById('product-stock').value = product.data.stock;
-                showModal('Edit Product', 'Save Changes');
-            } else {
-                alert(product.message);
-            }
-        } catch (error) {
-            console.error('Error fetching product:', error);
-        }
-    };
-
-    const handleDelete = async (id) => {
-        if (confirm('Are you sure you want to delete this product?')) {
-            try {
-                const res = await fetch(`../backend/api/products/delete.php?id=${id}`, {
-                    method: 'DELETE'
-                });
-                if (res.ok) {
-                    fetchProducts();
-                } else {
-                    const error = await res.json();
-                    alert(`Error: ${error.message}`);
-                }
-            } catch (error) {
-                console.error('Error deleting product:', error);
-                alert('An unexpected error occurred.');
-            }
-        }
-    };
-
-    // Fetch and display products
-    async function fetchProducts() {
-        try {
-            const res = await fetch('../backend/api/products/get_all.php');
-            const products = await res.json();
-
-            productsTable.innerHTML = ''; // Clear existing rows
-
-            if (products.success && products.data.length > 0) {
-                products.data.forEach(product => {
-                    const row = document.createElement('tr');
-                    row.classList.add('border-b');
-                    row.innerHTML = `
-                        <td class="p-3">${product.name}</td>
-                        <td class="p-3">$${product.price}</td>
-                        <td class="p-3">${product.stock}</td>
-                        <td class="p-3">
-                            <button class="edit-btn text-blue-500 hover:underline" data-id="${product.id}">Edit</button>
-                            <button class="delete-btn text-red-500 hover:underline ml-4" data-id="${product.id}">Delete</button>
-                        </td>
-                    `;
-                    productsTable.appendChild(row);
-                });
-            } else {
-                productsTable.innerHTML = '<tr><td colspan="4" class="p-3 text-center">No products found.</td></tr>';
-            }
         } catch (error) {
             console.error('Error fetching products:', error);
         }
-    }
+    };
+
+    productForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(productForm);
+        const data = Object.fromEntries(formData.entries());
+        const url = data.product_id ? UPDATE_URL : CREATE_URL;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                closeModal(productModal);
+                fetchProducts();
+            } else {
+                console.error('Operation failed:', result.message);
+            }
+        } catch (error) {
+            console.error('Error saving product:', error);
+        }
+    });
+
+    productsTbody.addEventListener('click', async (e) => {
+        if (e.target.closest('.edit-btn')) {
+            const productId = e.target.closest('.edit-btn').dataset.id;
+            try {
+                const response = await fetch(`${API_URL}?product_id=${productId}`);
+                const { data } = await response.json();
+                
+                document.getElementById('product-id').value = data.product_id;
+                document.getElementById('product-name').value = data.name;
+                document.getElementById('product-description').value = data.description;
+                document.getElementById('product-price').value = data.price;
+                document.getElementById('product-stock').value = data.stock_quantity;
+                
+                modalTitle.textContent = 'Edit Product';
+                saveBtn.textContent = 'Update';
+                openModal(productModal);
+            } catch (error) {
+                console.error('Error fetching product data:', error);
+            }
+        } else if (e.target.closest('.delete-btn')) {
+            const productId = e.target.closest('.delete-btn').dataset.id;
+            document.getElementById('delete-product-id').value = productId;
+            openModal(deleteProductModal);
+        }
+    });
+
+    deleteProductForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const productId = document.getElementById('delete-product-id').value;
+
+        try {
+            const response = await fetch(DELETE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId })
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                closeModal(deleteProductModal);
+                fetchProducts();
+            } else {
+                console.error('Deletion failed:', result.message);
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
+        }
+    });
 
     fetchProducts();
 });
