@@ -40,7 +40,8 @@ try {
     // generate simple order number
     $order_number = 'AF' . time() . rand(100, 999);
 
-    $stmt = $pdo->prepare('INSERT INTO orders (order_number, customer_id, delivery_address, delivery_city, delivery_state, delivery_postal_code, delivery_date, special_instructions, subtotal, delivery_fee, total_amount, status, payment_status, created_at) VALUES (:order_number, :customer_id, :delivery_address, :delivery_city, :delivery_state, :delivery_postal_code, :delivery_date, :special_instructions, :subtotal, :delivery_fee, :total_amount, :status, :payment_status, NOW())');
+    // note: avoid referencing columns that may not exist in some DB instances (e.g., delivery_postal_code)
+    $stmt = $pdo->prepare('INSERT INTO orders (order_number, customer_id, delivery_address, delivery_city, delivery_state, delivery_date, special_instructions, subtotal, delivery_fee, total_amount, status, payment_status, created_at) VALUES (:order_number, :customer_id, :delivery_address, :delivery_city, :delivery_state, :delivery_date, :special_instructions, :subtotal, :delivery_fee, :total_amount, :status, :payment_status, NOW())');
 
     // try to split delivery_address into components if comma-separated
     $delivery_city = '';
@@ -60,7 +61,6 @@ try {
         ':delivery_address' => $delivery_address,
         ':delivery_city' => $delivery_city,
         ':delivery_state' => $delivery_state,
-        ':delivery_postal_code' => '',
         ':delivery_date' => $delivery_date,
         ':special_instructions' => $special_instructions,
         ':subtotal' => $subtotal,

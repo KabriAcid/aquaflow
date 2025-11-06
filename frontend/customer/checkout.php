@@ -203,12 +203,15 @@
                         updateUiForPaymentMethod();
                     });
 
-                    // Set minimum delivery date to tomorrow
+                    // Set delivery date default and minimum to today
                     const today = new Date();
-                    const tomorrow = new Date(today);
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    const minDate = tomorrow.toISOString().split('T')[0];
-                    document.getElementById('delivery_date').setAttribute('min', minDate);
+                    const isoToday = today.toISOString().split('T')[0];
+                    const deliveryEl = document.getElementById('delivery_date');
+                    if (deliveryEl) {
+                        deliveryEl.setAttribute('min', isoToday);
+                        // if no value already set (e.g., from profile), default to today
+                        if (!deliveryEl.value) deliveryEl.value = isoToday;
+                    }
 
                     // initialize UI state
                     updateUiForPaymentMethod();
@@ -424,6 +427,14 @@
                     const user = payload.user || {};
                     const orderId = order.order_id;
                     const amount = parseFloat(order.total_amount || order.total_amount || 0);
+
+                    // Clear the client-side cart immediately after the order is created server-side
+                    // This prevents duplicate submissions and aligns with server-side order logging.
+                    try {
+                        clearCart();
+                    } catch (e) {
+                        console.warn('clearCart not available', e);
+                    }
 
                     if (orderData.payment_method === 'card') {
                         if (!FLW_PUBLIC_KEY || FLW_PUBLIC_KEY.includes('REPLACE_ME')) {

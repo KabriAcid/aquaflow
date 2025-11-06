@@ -10,6 +10,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide icons loaded for sales pages (matches admin) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.lucide && typeof lucide.createIcons === 'function') lucide.createIcons();
+        });
+    </script>
 </head>
-<body class="bg-gray-100 flex font-sans text-gray-800">
 
+<body class="bg-gray-100 flex font-sans text-gray-800">

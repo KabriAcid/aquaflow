@@ -4,7 +4,6 @@ if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['sales'
     header('Location: ../login.php');
     exit;
 }
-
 $page_title = "Sales Dashboard";
 
 include 'partials/header.php';
@@ -14,7 +13,6 @@ include 'partials/sidebar.php';
 <div class="container-fluid">
     <div class="mb-6">
         <h1 class="text-2xl font-semibold text-gray-700">Sales Dashboard</h1>
-        <p class="text-gray-500">Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</p>
     </div>
 
     <!-- Stats Cards -->

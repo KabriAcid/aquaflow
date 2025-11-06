@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 31, 2025 at 05:44 AM
+-- Generation Time: Nov 06, 2025 at 03:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -142,15 +142,13 @@ CREATE TABLE `orders` (
   `delivery_address` text NOT NULL,
   `delivery_city` varchar(50) DEFAULT NULL,
   `delivery_state` varchar(50) DEFAULT NULL,
-  `delivery_postal_code` varchar(10) DEFAULT NULL,
   `delivery_date` date DEFAULT NULL,
-  `special_instructions` text DEFAULT NULL,
+  `special_instructions` text DEFAULT 'No special instructions',
   `subtotal` decimal(10,2) NOT NULL,
   `delivery_fee` decimal(10,2) DEFAULT 0.00,
   `total_amount` decimal(10,2) NOT NULL,
   `status` enum('pending','processing','out_for_delivery','delivered','cancelled') NOT NULL DEFAULT 'pending',
   `payment_status` enum('unpaid','paid','refunded') NOT NULL DEFAULT 'unpaid',
-  `assigned_to` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -159,11 +157,10 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `order_number`, `customer_id`, `order_date`, `delivery_address`, `delivery_city`, `delivery_state`, `delivery_postal_code`, `delivery_date`, `special_instructions`, `subtotal`, `delivery_fee`, `total_amount`, `status`, `payment_status`, `assigned_to`, `created_at`, `updated_at`) VALUES
-(5, 'AF1761876884517', 4, '2025-10-31 02:14:44', '285 Second Street, Karaye, Kano', 'Karaye', 'Kano', '', '2025-10-31', 'Dignissimos deserunt', 8280.00, 500.00, 8780.00, 'pending', 'unpaid', NULL, '2025-10-31 02:14:44', '2025-10-31 02:14:44'),
-(6, 'AF1761877708218', 6, '2025-10-31 02:28:28', '330 North Rocky Old Lane, Karin-Lamido, Taraba', 'Karin-Lamido', 'Taraba', '', '2025-10-31', 'Mollit officia volup', 260.00, 500.00, 760.00, 'pending', 'unpaid', NULL, '2025-10-31 02:28:28', '2025-10-31 02:28:28'),
-(7, 'AF1761877736724', 6, '2025-10-31 02:28:56', '772 Milton Road, Karin-Lamido, Taraba', 'Karin-Lamido', 'Taraba', '', '2025-10-31', 'Explicabo Enim fugi', 260.00, 500.00, 760.00, 'pending', 'unpaid', NULL, '2025-10-31 02:28:56', '2025-10-31 02:28:56'),
-(8, 'AF1761879092740', 6, '2025-10-31 02:51:32', '294 West Nobel Court, Oshodi, Lagos', 'Oshodi', 'Lagos', '', '2025-10-31', 'Est quam molestiae n', 4080.00, 500.00, 4580.00, 'pending', 'unpaid', NULL, '2025-10-31 02:51:32', '2025-10-31 02:51:32');
+INSERT INTO `orders` (`id`, `order_number`, `customer_id`, `order_date`, `delivery_address`, `delivery_city`, `delivery_state`, `delivery_date`, `special_instructions`, `subtotal`, `delivery_fee`, `total_amount`, `status`, `payment_status`, `created_at`, `updated_at`) VALUES
+(10, 'AF1762436426361', 4, '2025-11-06 13:40:26', '639 White Second Boulevard, Surulere, Lagos', 'Surulere', 'Lagos', '2025-11-19', 'No special instructions', 24780.00, 500.00, 25280.00, 'pending', 'unpaid', '2025-11-06 13:40:26', '2025-11-06 13:42:19'),
+(11, 'AF1762438964726', 4, '2025-11-06 14:22:44', '639 White Second Boulevard, Bonny, Rivers', 'Bonny', 'Rivers', '2025-11-22', '', 36530.00, 500.00, 37030.00, 'pending', 'unpaid', '2025-11-06 14:22:44', '2025-11-06 14:22:44'),
+(12, 'AF1762439662896', 4, '2025-11-06 14:34:22', '639 White Second Boulevard, Surulere, Lagos', 'Surulere', 'Lagos', '2025-11-06', '', 9600.00, 500.00, 10100.00, '', 'unpaid', '2025-11-06 14:34:22', '2025-11-06 14:34:27');
 
 -- --------------------------------------------------------
 
@@ -186,24 +183,37 @@ CREATE TABLE `order_items` (
 --
 
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `quantity`, `unit_price`, `subtotal`) VALUES
-(1, 1, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
-(2, 1, 11, 'Mineral Water - Still', 13, 180.00, 2340.00),
-(3, 2, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
-(4, 2, 11, 'Mineral Water - Still', 13, 180.00, 2340.00),
-(5, 3, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
-(6, 3, 11, 'Mineral Water - Still', 13, 180.00, 2340.00),
-(7, 4, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
-(8, 4, 11, 'Mineral Water - Still', 13, 180.00, 2340.00),
-(9, 5, 9, 'Sparkling Water - Lime', 24, 75.00, 1800.00),
-(10, 5, 11, 'Mineral Water - Still', 12, 180.00, 2160.00),
-(11, 5, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
-(12, 5, 12, 'Natural Spring Water', 60, 40.00, 2400.00),
-(13, 6, 10, 'Sparkling Water - Berry', 1, 80.00, 80.00),
-(14, 6, 11, 'Mineral Water - Still', 1, 180.00, 180.00),
-(15, 7, 10, 'Sparkling Water - Berry', 1, 80.00, 80.00),
-(16, 7, 11, 'Mineral Water - Still', 1, 180.00, 180.00),
-(17, 8, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
-(18, 8, 11, 'Mineral Water - Still', 12, 180.00, 2160.00);
+(19, 9, 18, 'Party Pack - Mixed', 2, 3500.00, 7000.00),
+(20, 9, 1, 'Pure Life Water', 50, 50.00, 2500.00),
+(21, 9, 2, 'Pure Life Water', 40, 70.00, 2800.00),
+(22, 9, 9, 'Sparkling Water - Lime', 24, 75.00, 1800.00),
+(23, 9, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
+(24, 9, 11, 'Mineral Water - Still', 12, 180.00, 2160.00),
+(25, 9, 16, 'Family Mega Pack Water', 2, 1900.00, 3800.00),
+(26, 9, 17, 'Office Starter Pack', 2, 1400.00, 2800.00),
+(27, 10, 18, 'Party Pack - Mixed', 2, 3500.00, 7000.00),
+(28, 10, 1, 'Pure Life Water', 50, 50.00, 2500.00),
+(29, 10, 2, 'Pure Life Water', 40, 70.00, 2800.00),
+(30, 10, 9, 'Sparkling Water - Lime', 24, 75.00, 1800.00),
+(31, 10, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
+(32, 10, 11, 'Mineral Water - Still', 12, 180.00, 2160.00),
+(33, 10, 16, 'Family Mega Pack Water', 2, 1900.00, 3800.00),
+(34, 10, 17, 'Office Starter Pack', 2, 1400.00, 2800.00),
+(35, 11, 18, 'Party Pack - Mixed', 2, 3500.00, 7000.00),
+(36, 11, 1, 'Pure Life Water', 50, 50.00, 2500.00),
+(37, 11, 2, 'Pure Life Water', 40, 70.00, 2800.00),
+(38, 11, 9, 'Sparkling Water - Lime', 24, 75.00, 1800.00),
+(39, 11, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
+(40, 11, 11, 'Mineral Water - Still', 12, 180.00, 2160.00),
+(41, 11, 16, 'Family Mega Pack Water', 2, 1900.00, 3800.00),
+(42, 11, 17, 'Office Starter Pack', 2, 1400.00, 2800.00),
+(43, 11, 4, 'Fruit Juice - Orange', 20, 150.00, 3000.00),
+(44, 11, 5, 'Fruit Juice - Apple', 20, 150.00, 3000.00),
+(45, 11, 7, 'Family Pack Water', 5, 550.00, 2750.00),
+(46, 11, 8, 'Office Pack Water', 3, 1000.00, 3000.00),
+(47, 12, 13, 'Tropical Punch', 24, 160.00, 3840.00),
+(48, 12, 14, 'Iced Tea - Lemon', 24, 140.00, 3360.00),
+(49, 12, 12, 'Natural Spring Water', 60, 40.00, 2400.00);
 
 -- --------------------------------------------------------
 
@@ -222,6 +232,13 @@ CREATE TABLE `payments` (
   `receipt_url` varchar(255) DEFAULT NULL,
   `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`id`, `order_id`, `payment_method`, `amount`, `transaction_reference`, `payment_status`, `payment_date`, `receipt_url`, `notes`) VALUES
+(1, 12, 'cash_on_delivery', 10100.00, 'COD-12-1762439667', 'pending', '2025-11-06 14:34:27', NULL, '{\"note\":\"Cash on Delivery created via confirm_cod endpoint\",\"created_by\":4}');
 
 -- --------------------------------------------------------
 
@@ -321,10 +338,6 @@ INSERT INTO `settings` (`id`, `setting_key`, `setting_value`, `setting_type`, `u
 
 -- --------------------------------------------------------
 
--- transactions table removed from schema (payments table is used instead)
-
--- --------------------------------------------------------
-
 --
 -- Table structure for table `users`
 --
@@ -351,12 +364,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password_hash`, `role`, `status`, `address`, `city`, `state`, `postal_code`, `created_at`, `updated_at`, `last_login`) VALUES
-(1, 'System Administrator', 'admin@wbfms.com', '+2348000000000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active', NULL, NULL, NULL, NULL, '2025-10-30 22:31:36', '2025-10-30 22:31:36', NULL),
-(2, 'Cecilia Mercer', 'gynyzi@gmail.com', '08037573455', '$2y$10$67i1QxLgA51VsAbKqpHex.4C.q5/Q4hCM6lO6HlkYRxnokV6jAche', 'customer', 'active', '10 Milton Avenue', 'Lorem incididunt pro', 'Laudantium quo pari', 'Et archite', '2025-10-31 00:22:56', '2025-10-31 00:22:56', NULL),
-(3, 'Francesca Douglas', 'cowozeguv@gmail.com', '08035587073', '$2y$10$gKB746O.txDM7HAF0VGNEeUHZwSZk1MytoGIZM3Cd93UTxMiczryW', 'customer', 'active', '36 Green New Court', 'Adamawa', 'Yola', '184520', '2025-10-31 00:42:52', '2025-10-31 00:42:52', NULL),
-(4, 'Bevis Todd', 'vytu@gmail.com', '08046816018', '$2y$10$e8o4dq11EeUIUPMHTFTKOO..vIpVxUQmv.oZJ3x4hEJXd9ejB7LNa', 'customer', 'active', '639 White Second Boulevard', 'zaria', 'kaduna', '206794', '2025-10-31 00:53:49', '2025-10-31 00:53:49', NULL),
-(5, 'System Administrator', 'admin@aquaflow.com', '+2348000000000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active', NULL, NULL, NULL, NULL, '2025-10-31 01:24:42', '2025-10-31 01:24:42', NULL),
-(6, 'Kristen Fernandez', 'kafi@gmail.com', '08053194908', '$2y$10$1IIT1pJqPpGuVTqt79skbuCtCE79OToURPld7H.R/pnNAFc1jAbY.', 'sales_manager', 'active', '432 North White New Avenue', 'gokana', 'rivers', 'Reprehende', '2025-10-31 02:28:04', '2025-10-31 03:35:45', NULL);
+(2, 'Cecilia Mercer', 'admin@aquaflow.com', '08037573455', '$2y$10$67i1QxLgA51VsAbKqpHex.4C.q5/Q4hCM6lO6HlkYRxnokV6jAche', 'admin', 'active', '10 Milton Avenue', 'Lorem incididunt pro', 'Laudantium quo pari', 'Et archite', '2025-10-31 00:22:56', '2025-10-31 19:13:42', NULL),
+(3, 'Francesca Douglas', 'production@aquaflow.com', '08035587073', '$2y$10$gKB746O.txDM7HAF0VGNEeUHZwSZk1MytoGIZM3Cd93UTxMiczryW', 'production_manager', 'active', '36 Green New Court', 'Adamawa', 'Yola', '184520', '2025-10-31 00:42:52', '2025-10-31 19:14:17', NULL),
+(4, 'Bevis Todd', 'customer@aquaflow.com', '08046816018', '$2y$10$e8o4dq11EeUIUPMHTFTKOO..vIpVxUQmv.oZJ3x4hEJXd9ejB7LNa', 'customer', 'active', '639 White Second Boulevard', 'zaria', 'kaduna', '206794', '2025-10-31 00:53:49', '2025-10-31 19:13:57', NULL),
+(6, 'Kristen Fernandez', 'sales@aquaflow.com', '08053194908', '$2y$10$1IIT1pJqPpGuVTqt79skbuCtCE79OToURPld7H.R/pnNAFc1jAbY.', 'sales_manager', 'active', '432 North White New Avenue', 'gokana', 'rivers', 'Reprehende', '2025-10-31 02:28:04', '2025-10-31 19:13:10', NULL);
 
 --
 -- Indexes for dumped tables
@@ -456,9 +467,6 @@ ALTER TABLE `settings`
   ADD KEY `idx_setting_type` (`setting_type`);
 
 --
--- Indexes for table `transactions` removed (no transactions table)
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -500,19 +508,19 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `production`
@@ -531,9 +539,6 @@ ALTER TABLE `products`
 --
 ALTER TABLE `settings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `transactions` removed (no transactions table)
 
 --
 -- AUTO_INCREMENT for table `users`

@@ -1,6 +1,3 @@
-<?php
-// customer/order-details.php
-?>
 <!DOCTYPE html>
 <html lang="en">
 

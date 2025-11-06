@@ -69,7 +69,7 @@ try {
     // Update order status and payment status
     $update = $pdo->prepare('UPDATE orders SET status = :status, payment_status = :payment_status, updated_at = NOW() WHERE id = :id');
     $update->execute([
-        ':status' => 'confirmed',
+        ':status' => 'processing',
         ':payment_status' => 'unpaid',
         ':id' => $order_id
     ]);

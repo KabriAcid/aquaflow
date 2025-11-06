@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$userName = $_SESSION['user_name'] ?? 'Sales Manager';
+$userName = 'Sales Manager';
 
 $links = [
     ['href' => 'dashboard.php', 'icon' => 'M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z', 'text' => 'Dashboard'],
@@ -15,20 +15,30 @@ $links = [
 $current_page = basename($_SERVER['PHP_SELF']);
 
 ?>
-<aside class="w-64 bg-white text-gray-800 p-6 flex-col shadow-lg hidden md:flex">
-    <div class="flex items-center gap-3 mb-8">
+<aside class="w-64 bg-white text-gray-800 p-6 flex flex-col h-screen shadow-lg hidden md:flex">
+    <div class="flex items-center gap-3 mb-8 border-b pb-3">
         <img src="../../favicon.png" alt="Aquaflow Logo" class="w-10 h-10">
         <h1 class="text-2xl font-bold">Aquaflow</h1>
     </div>
 
     <nav class="flex-1">
+        <?php
+        // Map readable names to lucide icon names for consistent visuals
+        $icon_map = [
+            'Dashboard' => 'home',
+            'Orders' => 'shopping-cart',
+            'Products' => 'package',
+            'Customers' => 'users',
+        ];
+        ?>
         <ul class="space-y-2">
             <?php foreach ($links as $link) : ?>
                 <?php $isActive = ($current_page == $link['href']); ?>
-                <li>
-                    <a href="<?php echo $link['href']; ?>" class="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors <?php echo $isActive ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-200'; ?>">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo $link['icon']; ?>"></path></svg>
-                        <span><?php echo $link['text']; ?></span>
+                <?php $iconName = $icon_map[$link['text']] ?? 'circle'; ?>
+                <li class="whitespace-nowrap">
+                    <a href="<?php echo htmlspecialchars($link['href'], ENT_QUOTES); ?>" class="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors <?php echo $isActive ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-200'; ?>">
+                        <i data-lucide="<?php echo $iconName; ?>" class="w-5 h-5" aria-hidden="true"></i>
+                        <span><?php echo htmlspecialchars($link['text']); ?></span>
                     </a>
                 </li>
             <?php endforeach; ?>
@@ -36,21 +46,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </nav>
 
     <div class="mt-auto">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500">
-                <?php echo strtoupper(substr($userName, 0, 1)); ?>
-            </div>
-            <div>
-                <p class="font-semibold"><?php echo htmlspecialchars($userName); ?></p>
-                <p class="text-sm text-gray-500">Sales Manager</p>
-            </div>
-        </div>
         <a href="../../includes/logout.php" class="flex items-center gap-3 px-4 py-2 mt-4 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3"></path></svg>
+            <i data-lucide="log-out" class="w-5 h-5" aria-hidden="true"></i>
             <span>Logout</span>
         </a>
     </div>
 </aside>
 <div class="flex-1 flex flex-col">
-    <?php include 'partials/topbar.php'; ?>
     <main class="flex-1 p-6 bg-gray-100">

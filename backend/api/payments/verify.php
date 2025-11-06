@@ -34,8 +34,7 @@ try {
         $resp = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-
-        $verification_info = json_decode($resp, true);
+        $verification_info = @json_decode($resp, true);
         if ($code === 200 && isset($verification_info['status']) && $verification_info['status'] === 'success') {
             $verified = true;
         }
@@ -53,6 +52,16 @@ try {
         $orderStmt = $pdo->prepare('SELECT id, customer_id, total_amount FROM orders WHERE id = :id LIMIT 1');
         $orderStmt->execute([':id' => $order_id]);
         $order = $orderStmt->fetch(PDO::FETCH_ASSOC) ?: null;
+
+        if (!$order) {
+            // log and return a 404 if the order isn't present
+            $logDir = __DIR__ . '/../../../logs';
+            if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+            $logFile = $logDir . '/payments_verify_errors.log';
+            $msg = date('Y-m-d H:i:s') . " - verify.php: order not found for order_id={$order_id} payload=" . json_encode($data) . " response=" . substr(($resp ?? ''), 0, 1000) . "\n";
+            @file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+            error_response('Order not found', null, 404);
+        }
 
         $customer_id = $order['customer_id'] ?? null;
         $amount = null;
@@ -91,6 +100,8 @@ try {
         if (is_array($verification_info) && isset($verification_info['data']['payment_type'])) {
             $payment_method = $verification_info['data']['payment_type'];
         }
+        // fallback
+        if (empty($payment_method)) $payment_method = 'card';
 
         // Insert a record into payments table with verification info
         $insertStmt = $pdo->prepare('INSERT INTO payments (order_id, payment_method, amount, transaction_reference, payment_status, payment_date, notes, receipt_url) VALUES (:order_id, :payment_method, :amount, :transaction_reference, :payment_status, NOW(), :notes, :receipt_url)');
@@ -118,5 +129,16 @@ try {
         error_response('Payment verification failed', ['remote' => $verification_info], 400);
     }
 } catch (Exception $e) {
+    // Log detailed error to logs/payments_verify_errors.log
+    $logDir = __DIR__ . '/../../../logs';
+    if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+    $logFile = $logDir . '/payments_verify_errors.log';
+    $trace = $e->getTraceAsString();
+    $payload = isset($data) ? json_encode($data) : '';
+    $respSnippet = isset($resp) ? substr($resp, 0, 2000) : '';
+    $verificationSnippet = isset($verification_info) ? json_encode($verification_info) : '';
+    $msg = date('Y-m-d H:i:s') . " - verify.php exception: " . $e->getMessage() . "\npayload=" . $payload . "\nresponse_snippet=" . $respSnippet . "\nverification_info=" . $verificationSnippet . "\ntrace=" . $trace . "\n\n";
+    @file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+
     error_response('Verification error', ['exception' => $e->getMessage()], 500);
 }
