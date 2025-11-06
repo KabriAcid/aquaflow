@@ -139,4 +139,12 @@ include 'partials/sidebar.php';
 
 
 <script src="../js/admin-production-managers.js" defer></script>
+<script>
+    // Ensure lucide replaces any static placeholders (header icons) after DOM load.
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.lucide && typeof window.lucide.replace === 'function') {
+            window.lucide.replace();
+        }
+    });
+</script>
 <?php include 'partials/footer.php'; ?>

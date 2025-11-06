@@ -4,10 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelAddBtn = document.getElementById("cancel-add-btn");
   const addManagerForm = document.getElementById("add-manager-form");
 
-  const editManagerModal = document.getElementById("edit-manager-modal");
-  const cancelEditBtn = document.getElementById("cancel-edit-btn");
-  const editManagerForm = document.getElementById("edit-manager-form");
-
   const deleteManagerModal = document.getElementById("delete-manager-modal");
   const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
   const deleteManagerForm = document.getElementById("delete-manager-form");
@@ -34,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Event listeners for modals
   addManagerBtn.addEventListener("click", () => openModal(addManagerModal));
   cancelAddBtn.addEventListener("click", () => closeModal(addManagerModal));
-  cancelEditBtn.addEventListener("click", () => closeModal(editManagerModal));
   cancelDeleteBtn.addEventListener("click", () =>
     closeModal(deleteManagerModal)
   );
@@ -66,14 +61,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td class="p-3 border-b">
                         <button class="edit-btn text-blue-500 hover:text-blue-700" data-id="${
                           manager.user_id
-                        }"><i class="fas fa-edit"></i></button>
+                        }" aria-label="Edit"><i data-lucide="edit-2" class="w-4 h-4" aria-hidden="true"></i></button>
                         <button class="delete-btn text-red-500 hover:text-red-700 ml-2" data-id="${
                           manager.user_id
-                        }"><i class="fas fa-trash"></i></button>
+                        }" aria-label="Delete"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button>
                     </td>
                 `;
         managersTbody.appendChild(tr);
       });
+      // initialize lucide icons inside newly added rows
+      if (window.lucide && typeof window.lucide.replace === "function") {
+        window.lucide.replace();
+      }
     } catch (error) {
       console.error("Error fetching managers:", error);
       managersTbody.innerHTML =
@@ -81,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Add new manager
+  // Add or Update manager (reuse add modal for edits)
   addManagerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(addManagerForm);
@@ -89,7 +88,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const payload = Object.fromEntries(formData.entries());
-      const response = await fetch(CREATE_URL, {
+
+      // normalize keys
+      if (payload.name && !payload.username) payload.username = payload.name;
+      if (payload.lga && !payload.city) payload.city = payload.lga;
+
+      const isEdit = payload.user_id && payload.user_id.length > 0;
+      const url = isEdit ? UPDATE_URL : CREATE_URL;
+
+      const response = await fetch(url, {
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
@@ -100,20 +107,29 @@ document.addEventListener("DOMContentLoaded", () => {
         closeModal(addManagerModal);
         fetchManagers();
         addManagerForm.reset();
+        // reset modal title/button
+        const title = document.querySelector("#add-manager-modal h2");
+        const submitBtn = addManagerForm.querySelector('button[type="submit"]');
+        if (title) title.textContent = "Add New Manager";
+        if (submitBtn) submitBtn.textContent = "Save Manager";
+        document.getElementById("add-user-id").value = "";
       } else {
-        console.error("Error adding manager:", result && result.message);
+        console.error(
+          isEdit ? "Error updating manager:" : "Error adding manager:",
+          result && result.message
+        );
         alert(
-          "Failed to add manager: " +
+          (isEdit ? "Failed to update manager: " : "Failed to add manager: ") +
             (result && result.message ? result.message : "Unknown error")
         );
       }
     } catch (error) {
-      console.error("Error adding manager:", error);
-      alert("Network error while adding manager");
+      console.error("Error saving manager:", error);
+      alert("Network error while saving manager");
     }
   });
 
-  // Edit manager
+  // Edit manager: reuse the add modal
   managersTbody.addEventListener("click", async (e) => {
     if (e.target.closest(".edit-btn")) {
       const userId = e.target.closest(".edit-btn").dataset.id;
@@ -127,46 +143,29 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("Failed to load manager details");
           return;
         }
-        const data = res.data;
-        document.getElementById("edit-user-id").value = data.user_id;
-        document.getElementById("edit-name").value = data.name;
-        document.getElementById("edit-email").value = data.email;
-        document.getElementById("edit-phone").value = data.phone;
-        openModal(editManagerModal);
+        // Handle both array and object responses
+        const data = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!data) {
+          alert("Manager data not found");
+          return;
+        }
+        // populate add form fields
+        document.getElementById("add-user-id").value = data.user_id || "";
+        document.getElementById("add-name").value = data.name || "";
+        document.getElementById("add-email").value = data.email || "";
+        document.getElementById("add-phone").value = data.phone || "";
+        document.getElementById("add-lga").value = data.city || "";
+        document.getElementById("add-state").value = data.state || "";
+        // change modal title & submit text
+        const title = document.querySelector("#add-manager-modal h2");
+        const submitBtn = addManagerForm.querySelector('button[type="submit"]');
+        if (title) title.textContent = "Edit Manager";
+        if (submitBtn) submitBtn.textContent = "Update Manager";
+        openModal(addManagerModal);
       } catch (error) {
         console.error("Error fetching manager data:", error);
         alert("Network error while loading manager");
       }
-    }
-  });
-
-  editManagerForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(editManagerForm);
-    const data = Object.fromEntries(formData.entries());
-
-    try {
-      const response = await fetch(UPDATE_URL, {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-
-      if (result && result.success) {
-        closeModal(editManagerModal);
-        fetchManagers();
-      } else {
-        console.error("Update failed:", result && result.message);
-        alert(
-          "Failed to update manager: " +
-            (result && result.message ? result.message : "Unknown error")
-        );
-      }
-    } catch (error) {
-      console.error("Error updating manager:", error);
-      alert("Network error while updating manager");
     }
   });
 
