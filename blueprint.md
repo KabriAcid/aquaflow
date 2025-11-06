@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aquaflow is a web application designed to facilitate the sale and delivery of bottled water. The application provides a customer-facing interface for ordering water and a sales manager portal for managing orders, customers, and products.
+Aquaflow is a web application designed to facilitate the sale and delivery of bottled water. The application provides two main user-facing portals: an Admin Portal for overall system management and a Sales Portal for sales managers to handle their customers and orders.
 
 ## Project Structure
 
@@ -10,117 +10,102 @@ Aquaflow is a web application designed to facilitate the sale and delivery of bo
 /
 |-- backend/
 |   |-- api/
+|   |   |-- admin/
 |   |   |-- auth/
 |   |   |   |-- login.php
-|   |   |   |-- logout.php
-|   |   |   `-- register.php
-|   |   |-- customers/
-|   |   |   |-- get_all.php
-|   |   |   `-- get_single.php
-|   |   |-- orders/
-|   |   |   |-- create.php
-|   |   |   |-- get_all.php
-|   |   |   `-- get_single.php
-|   |   |-- products/
-|   |   |   |-- create.php
-|   |   |   |-- delete.php
-|   |   |   |-- get_all.php
-|   |   |   |-- get_single.php
-|   |   |   `-- update.php
-|   |   `-- sales/
-|   |       `-- summary.php
-|   |-- utils/
-|   |   |-- auth.php
-|   |   `-- response.php
-|   `-- config/
-|       `-- database.php
+|   |   |   `-- logout.php
+|   |   |-- sales/
+|   |   `-- ... (other API folders)
+|   |-- config/
+|   |   `-- database.php
+|   `-- utils/
+|       |-- auth.php
+|       `-- response.php
 |-- frontend/
 |   |-- css/
+|   |   |-- style.css
 |   |   `-- tailwind.css
-|   |-- images/
 |   |-- js/
-|   |   `-- main.js
+|   |   |-- admin-dashboard.js
+|   |   |-- main.js
+|   |   `-- sales-dashboard.js
+|   |-- admin/
+|   |   |-- partials/
+|   |   |   |-- footer.php
+|   |   |   |-- header.php
+|   |   |   `-- sidebar.php
+|   |   |-- dashboard.php
+|   |   |-- settings.php
+|   |   `-- users.php
 |   |-- sales/
 |   |   |-- partials/
 |   |   |   |-- footer.php
-|   |   |   |-- sidebar.php
-|   |   |   `-- topbar.php
-|   |   |-- add-product.php
-|   |   |-- customer-details.php
+|   |   |   |-- header.php
+|   |   |   `-- sidebar.php
 |   |   |-- customers.php
 |   |   |-- dashboard.php
-|   |   |-- edit-product.php
-|   |   |-- order-details.php
 |   |   |-- orders.php
 |   |   `-- products.php
-|   |-- about.php
-|   |-- contact.php
-|   |-- index.php
-|   |-- login.php
-|   |-- register.php
-|   `-- shop.php
+|   `-- login.php
 `-- index.php
 ```
 
 ## Style, Design, and Features
 
-### Frontend
+### General
+*   **Styling**: The UI is built with Tailwind CSS for a utility-first approach. A global `style.css` file (`frontend/css/style.css`) adds base styles, custom fonts (Inter), and utility classes like `multi-shadow` for a consistent, modern aesthetic.
+*   **Standardized Portals**: Both the Admin and Sales portals have been refactored to use a consistent structure, including a shared header (`header.php`), a dynamic sidebar (`sidebar.php`), and a footer (`footer.php`). This creates a unified user experience across the application.
 
-*   **Styling:** The frontend is styled using Tailwind CSS, providing a modern and responsive design.
-*   **Customer Pages:**
-    *   **Home (`index.php`):** The main landing page.
-    *   **Shop (`shop.php`):** Displays available water products for purchase.
-    *   **About (`about.php`):** Provides information about Aquaflow.
-    *   **Contact (`contact.php`):** A contact form for inquiries.
-    *   **Login (`login.php`):** A login page for both customers and sales managers.
-    *   **Register (`register.php`):** A registration page for new customers.
-*   **Sales Manager Portal (`frontend/sales/`):**
-    *   **Dashboard (`dashboard.php`):** Provides a summary of key sales metrics, including total sales, total orders, new customers, and pending deliveries.
-    *   **Orders (`orders.php`):** A list of all customer orders, with links to view order details. Includes search by customer name/order ID and filtering by order status.
-    *   **Order Details (`order-details.php`):** Detailed information about a specific order, including the customer, order items, and total amount.
-    *   **Customers (`customers.php`):** A list of all registered customers. Includes search by customer name/email.
-    *   **Customer Details (`customer-details.php`):** Detailed information about a specific customer, including their order history.
-    *   **Products (`products.php`):** A list of all water products, with options to add, edit, or delete products. Includes search by product name.
-    *   **Add Product (`add-product.php`):** A form to add a new product.
-    *   **Edit Product (`edit-product.php`):** A form to edit an existing product.
-    *   **Shared Partials:** The sales portal uses shared partials for the sidebar, top bar, and footer to ensure a consistent look and feel.
+### Admin Portal (`frontend/admin/`)
+*   **Authentication**: Access is restricted to users with the 'admin' role.
+*   **Dashboard (`dashboard.php`)**: This is the central hub for administrators.
+    *   **Design**: It features a clean, card-based layout with `multi-shadow` effects for depth.
+    *   **Stats Cards**: At-a-glance metrics for "Total Sales," "New Customers," "Pending Orders," and "Revenue." Cards include relevant icons and bold typography.
+    *   **Data Visualization**: Includes two charts for visual analysis:
+        *   A line chart for "Sales Overview".
+        *   A doughnut chart for "Top Products".
+    *   **Interactivity**: Chart data is dynamically loaded via `admin-dashboard.js`, which fetches data from the backend (currently using dummy data).
+*   **Pages**:
+    *   `users.php`: For managing system users.
+    *   `settings.php`: For configuring application settings.
 
-### Backend
+### Sales Portal (`frontend/sales/`)
+*   **Authentication**: Access is restricted to users with the 'sales' role.
+*   **Dashboard (`dashboard.php`)**: Provides sales managers with a summary of their performance.
+    *   **Design**: Follows the same clean, card-based design as the admin portal.
+    *   **Stats Cards**: Key metrics tailored to the sales manager, including "My Pending Orders," "My Sales," and "New Customers."
+    *   **Data Visualization**: Features a line chart for "My Recent Activity" to track sales performance over time.
+    *   **Interactivity**: The chart is powered by `sales-dashboard.js`, which will fetch data specific to the logged-in sales manager.
+*   **Pages**:
+    *   `orders.php`: To manage customer orders.
+    *   `products.php`: To manage product listings.
+    *   `customers.php`: To manage their customer list.
 
-*   **API:** The backend provides a RESTful API for all frontend functionality.
-*   **Authentication:**
-    *   Session-based authentication is used to manage user logins.
-    *   The `backend/utils/auth.php` file provides a centralized function for role-based access control.
-    *   The `login.php` endpoint handles user authentication and session creation.
-    *   The `logout.php` endpoint destroys the user session.
-    *   The `register.php` endpoint handles new customer registration.
-*   **Database:**
-    *   The application uses a MySQL database to store user, product, and order data.
-    *   The `config/database.php` file contains the database connection settings.
-*   **API Endpoints:**
-    *   **Sales Summary (`/api/sales/summary.php`):** Returns a summary of sales data for the sales manager dashboard. (Requires `sales_manager` role)
-    *   **Orders (`/api/orders/`):**
-        *   `get_all.php`: Returns a list of all orders. (Accessible by `sales_manager` and `customer` roles)
-        *   `get_single.php`: Returns a single order by ID. (Accessible by `sales_manager` and the `customer` who owns the order)
-        *   `create.php`: Creates a new order. (Accessible by `customer` role)
-    *   **Customers (`/api/customers/`):**
-        *   `get_all.php`: Returns a list of all customers. (Requires `sales_manager` role)
-        *   `get_single.php`: Returns a single customer by ID. (Accessible by `sales_manager` and the `customer` themselves)
-    *   **Products (`/api/products/`):**
-        *   `get_all.php`: Returns a list of all products. (Accessible by `sales_manager` and `customer` roles)
-        *   `get_single.php`: Returns a single product by ID. (Accessible by `sales_manager` and `customer` roles)
-        *   `create.php`: Creates a new product. (Requires `sales_manager` role)
-        *   `update.php`: Updates an existing product. (Requires `sales_manager` role)
-        *   `delete.php`: Deletes a product. (Requires `sales_manager` role)
+## Current Task: Connect Dashboards to Live Data
 
-## Current Task: Enhance User Experience with Search and Filtering
+The dashboards have been designed and are visually complete, but they currently rely on hardcoded placeholder data in the JavaScript files. The next critical step is to replace this dummy data with live data from the backend API.
 
 **Plan:**
 
-1.  **Add Search to Products Page:**
-    *   Modify `frontend/sales/products.php` to include a search bar that filters products by name.
-2.  **Add Search to Customers Page:**
-    *   Modify `frontend/sales/customers.php` to include a search bar that filters customers by name or email.
-3.  **Add Search and Filtering to Orders Page:**
-    *   Modify `frontend/sales/orders.php` to include a search bar that filters orders by customer name or order ID.
-    *   Add a dropdown to filter orders by status (pending, shipped, delivered, cancelled).
+1.  **Create Admin Dashboard API Endpoint:**
+    *   Develop a new API script at `backend/api/admin/dashboard_summary.php`.
+    *   This endpoint will perform database queries to aggregate and return the following metrics:
+        *   Total sales revenue.
+        *   Count of new customers (e.g., registered in the last 30 days).
+        *   Count of orders with a 'pending' status.
+        *   Data points for the "Sales Overview" line chart (e.g., monthly sales totals).
+        *   Data for the "Top Products" doughnut chart (e.g., sales count per product).
+2.  **Create Sales Dashboard API Endpoint:**
+    *   Develop a new API script at `backend/api/sales/dashboard_summary.php`.
+    *   This endpoint will be context-aware, fetching data only for the currently logged-in sales manager. It will return:
+        *   Count of pending orders assigned to the manager.
+        *   Total sales revenue generated by the manager.
+        *   Count of new customers acquired by the manager.
+        *   Data for the "My Recent Activity" line chart (e.g., daily or weekly orders).
+3.  **Update Frontend JavaScript:**
+    *   Modify `frontend/js/admin-dashboard.js`:
+        *   Replace the dummy data objects with a `fetch` call to the new `dashboard_summary.php` API endpoint.
+        *   Parse the JSON response and use the data to dynamically populate the stats cards and render the charts.
+    *   Modify `frontend/js/sales-dashboard.js`:
+        *   Perform a `fetch` call to its respective `dashboard_summary.php` endpoint.
+        *   Update the sales dashboard cards and activity chart with the fetched data.
