@@ -1,125 +1,90 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Target elements where data will be rendered
-    const dashboardContainer = document.querySelector('#production-dashboard-content');
-    const trendsChartCanvas = document.getElementById('production-trends-chart');
+document.addEventListener('DOMContentLoaded', () => {
+    // KPI Card Elements
+    const totalProductionEl = document.getElementById('total-production');
+    const bottledWaterOutputEl = document.getElementById('bottled-water-output');
+    const sparklingBeveragesOutputEl = document.getElementById('sparkling-beverages-output');
+    const lowStockItemsEl = document.getElementById('low-stock-items');
 
-    // Check if the necessary elements are on the page
-    if (!dashboardContainer || !trendsChartCanvas) {
-        console.error("Dashboard containers not found. Ensure the required HTML elements exist.");
+    // Chart and Table Elements
+    const trendsChartCanvas = document.getElementById('production-trends-chart');
+    const inventoryTbody = document.getElementById('inventory-summary-tbody');
+
+    const API_URL = '../../backend/api/production/dashboard.php';
+
+    // Check if all required elements exist
+    if (!totalProductionEl || !bottledWaterOutputEl || !sparklingBeveragesOutputEl || !lowStockItemsEl || !trendsChartCanvas || !inventoryTbody) {
+        console.error("One or more dashboard elements are missing from the DOM.");
         return;
     }
 
-    // Fetch data from the production dashboard API
-    fetch('../../backend/api/production/dashboard.php', { credentials: 'same-origin' })
-        .then(response => {
-            // Check for a successful response, otherwise throw an error
+    // Main function to fetch data and update the UI
+    const fetchDashboardData = async () => {
+        try {
+            const response = await fetch(API_URL, { credentials: 'same-origin' });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.json();
-        })
-        .then(apiResponse => {
-            // Ensure the API response has a 'data' field
+            const apiResponse = await response.json();
             if (!apiResponse.data) {
                 throw new Error("Invalid API response format: missing 'data' field.");
             }
-            const data = apiResponse.data;
+            
+            updateDashboardUI(apiResponse.data);
 
-            // Render the fetched data onto the dashboard
-            renderDashboard(data);
-        })
-        .catch(error => {
-            // Display an error message if the fetch fails
+        } catch (error) {
             console.error("Error fetching dashboard data:", error);
-            dashboardContainer.innerHTML = `<div class="text-red-500">Failed to load dashboard data. Please check the console for details.</div>`;
-        });
+            const mainContent = document.querySelector('.container-fluid');
+            if (mainContent) {
+                mainContent.innerHTML = '<p class="text-red-500 text-center">Failed to load dashboard data. Please try again later.</p>';
+            }
+        }
+    };
 
-    /**
-     * Renders the entire dashboard with data from the API.
-     * @param {object} data - The data object from the API response.
-     */
-    function renderDashboard(data) {
-        // Render the main metrics and stock levels
-        renderMetrics(data.daily_output);
-        renderStockLevels(data.stock_levels);
-
-        // Render the production trends chart
+    // Function to update all parts of the dashboard
+    const updateDashboardUI = (data) => {
+        renderKpiCards(data.daily_output, data.stock_levels);
+        renderInventorySummary(data.stock_levels);
         renderTrendsChart(data.production_trends);
-    }
+    };
 
-    /**
-     * Renders the daily output metrics.
-     * @param {object} dailyOutput - The daily output data.
-     */
-    function renderMetrics(dailyOutput) {
-        const metricsContainer = document.getElementById('daily-output-metrics');
-        if (!metricsContainer) return;
+    // Renders the KPI cards with fetched data
+    const renderKpiCards = (dailyOutput, stockLevels) => {
+        totalProductionEl.textContent = (dailyOutput.total || 0).toLocaleString();
+        bottledWaterOutputEl.textContent = (dailyOutput.bottled_water || 0).toLocaleString();
+        sparklingBeveragesOutputEl.textContent = (dailyOutput.sparkling_beverages || 0).toLocaleString();
 
-        metricsContainer.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-blue-100 p-4 rounded-lg shadow-sm">
-                    <h3 class="text-lg font-semibold text-blue-800">Total Production</h3>
-                    <p class="text-2xl font-bold">${dailyOutput.total.toLocaleString()} Units</p>
-                </div>
-                <div class="bg-green-100 p-4 rounded-lg shadow-sm">
-                    <h3 class="text-lg font-semibold text-green-800">Bottled Water</h3>
-                    <p class="text-2xl font-bold">${dailyOutput.bottled_water.toLocaleString()} Units</p>
-                </div>
-                <div class="bg-purple-100 p-4 rounded-lg shadow-sm">
-                    <h3 class="text-lg font-semibold text-purple-800">Sparkling Beverages</h3>
-                    <p class="text-2xl font-bold">${dailyOutput.sparkling_beverages.toLocaleString()} Units</p>
-                </div>
-            </div>
-        `;
-    }
+        const lowStockCount = stockLevels.filter(item => item.quantity <= item.reorder_point).length;
+        lowStockItemsEl.textContent = lowStockCount;
+    };
 
-    /**
-     * Renders the stock levels table.
-     * @param {Array} stockLevels - An array of stock level objects.
-     */
-    function renderStockLevels(stockLevels) {
-        const stockLevelsContainer = document.getElementById('stock-levels-summary');
-        if (!stockLevelsContainer) return;
+    // Renders the inventory summary table
+    const renderInventorySummary = (stockLevels) => {
+        inventoryTbody.innerHTML = ''; // Clear previous data
 
-        const tableRows = stockLevels.map(item => {
-            // Determine the stock status based on quantity vs. reorder point
-            const status = item.quantity > item.reorder_point ? 
-                '<span class="text-green-600 font-semibold">In Stock</span>' : 
-                '<span class="text-red-600 font-semibold">Low Stock</span>';
+        if (stockLevels.length === 0) {
+            inventoryTbody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500 p-4">No inventory data.</td></tr>';
+            return;
+        }
 
-            return `
+        stockLevels.forEach(item => {
+            const status = item.quantity > item.reorder_point
+                ? '<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-green-600 bg-green-200">In Stock</span>'
+                : '<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-red-600 bg-red-200">Low Stock</span>';
+
+            const row = `
                 <tr>
-                    <td class="py-2 px-4 border-b">${item.product_name}</td>
-                    <td class="py-2 px-4 border-b text-right">${item.quantity.toLocaleString()}</td>
-                    <td class="py-2 px-4 border-b text-center">${status}</td>
+                    <td class="p-2 border-b text-sm">${item.product_name}</td>
+                    <td class="p-2 border-b text-sm text-right">${item.quantity.toLocaleString()}</td>
+                    <td class="p-2 border-b text-sm text-center">${status}</td>
                 </tr>
             `;
-        }).join('');
+            inventoryTbody.innerHTML += row;
+        });
+    };
 
-        stockLevelsContainer.innerHTML = `
-            <div class="bg-white p-6 rounded-lg shadow-lg mt-8">
-                <h3 class="text-xl font-bold mb-4">Current Stock Levels</h3>
-                <table class="min-w-full">
-                    <thead>
-                        <tr>
-                            <th class="text-left py-2 px-4 border-b">Product</th>
-                            <th class="text-right py-2 px-4 border-b">Quantity</th>
-                            <th class="text-center py-2 px-4 border-b">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-
-    /**
-     * Renders the production trends chart using Chart.js.
-     * @param {object} trendsData - The production trends data.
-     */
-    function renderTrendsChart(trendsData) {
+    // Renders the production trends chart
+    const renderTrendsChart = (trendsData) => {
+        if (!trendsData || !trendsChartCanvas) return;
         new Chart(trendsChartCanvas, {
             type: 'line',
             data: {
@@ -139,13 +104,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Units Produced'
-                        }
+                        title: { display: true, text: 'Units Produced' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
                     }
                 }
             }
         });
-    }
+    };
+
+    // Initial data fetch
+    fetchDashboardData();
 });
