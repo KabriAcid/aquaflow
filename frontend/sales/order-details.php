@@ -31,8 +31,6 @@ if (!$order_id) {
     <?php include 'partials/sidebar.php'; ?>
 
     <div class="flex-1 flex flex-col">
-        <?php include 'partials/topbar.php'; ?>
-
         <main class="flex-1 p-6">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-bold text-gray-800">Order Details</h1>

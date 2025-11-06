@@ -40,9 +40,60 @@ document.addEventListener("DOMContentLoaded", function () {
       .replace(/'/g, "&#039;");
   }
 
+  // Compute API base relative to current path (handles subfolder deployments)
+  function getApiBase() {
+    const parts = window.location.pathname.split("/");
+    const idx = parts.indexOf("frontend");
+    if (idx !== -1) {
+      const root = parts.slice(0, idx).join("/");
+      return root + "/backend/api";
+    }
+    return "/backend/api";
+  }
+  const API_BASE = getApiBase();
+
+  // Status badge helpers (match sales-orders.js)
+  function statusLabel(s) {
+    switch ((s || "").toLowerCase()) {
+      case "processing":
+        return "Processing";
+      case "out_for_delivery":
+        return "Out for delivery";
+      case "delivered":
+        return "Delivered";
+      case "cancelled":
+        return "Cancelled";
+      case "pending":
+      default:
+        return "Pending";
+    }
+  }
+
+  function statusBadgeClasses(s) {
+    switch ((s || "").toLowerCase()) {
+      case "processing":
+        return "inline-block px-2 py-0.5 rounded text-white bg-blue-600";
+      case "out_for_delivery":
+        return "inline-block px-2 py-0.5 rounded text-white bg-indigo-600";
+      case "delivered":
+        return "inline-block px-2 py-0.5 rounded text-white bg-green-600";
+      case "cancelled":
+        return "inline-block px-2 py-0.5 rounded text-white bg-red-600";
+      case "pending":
+      default:
+        return "inline-block px-2 py-0.5 rounded text-yellow-800 bg-yellow-100";
+    }
+  }
+
+  function renderStatusBadge(s) {
+    const label = statusLabel(s);
+    const classes = statusBadgeClasses(s);
+    return `<span class="${classes}">${escapeHtml(label)}</span>`;
+  }
+
   // Fetch recent orders and populate stats + table
   function loadRecentOrders() {
-    fetch("../../backend/api/orders/get_all.php?limit=10", {
+    fetch(API_BASE + "/orders/get_all.php?limit=10", {
       credentials: "same-origin",
     })
       .then((r) => r.json())
@@ -89,13 +140,13 @@ document.addEventListener("DOMContentLoaded", function () {
               o.order_number || "#" + o.id
             )}</a></td>
                             <td class="py-3 px-3 text-sm">${escapeHtml(
-                              o.customer_id || ""
+                              o.customer_name || o.customer_id || ""
                             )}</td>
                             <td class="py-3 px-3 text-sm">₦${(
                               parseFloat(o.total_amount || 0) || 0
                             ).toFixed(2)}</td>
-                            <td class="py-3 px-3 text-sm">${escapeHtml(
-                              o.status || ""
+                            <td class="py-3 px-3 text-sm">${renderStatusBadge(
+                              o.status || "pending"
                             )}</td>
                             <td class="py-3 px-3 text-sm">${escapeHtml(
                               o.payment_status || ""
@@ -140,4 +191,73 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   loadRecentOrders();
+
+  // Hook order details modal behavior: intercept recent orders links and show modal
+  function showOrderModal(orderId) {
+    const modal = document.getElementById("orderDetailsModal");
+    const content = document.getElementById("orderModalContent");
+    if (!modal || !content) return;
+    modal.classList.remove("hidden");
+    content.innerHTML = '<p class="text-gray-500">Loading...</p>';
+    fetch(
+      API_BASE + `/orders/get_single.php?id=${encodeURIComponent(orderId)}`,
+      { credentials: "same-origin" }
+    )
+      .then((r) => r.json())
+      .then((res) => {
+        if (!res || !res.success) {
+          content.innerHTML = `<div class="text-red-600">${escapeHtml(
+            (res && res.message) || "Failed to load order"
+          )}</div>`;
+          return;
+        }
+        const o = res.data;
+        let html = `<div class="mb-3"><strong>Order #</strong> ${escapeHtml(
+          o.order_number
+        )}</div>`;
+        html += `<div class="mb-2"><strong>Customer</strong> ${escapeHtml(
+          o.customer_name || o.customer_id || ""
+        )}</div>`;
+        html += `<div class="mb-2"><strong>Status</strong> ${renderStatusBadge(
+          o.status || "pending"
+        )}</div>`;
+        html += `<div class="mb-2"><strong>Payment</strong> ${escapeHtml(
+          o.payment_status || ""
+        )}</div>`;
+        html += `<div class="mb-2"><strong>Amount</strong> ₦${(
+          parseFloat(o.total_amount || o.subtotal || 0) || 0
+        ).toFixed(2)}</div>`;
+        html +=
+          '<div class="mt-4"><strong>Items</strong><ul class="list-disc pl-6">';
+        (o.items || []).forEach((it) => {
+          html += `<li>${escapeHtml(it.product_name)} — ${escapeHtml(
+            String(it.quantity)
+          )} × ₦${(parseFloat(it.unit_price) || 0).toFixed(2)}</li>`;
+        });
+        html += "</ul></div>";
+        content.innerHTML = html;
+      })
+      .catch((err) => {
+        console.error(err);
+        content.innerHTML =
+          '<div class="text-red-600">Network or server error</div>';
+      });
+  }
+
+  document.addEventListener("click", function (e) {
+    const a = e.target.closest('a[href^="order-details.php"]');
+    if (a) {
+      e.preventDefault();
+      const url = new URL(a.href, window.location.href);
+      const id = url.searchParams.get("id");
+      if (id) showOrderModal(id);
+    }
+  });
+
+  const modalClose = document.getElementById("orderModalClose");
+  if (modalClose)
+    modalClose.addEventListener("click", function () {
+      const modal = document.getElementById("orderDetailsModal");
+      if (modal) modal.classList.add("hidden");
+    });
 });

@@ -46,7 +46,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </nav>
 
     <div class="mt-auto">
-        <a href="../../includes/logout.php" class="flex items-center gap-3 px-4 py-2 mt-4 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors">
+        <a href="logout.php" class="flex items-center gap-3 px-4 py-2 mt-4 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors">
             <i data-lucide="log-out" class="w-5 h-5" aria-hidden="true"></i>
             <span>Logout</span>
         </a>

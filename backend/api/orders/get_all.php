@@ -34,7 +34,8 @@ try {
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 0;
 
     if (in_array($role, ['admin', 'sales_manager'])) {
-        $sql = 'SELECT id, order_number, order_date, customer_id, subtotal, delivery_fee, total_amount, status, payment_status FROM orders ORDER BY order_date DESC';
+        // include customer full name for admin/sales views
+        $sql = 'SELECT orders.id, orders.order_number, orders.order_date, orders.customer_id, users.full_name AS customer_name, orders.subtotal, orders.delivery_fee, orders.total_amount, orders.status, orders.payment_status FROM orders LEFT JOIN users ON orders.customer_id = users.id ORDER BY orders.order_date DESC';
         if ($limit > 0) {
             $sql .= ' LIMIT :limit';
             $stmt = $pdo->prepare($sql);
@@ -48,7 +49,8 @@ try {
         if (!$userId) {
             error_response('Not authenticated', null, 401);
         }
-        $sql = 'SELECT id, order_number, order_date, customer_id, subtotal, delivery_fee, total_amount, status, payment_status FROM orders WHERE customer_id = :cid ORDER BY order_date DESC';
+        // for customers, only show their orders (include name for consistency)
+        $sql = 'SELECT orders.id, orders.order_number, orders.order_date, orders.customer_id, users.full_name AS customer_name, orders.subtotal, orders.delivery_fee, orders.total_amount, orders.status, orders.payment_status FROM orders LEFT JOIN users ON orders.customer_id = users.id WHERE orders.customer_id = :cid ORDER BY orders.order_date DESC';
         if ($limit > 0) {
             $sql .= ' LIMIT :limit';
             $stmt = $pdo->prepare($sql);
