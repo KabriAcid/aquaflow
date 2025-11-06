@@ -20,18 +20,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Lucide icons loaded once for admin pages -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.lucide) {
-                try {
-                    lucide.replace({
-                        'strokeWidth': 2
-                    });
-                } catch (e) {
-                    console.warn('Lucide replace failed', e);
-                }
-            }
+            lucide.createIcons();
         });
     </script>
 </head>

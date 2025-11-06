@@ -48,7 +48,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <?php $iconName = $icon_map[$link['text']] ?? 'circle'; ?>
                 <!-- adding no wrap class -->
                 <li class="whitespace-nowrap">
-                    <a href="<?php echo htmlspecialchars($link['href'], ENT_QUOTES); ?>" class="flex items-center gap-3 py-2 rounded-lg transition-colors <?php echo $isActive ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-200'; ?>">
+                    <a href="<?php echo htmlspecialchars($link['href'], ENT_QUOTES); ?>" class="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors <?php echo $isActive ? 'bg-gray-800 text-white' : 'text-gray-500 hover:bg-gray-200'; ?>">
                         <i data-lucide="<?php echo $iconName; ?>" class="w-5 h-5" aria-hidden="true"></i>
                         <span><?php echo htmlspecialchars($link['text']); ?></span>
                     </a>
