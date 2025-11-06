@@ -100,6 +100,18 @@ try {
     $orderPayload = ['order_id' => $order_id, 'order_number' => $order_number, 'total_amount' => $total_amount];
     success_response('Order created', ['order' => $orderPayload, 'user' => $user], 201);
 } catch (Exception $e) {
-    if ($pdo && $pdo->inTransaction()) $pdo->rollBack();
+    // attempt rollback if transaction is active
+    if (isset($pdo) && $pdo && $pdo->inTransaction()) $pdo->rollBack();
+
+    // log exception to a dedicated file to help debugging on development machine
+    $logDir = __DIR__ . '/../../../logs';
+    if (!is_dir($logDir)) {
+        @mkdir($logDir, 0755, true);
+    }
+    $logFile = $logDir . '/create_order_errors.log';
+    $msg = date('Y-m-d H:i:s') . " - create.php exception: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n";
+    @file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+
+    // return error to client (include exception message to aid debugging in dev)
     error_response('Failed to create order', ['exception' => $e->getMessage()], 500);
 }

@@ -59,7 +59,7 @@
                         .then(data => {
                             if (data.success && data.data) {
                                 const order = data.data;
-                                // load transactions for this order to show tx_ref if present
+                                // load payment(s) for this order to show transaction reference/status if present
                                 fetch(`../../backend/api/payments/get_by_order.php?order_id=${orderId}`, {
                                         credentials: 'same-origin'
                                     })
@@ -67,8 +67,9 @@
                                     .then(txData => {
                                         let txHtml = '';
                                         if (txData.success && Array.isArray(txData.data) && txData.data.length > 0) {
-                                            const tx = txData.data[0];
-                                            txHtml = `<p><strong>Transaction Ref:</strong> ${tx.tx_ref || ''}</p><p><strong>Transaction Status:</strong> ${tx.status || ''}</p>`;
+                                            const p = txData.data[0];
+                                            txHtml = `<p><strong>Payment Ref:</strong> ${p.transaction_reference || ''}</p><p><strong>Payment Status:</strong> ${p.payment_status || ''}</p>`;
+                                            if (p.payment_date) txHtml += `<p><strong>Payment Date:</strong> ${p.payment_date}</p>`;
                                         }
                                         document.getElementById('orderDetails').innerHTML = `
                                                     <p><strong>Order Number:</strong> ${order.order_number}</p>
@@ -77,7 +78,7 @@
                                                 `;
                                     })
                                     .catch(err => {
-                                        console.warn('Could not fetch transactions', err);
+                                        console.warn('Could not fetch payments', err);
                                         document.getElementById('orderDetails').innerHTML = `
                                                     <p><strong>Order Number:</strong> ${order.order_number}</p>
                                                     <p><strong>Total Amount:</strong> ₦${parseFloat(order.total_amount).toFixed(2)}</p>

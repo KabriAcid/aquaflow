@@ -321,26 +321,7 @@ INSERT INTO `settings` (`id`, `setting_key`, `setting_value`, `setting_type`, `u
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `transactions`
---
-
-CREATE TABLE `transactions` (
-  `id` int(11) NOT NULL,
-  `order_id` int(11) NOT NULL,
-  `customer_id` int(11) DEFAULT NULL,
-  `customer_name` varchar(150) DEFAULT NULL,
-  `customer_email` varchar(150) DEFAULT NULL,
-  `customer_phone` varchar(50) DEFAULT NULL,
-  `transaction_id` varchar(255) NOT NULL,
-  `tx_ref` varchar(255) DEFAULT NULL,
-  `amount` decimal(12,2) NOT NULL,
-  `currency` varchar(10) DEFAULT 'NGN',
-  `status` varchar(50) DEFAULT 'pending',
-  `payment_method` varchar(50) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- transactions table removed from schema (payments table is used instead)
 
 -- --------------------------------------------------------
 
@@ -475,14 +456,7 @@ ALTER TABLE `settings`
   ADD KEY `idx_setting_type` (`setting_type`);
 
 --
--- Indexes for table `transactions`
---
-ALTER TABLE `transactions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_order_id` (`order_id`),
-  ADD KEY `idx_customer_id` (`customer_id`),
-  ADD KEY `idx_transaction_id` (`transaction_id`),
-  ADD KEY `idx_tx_ref` (`tx_ref`);
+-- Indexes for table `transactions` removed (no transactions table)
 
 --
 -- Indexes for table `users`
@@ -559,10 +533,7 @@ ALTER TABLE `settings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `transactions`
---
-ALTER TABLE `transactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+-- AUTO_INCREMENT for table `transactions` removed (no transactions table)
 
 --
 -- AUTO_INCREMENT for table `users`

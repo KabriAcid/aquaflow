@@ -1,6 +1,6 @@
 <?php
 // backend/api/payments/get_by_order.php
-// Returns transaction(s) for a given order id
+// Returns payment(s) for a given order id (reads from payments table)
 
 require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../utils/response.php';
@@ -48,14 +48,15 @@ try {
     }
 
     if ($role !== 'admin' && $userId && (int)$order['customer_id'] !== (int)$userId) {
-        error_response('Unauthorized to view transactions for this order', null, 403);
+        error_response('Unauthorized to view payments for this order', null, 403);
     }
 
-    $tstmt = $pdo->prepare('SELECT id, transaction_id, tx_ref, amount, currency, status, payment_method, processor_response, created_at FROM transactions WHERE order_id = :order_id ORDER BY created_at DESC');
-    $tstmt->execute([':order_id' => $orderId]);
-    $transactions = $tstmt->fetchAll(PDO::FETCH_ASSOC);
+    // Use the payments table (single payment per order or multiple payment attempts)
+    $pstmt = $pdo->prepare('SELECT id, order_id, payment_method, amount, transaction_reference, payment_status, payment_date, receipt_url, notes FROM payments WHERE order_id = :order_id ORDER BY payment_date DESC');
+    $pstmt->execute([':order_id' => $orderId]);
+    $payments = $pstmt->fetchAll(PDO::FETCH_ASSOC);
 
-    success_response('Transactions fetched', $transactions);
+    success_response('Payments fetched', $payments);
 } catch (PDOException $ex) {
     error_log('payments/get_by_order.php error: ' . $ex->getMessage());
     error_response('Server error', null, 500);

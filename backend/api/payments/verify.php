@@ -92,29 +92,28 @@ try {
             $payment_method = $verification_info['data']['payment_type'];
         }
 
-        // Insert transaction record
-        $insertStmt = $pdo->prepare('INSERT INTO transactions (order_id, customer_id, customer_name, customer_email, customer_phone, transaction_id, tx_ref, amount, currency, status, payment_method, processor_response, created_at, updated_at) VALUES (:order_id, :customer_id, :customer_name, :customer_email, :customer_phone, :transaction_id, :tx_ref, :amount, :currency, :status, :payment_method, :processor_response, NOW(), NOW())');
+        // Insert a record into payments table with verification info
+        $insertStmt = $pdo->prepare('INSERT INTO payments (order_id, payment_method, amount, transaction_reference, payment_status, payment_date, notes, receipt_url) VALUES (:order_id, :payment_method, :amount, :transaction_reference, :payment_status, NOW(), :notes, :receipt_url)');
         $procResp = json_encode($verification_info);
+        // Determine a reasonable transaction reference: prefer provider transaction id if available, else tx_ref
+        $txRefValue = $transaction_id ?: $tx_ref;
+        $receiptUrl = null;
+
         $insertStmt->execute([
             ':order_id' => $order_id,
-            ':customer_id' => $customer_id,
-            ':customer_name' => $customer_name,
-            ':customer_email' => $customer_email,
-            ':customer_phone' => $customer_phone,
-            ':transaction_id' => $transaction_id,
-            ':tx_ref' => $tx_ref,
-            ':amount' => $amount ?: 0,
-            ':currency' => $currency,
-            ':status' => 'paid',
             ':payment_method' => $payment_method,
-            ':processor_response' => $procResp
+            ':amount' => $amount ?: 0,
+            ':transaction_reference' => $txRefValue,
+            ':payment_status' => 'completed',
+            ':notes' => $procResp,
+            ':receipt_url' => $receiptUrl
         ]);
 
         // mark order as paid
         $stmt = $pdo->prepare('UPDATE orders SET payment_status = :payment_status, updated_at = NOW() WHERE id = :id');
         $stmt->execute([':payment_status' => 'paid', ':id' => $order_id]);
 
-        success_response('Payment verified, order marked paid and transaction logged', ['verification' => $verification_info, 'transaction_id' => (int)$pdo->lastInsertId()]);
+        success_response('Payment verified, order marked paid and payment recorded', ['verification' => $verification_info, 'payment_id' => (int)$pdo->lastInsertId()]);
     } else {
         error_response('Payment verification failed', ['remote' => $verification_info], 400);
     }

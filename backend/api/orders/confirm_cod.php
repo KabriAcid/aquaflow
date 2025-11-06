@@ -52,25 +52,19 @@ try {
     $amount = isset($order['total_amount']) ? (float)$order['total_amount'] : 0.0;
     $currency = 'NGN';
 
-    // Insert transaction record (status pending/unpaid for COD)
-    $insertStmt = $pdo->prepare('INSERT INTO transactions (order_id, customer_id, customer_name, customer_email, customer_phone, transaction_id, tx_ref, amount, currency, status, payment_method, processor_response, created_at, updated_at) VALUES (:order_id, :customer_id, :customer_name, :customer_email, :customer_phone, :transaction_id, :tx_ref, :amount, :currency, :status, :payment_method, :processor_response, NOW(), NOW())');
-    $procResp = json_encode(['note' => 'Cash on Delivery created via confirm_cod endpoint']);
+    // Insert a payment record into the payments table instead of transactions
+    $insertStmt = $pdo->prepare('INSERT INTO payments (order_id, payment_method, amount, transaction_reference, payment_status, payment_date, notes) VALUES (:order_id, :payment_method, :amount, :transaction_reference, :payment_status, NOW(), :notes)');
+    $procResp = json_encode(['note' => 'Cash on Delivery created via confirm_cod endpoint', 'created_by' => $customer_id]);
     $insertStmt->execute([
         ':order_id' => $order_id,
-        ':customer_id' => $customer_id,
-        ':customer_name' => $user['full_name'] ?? null,
-        ':customer_email' => $user['email'] ?? null,
-        ':customer_phone' => $user['phone'] ?? null,
-        ':transaction_id' => null,
-        ':tx_ref' => $tx_ref,
-        ':amount' => $amount,
-        ':currency' => $currency,
-        ':status' => 'pending',
         ':payment_method' => 'cash_on_delivery',
-        ':processor_response' => $procResp
+        ':amount' => $amount,
+        ':transaction_reference' => $tx_ref,
+        ':payment_status' => 'pending',
+        ':notes' => $procResp
     ]);
 
-    $transaction_id = (int)$pdo->lastInsertId();
+    $payment_id = (int)$pdo->lastInsertId();
 
     // Update order status and payment status
     $update = $pdo->prepare('UPDATE orders SET status = :status, payment_status = :payment_status, updated_at = NOW() WHERE id = :id');
@@ -82,7 +76,7 @@ try {
 
     $pdo->commit();
 
-    success_response('COD confirmed and transaction logged', ['order_id' => $order_id, 'transaction_id' => $transaction_id, 'tx_ref' => $tx_ref]);
+    success_response('COD confirmed and payment recorded', ['order_id' => $order_id, 'payment_id' => $payment_id, 'transaction_reference' => $tx_ref]);
 } catch (Exception $e) {
     if ($pdo && $pdo->inTransaction()) $pdo->rollBack();
     error_response('Failed to confirm COD order', ['exception' => $e->getMessage()], 500);
