@@ -1,46 +1,74 @@
 <?php
-// backend/api/users/create.php
 
-include_once '../../config/database.php';
-include_once '../../utils/response.php';
-include_once '../../utils/auth.php';
+require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../../utils/response.php';
+require_once __DIR__ . '/../../utils/auth.php';
 
-// Headers
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
+set_json_headers();
+require_role(['admin']);
 
-$conn = connect_db();
-
-// Require admin role
-require_role('admin');
-
-// Get raw posted data
-$data = json_decode(file_get_contents("php://input"));
-
-if (empty($data->name) || empty($data->email) || empty($data->password)) {
-    error_response('Missing required fields');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    error_response('Invalid request method.', null, 405);
+    exit;
 }
 
-// Create user
-$query = "INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)";
-$stmt = $conn->prepare($query);
+$input = json_decode(file_get_contents('php://input'), true);
 
-// Sanitize data
-$name = htmlspecialchars(strip_tags($data->name));
-$email = htmlspecialchars(strip_tags($data->email));
-$password = password_hash($data->password, PASSWORD_BCRYPT);
-$role = 'sales_manager'; // Default to sales_manager
+$username = trim($input['username'] ?? '');
+$email = trim($input['email'] ?? '');
+$password = $input['password'] ?? '';
+$role = $input['role'] ?? 'customer';
+$state = trim($input['state'] ?? '');
+$lga = trim($input['lga'] ?? '');
+$phone = trim($input['phone'] ?? '');
 
-// Bind data
-$stmt->bindParam(':name', $name);
-$stmt->bindParam(':email', $email);
-$stmt->bindParam(':password', $password);
-$stmt->bindParam(':role', $role);
+if (empty($username) || empty($email) || empty($password) || empty($role)) {
+    error_response('Missing required fields: username, email, password, role.', null, 400);
+    exit;
+}
 
-if ($stmt->execute()) {
-    success_response('User created successfully');
-} else {
-    error_response('User could not be created');
+if (!in_array($role, ['customer', 'sales_manager', 'admin'])) {
+    error_response('Invalid role specified.', null, 400);
+    exit;
+}
+
+$password_hash = password_hash($password, PASSWORD_DEFAULT);
+
+try {
+    $pdo = get_db_connection();
+    $stmt = $pdo->prepare(
+        "INSERT INTO users (username, email, password_hash, role, state, lga, phone) VALUES (:username, :email, :password_hash, :role, :state, :lga, :phone)"
+    );
+    $stmt->execute([
+        ':username' => $username,
+        ':email' => $email,
+        ':password_hash' => $password_hash,
+        ':role' => $role,
+        ':state' => $state,
+        ':lga' => $lga,
+        ':phone' => $phone
+    ]);
+
+    $user_id = $pdo->lastInsertId();
+    $newUser = [
+        'user_id' => $user_id, 
+        'username' => $username, 
+        'email' => $email, 
+        'role' => $role, 
+        'state' => $state, 
+        'lga' => $lga, 
+        'phone' => $phone
+    ];
+    success_response('User created successfully', $newUser, 201);
+
+} catch (PDOException $e) {
+    if ($e->errorInfo[1] == 1062) { // Duplicate entry
+        error_response('A user with this username or email already exists.', null, 409);
+    } else {
+        error_log('Database error creating user: ' . $e->getMessage());
+        error_response('A database error occurred.', null, 500);
+    }
+} catch (Exception $e) {
+    error_log('Error creating user: ' . $e->getMessage());
+    error_response($e->getMessage(), null, 500);
 }
