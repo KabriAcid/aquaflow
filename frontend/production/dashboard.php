@@ -1,27 +1,55 @@
 <?php
-session_start();
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_manager') {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if the user is logged in and has the correct role
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'production_manager') {
+    // Redirect to the login page if not authenticated
     header('Location: ../login.php');
     exit;
 }
 
-$userName = isset($_SESSION['user_name']) && !empty($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Production Manager';
-$page_title = "Production Manager";
+$page_title = "Production Dashboard";
 
-include 'partials/header.php';
-include 'partials/sidebar.php';
-// Page layout wrapper (kept in page so partials only render their component)
 ?>
-<div class="flex-1 flex flex-col">
-    <main class="flex-1 p-6 bg-gray-100">
-        <?php
-        ?>
 
-        <div class="container-fluid">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-gray-700">Production Manager</h1>
-                <p class="text-gray-500">Welcome, <?php echo htmlspecialchars($userName); ?>!</p>
+<?php include './partials/header.php'; ?>
+
+<div class="flex-1 flex">
+    <!-- Sidebar -->
+    <?php include './partials/sidebar.php'; ?>
+
+    <!-- Main Content -->
+    <main class="flex-1 bg-gray-100 p-6 md:p-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Welcome, Production Manager!</h1>
+                <span class="text-lg text-gray-500">Today is <?php echo date('F j, Y'); ?></span>
             </div>
-        </div>
 
-        <?php include 'partials/footer.php'; ?>
+            <!-- Main dashboard content will be loaded here by JavaScript -->
+            <div id="production-dashboard-content">
+                <!-- Daily Output Metrics -->
+                <div id="daily-output-metrics" class="mb-8"></div>
+
+                <!-- Production Trends Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                    <h3 class="text-xl font-bold mb-4">Weekly Production Trends</h3>
+                    <div class="h-64 md:h-96">
+                        <canvas id="production-trends-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Stock Levels Summary -->
+                <div id="stock-levels-summary"></div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Include the dashboard-specific JavaScript -->
+<script src="../js/production-dashboard.js"></script>
+
+<?php include './partials/footer.php'; ?>

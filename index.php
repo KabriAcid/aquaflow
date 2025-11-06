@@ -1,3 +1,23 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if the user is already logged in and redirect based on role
+if (isset($_SESSION['user_id'])) {
+    $role = $_SESSION['role'];
+    if ($role === 'admin') {
+        header('Location: frontend/admin/dashboard.php');
+        exit;
+    } elseif ($role === 'sales_manager') {
+        header('Location: frontend/sales/dashboard.php');
+        exit;
+    } elseif ($role === 'production_manager') {
+        header('Location: frontend/production/dashboard.php');
+        exit;
+    }
+}
+?>
 <!doctype html>
 <html lang="en">
 
