@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Fetch data from the production dashboard API
-    fetch('../../backend/api/production/dashboard.php')
+    fetch('../../backend/api/production/dashboard.php', { credentials: 'same-origin' })
         .then(response => {
             // Check for a successful response, otherwise throw an error
             if (!response.ok) {
