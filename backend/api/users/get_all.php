@@ -14,11 +14,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     $pdo = get_db_connection();
-    $stmt = $pdo->query("SELECT user_id, username, email, role, state, lga, phone FROM users ORDER BY created_at DESC");
+    $stmt = $pdo->query("SELECT id AS user_id, full_name AS username, email, role, state, city, phone, created_at FROM users ORDER BY created_at DESC");
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     success_response('Users fetched successfully', $users);
-
 } catch (PDOException $e) {
     error_log('Database error fetching users: ' . $e->getMessage());
     error_response('A database error occurred.', null, 500);

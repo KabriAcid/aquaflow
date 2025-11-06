@@ -31,8 +31,8 @@
 **Responsibilities:**
 
 * Record daily production (bottled water and beverage quantities).
-* Track material usage and wastage.
 * Update stock data to synchronize with sales and inventory.
+* Track material usage and wastage.
 * View and act upon production reports and trends.
 * Receive alerts for low material or high demand.
 * Coordinate with sales manager when production adjustments are needed.

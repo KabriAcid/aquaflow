@@ -25,7 +25,7 @@ try {
     $pdo = get_db_connection();
 
     // Only delete if the role is production_manager to avoid accidental deletions
-    $stmt = $pdo->prepare("DELETE FROM users WHERE user_id = :user_id AND role = 'production_manager'");
+    $stmt = $pdo->prepare("DELETE FROM users WHERE id = :user_id AND role = 'production_manager'");
     $stmt->execute([':user_id' => $user_id]);
 
     if ($stmt->rowCount() > 0) {

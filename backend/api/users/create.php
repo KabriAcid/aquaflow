@@ -36,31 +36,31 @@ $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
 try {
     $pdo = get_db_connection();
+    // Map to current schema: `full_name`, `email`, `password_hash`, `role`, `city`, `state`, `phone`
     $stmt = $pdo->prepare(
-        "INSERT INTO users (username, email, password_hash, role, state, lga, phone) VALUES (:username, :email, :password_hash, :role, :state, :lga, :phone)"
+        "INSERT INTO users (full_name, email, password_hash, role, city, state, phone) VALUES (:full_name, :email, :password_hash, :role, :city, :state, :phone)"
     );
     $stmt->execute([
-        ':username' => $username,
+        ':full_name' => $username,
         ':email' => $email,
         ':password_hash' => $password_hash,
         ':role' => $role,
+        ':city' => $lga,
         ':state' => $state,
-        ':lga' => $lga,
         ':phone' => $phone
     ]);
 
     $user_id = $pdo->lastInsertId();
     $newUser = [
-        'user_id' => $user_id, 
-        'username' => $username, 
-        'email' => $email, 
-        'role' => $role, 
-        'state' => $state, 
-        'lga' => $lga, 
+        'user_id' => $user_id,
+        'full_name' => $username,
+        'email' => $email,
+        'role' => $role,
+        'city' => $lga,
+        'state' => $state,
         'phone' => $phone
     ];
     success_response('User created successfully', $newUser, 201);
-
 } catch (PDOException $e) {
     if ($e->errorInfo[1] == 1062) { // Duplicate entry
         error_response('A user with this username or email already exists.', null, 409);

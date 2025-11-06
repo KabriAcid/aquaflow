@@ -14,10 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-$username = trim($input['username'] ?? '');
+$username = trim($input['username'] ?? $input['name'] ?? '');
 $email = trim($input['email'] ?? '');
 $password = $input['password'] ?? '';
 $phone = trim($input['phone'] ?? '');
+// map city/lga
+$city = trim($input['city'] ?? $input['lga'] ?? '');
+// map state if provided
+$state = trim($input['state'] ?? '');
 
 if (empty($username) || empty($email) || empty($password)) {
     error_response('Missing required fields: username, email, password.', null, 400);
@@ -33,12 +37,15 @@ $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
 try {
     $pdo = get_db_connection();
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, role, phone) VALUES (:username, :email, :password_hash, 'production_manager', :phone)");
+    // Insert using current schema: full_name, email, password_hash, role, phone, city, state
+    $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, role, phone, city, state) VALUES (:full_name, :email, :password_hash, 'production_manager', :phone, :city, :state)");
     $stmt->execute([
-        ':username' => $username,
+        ':full_name' => $username,
         ':email' => $email,
         ':password_hash' => $password_hash,
-        ':phone' => $phone
+        ':phone' => $phone,
+        ':city' => $city,
+        ':state' => $state
     ]);
 
     $user_id = $pdo->lastInsertId();
@@ -46,7 +53,9 @@ try {
         'user_id' => $user_id,
         'name' => $username,
         'email' => $email,
-        'phone' => $phone
+        'phone' => $phone,
+        'city' => $city,
+        'state' => $state
     ];
     success_response('Production manager created successfully', $newUser, 201);
 } catch (PDOException $e) {

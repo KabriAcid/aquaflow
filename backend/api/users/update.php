@@ -23,13 +23,14 @@ $user_id = $input['user_id'];
 
 try {
     $pdo = get_db_connection();
-    
+
     $fields = [];
     $params = [':user_id' => $user_id];
 
     if (isset($input['username'])) {
-        $fields[] = 'username = :username';
-        $params[':username'] = trim($input['username']);
+        // map `username` field expected by front-end to `full_name` in DB
+        $fields[] = 'full_name = :full_name';
+        $params[':full_name'] = trim($input['username']);
     }
     if (isset($input['email'])) {
         $email = filter_var($input['email'], FILTER_SANITIZE_EMAIL);
@@ -53,8 +54,9 @@ try {
         $params[':state'] = trim($input['state']);
     }
     if (isset($input['lga'])) {
-        $fields[] = 'lga = :lga';
-        $params[':lga'] = trim($input['lga']);
+        // frontend may provide `lga`; map to DB `city`
+        $fields[] = 'city = :city';
+        $params[':city'] = trim($input['lga']);
     }
     if (isset($input['phone'])) {
         $fields[] = 'phone = :phone';
@@ -71,7 +73,7 @@ try {
         exit;
     }
 
-    $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE user_id = :user_id";
+    $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :user_id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
@@ -80,7 +82,6 @@ try {
     } else {
         success_response('No changes made.', null, 200);
     }
-
 } catch (PDOException $e) {
     if ($e->errorInfo[1] == 1062) { // Duplicate entry
         error_response('A user with this username or email already exists.', null, 409);

@@ -25,7 +25,7 @@ try {
     $pdo = get_db_connection();
 
     // Ensure the target user is a production_manager
-    $check = $pdo->prepare("SELECT user_id FROM users WHERE user_id = :user_id AND role = 'production_manager'");
+    $check = $pdo->prepare("SELECT id FROM users WHERE id = :user_id AND role = 'production_manager'");
     $check->execute([':user_id' => $user_id]);
     if (!$check->fetch()) {
         error_response('Production manager not found.', null, 404);
@@ -35,9 +35,10 @@ try {
     $fields = [];
     $params = [':user_id' => $user_id];
 
-    if (isset($input['username'])) {
-        $fields[] = 'username = :username';
-        $params[':username'] = trim($input['username']);
+    if (isset($input['username']) || isset($input['name'])) {
+        // map frontend username/name -> DB full_name
+        $fields[] = 'full_name = :full_name';
+        $params[':full_name'] = trim($input['username'] ?? $input['name']);
     }
     if (isset($input['email'])) {
         $email = filter_var($input['email'], FILTER_SANITIZE_EMAIL);
@@ -52,6 +53,15 @@ try {
         $fields[] = 'phone = :phone';
         $params[':phone'] = trim($input['phone']);
     }
+    if (isset($input['lga']) || isset($input['city'])) {
+        // map frontend lga -> DB city
+        $fields[] = 'city = :city';
+        $params[':city'] = trim($input['lga'] ?? $input['city']);
+    }
+    if (isset($input['state'])) {
+        $fields[] = 'state = :state';
+        $params[':state'] = trim($input['state']);
+    }
     if (!empty($input['password'])) {
         $password_hash = password_hash($input['password'], PASSWORD_DEFAULT);
         $fields[] = 'password_hash = :password_hash';
@@ -63,7 +73,7 @@ try {
         exit;
     }
 
-    $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE user_id = :user_id";
+    $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :user_id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 

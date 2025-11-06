@@ -17,7 +17,7 @@ $user_id = $_SESSION['user_id'];
 
 try {
     $pdo = get_db_connection();
-    $stmt = $pdo->prepare("SELECT user_id, username, email, role, created_at FROM users WHERE user_id = :user_id");
+    $stmt = $pdo->prepare("SELECT id AS user_id, full_name AS username, email, role, created_at FROM users WHERE id = :user_id");
     $stmt->execute([':user_id' => $user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -26,7 +26,6 @@ try {
     } else {
         error_response('User not found.', null, 404);
     }
-
 } catch (PDOException $e) {
     error_log('Database error fetching user: ' . $e->getMessage());
     error_response('A database error occurred.', null, 500);

@@ -15,7 +15,7 @@ $links = [
 $current_page = basename($_SERVER['PHP_SELF']);
 
 ?>
-<aside class="w-64 bg-white text-gray-800 p-6 flex-col shadow-lg hidden md:flex">
+<aside class="w-64 bg-white text-gray-800 p-6 flex-col shadow-lg hidden md:flex h-screen">
     <div class="flex items-center gap-3 mb-8 border-b pb-3">
         <img src="../../favicon.png" alt="Aquaflow Logo" class="w-10 h-10">
         <h1 class="text-2xl font-bold">Aquaflow</h1>

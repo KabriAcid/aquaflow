@@ -18,7 +18,7 @@ try {
     $pdo = get_db_connection();
 
     if ($user_id) {
-        $stmt = $pdo->prepare("SELECT user_id, username AS name, email, phone, state, lga, role, created_at FROM users WHERE user_id = :user_id AND role = 'production_manager' LIMIT 1");
+        $stmt = $pdo->prepare("SELECT id AS user_id, full_name AS name, email, phone, city, state, role, created_at FROM users WHERE id = :user_id AND role = 'production_manager' LIMIT 1");
         $stmt->execute([':user_id' => $user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$user) {
@@ -29,7 +29,7 @@ try {
         exit;
     }
 
-    $stmt = $pdo->query("SELECT user_id, username AS name, email, phone, created_at FROM users WHERE role = 'production_manager' ORDER BY created_at DESC");
+    $stmt = $pdo->query("SELECT id AS user_id, full_name AS name, email, phone, created_at FROM users WHERE role = 'production_manager' ORDER BY created_at DESC");
     $managers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     success_response('Production managers fetched', $managers);
