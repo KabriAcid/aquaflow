@@ -99,6 +99,7 @@
       try {
         const res = await fetch('../backend/api/auth/login.php', {
           method: 'POST',
+          credentials: 'same-origin',
           headers: {
             'Content-Type': 'application/json'
           },
