@@ -101,9 +101,11 @@ document.addEventListener("DOMContentLoaded", function () {
         : "";
 
       tr.innerHTML = `
-                <td class="py-2 px-3">${escapeHtml(
-                  order.order_number || ""
-                )}</td>
+                <td class="py-2 px-3"><a href="order-details.php?id=${
+                  order.id
+                }" class="text-sm text-blue-600">${escapeHtml(
+        order.order_number || "#" + order.id
+      )}</a></td>
                 <td class="py-2 px-3">${escapeHtml(
                   order.customer_name || order.customer_id || ""
                 )}</td>

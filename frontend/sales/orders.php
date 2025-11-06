@@ -12,13 +12,9 @@ include 'partials/sidebar.php';
 ?>
 
 <div class="container-fluid">
-    <h1 class="h3 mb-4 text-gray-800">Manage Orders</h1>
+    <h1 class="text-2xl mb-4 text-gray-800 font-semibold">Manage Orders</h1>
 
     <div class="bg-white p-6 rounded-lg multi-shadow">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-medium text-gray-600">Orders</h3>
-        </div>
-
         <div class="overflow-x-auto">
             <table id="ordersTable" class="w-full text-left table-auto">
                 <thead>
