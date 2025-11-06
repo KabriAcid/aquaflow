@@ -1,13 +1,5 @@
-/* Use local Product Sans font */
-@font-face {
-  font-family: "Product Sans";
-  src: url("../../assets/fonts/ProductSans-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
 body {
-  font-family: "Product Sans", sans-serif;
+  font-family: "system-ui", sans-serif;
 }
 
 /* Multi-layered shadow utility used across the UI */
