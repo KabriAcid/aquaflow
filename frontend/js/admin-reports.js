@@ -2,11 +2,31 @@
 document.addEventListener("DOMContentLoaded", () => {
     const generateReportBtn = document.getElementById("generateReportBtn");
     const reportContent = document.getElementById("reportContent");
-    const spinner = generateReportBtn.querySelector(".spinner-border");
+    // Support both the old Bootstrap spinner inside the button and the new Tailwind spinner with id #reportSpinner
+    const btnSpinner = generateReportBtn ? generateReportBtn.querySelector(".spinner-border") : null;
+    const idSpinner = document.getElementById("reportSpinner");
+
+    function showSpinner() {
+        if (idSpinner) {
+            idSpinner.classList.remove('hidden');
+        }
+        if (btnSpinner) {
+            btnSpinner.classList.remove('d-none');
+        }
+    }
+
+    function hideSpinner() {
+        if (idSpinner) {
+            idSpinner.classList.add('hidden');
+        }
+        if (btnSpinner) {
+            btnSpinner.classList.add('d-none');
+        }
+    }
 
     generateReportBtn.addEventListener("click", async () => {
         // Show spinner and disable button
-        spinner.classList.remove("d-none");
+        showSpinner();
         generateReportBtn.disabled = true;
 
         try {
@@ -20,11 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             reportContent.innerHTML = `<div class="alert alert-danger">Error: Could not connect to the reporting service.</div>`;
+        } finally {
+            // Hide spinner and enable button
+            hideSpinner();
+            generateReportBtn.disabled = false;
         }
-
-        // Hide spinner and enable button
-        spinner.classList.add("d-none");
-        generateReportBtn.disabled = false;
     });
 
     function displayReport(data) {
