@@ -1,51 +1,54 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Fetch and display dashboard data
-    async function fetchDashboardData() {
-        try {
-            // Fetch sales summary
-            const salesRes = await fetch('../backend/api/sales/summary.php');
-            const salesData = await salesRes.json();
+document.addEventListener('DOMContentLoaded', function () {
+    // Dummy data for the charts
+    const salesData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [{
+            label: 'Sales',
+            data: [120, 150, 180, 220, 200, 250, 280],
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            fill: true,
+            tension: 0.4
+        }]
+    };
 
-            if (salesData.success) {
-                document.getElementById('total-sales').textContent = `$${salesData.data.total_sales}`;
-                document.getElementById('total-orders').textContent = salesData.data.total_orders;
-            }
+    const topProductsData = {
+        labels: ['Product A', 'Product B', 'Product C'],
+        datasets: [{
+            data: [300, 50, 100],
+            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B'],
+            hoverOffset: 4
+        }]
+    };
 
-            // Fetch users
-            const usersRes = await fetch('../backend/api/users/get_all.php');
-            const usersData = await usersRes.json();
-
-            if (usersData.success) {
-                const customers = usersData.data.filter(user => user.role === 'customer');
-                const salesManagers = usersData.data.filter(user => user.role === 'sales_manager');
-
-                document.getElementById('total-customers').textContent = customers.length;
-                document.getElementById('total-sales-managers').textContent = salesManagers.length;
-            }
-
-            // Initialize sales chart
-            const salesChartCtx = document.getElementById('sales-chart').getContext('2d');
-            new Chart(salesChartCtx, {
-                type: 'line',
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                    datasets: [{
-                        label: 'Sales',
-                        data: [65, 59, 80, 81, 56, 55, 40],
-                        fill: false,
-                        borderColor: '#3b82f6',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+    // Sales Overview Chart (Line)
+    const salesOverviewCtx = document.getElementById('salesOverviewChart')?.getContext('2d');
+    if (salesOverviewCtx) {
+        new Chart(salesOverviewCtx, {
+            type: 'line',
+            data: salesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
-            });
-        } catch (error) {
-            console.error('Error fetching dashboard data:', error);
-        }
+            }
+        });
     }
 
-    fetchDashboardData();
+    // Top Products Chart (Doughnut)
+    const topProductsCtx = document.getElementById('topProductsChart')?.getContext('2d');
+    if (topProductsCtx) {
+        new Chart(topProductsCtx, {
+            type: 'doughnut',
+            data: topProductsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }
 });

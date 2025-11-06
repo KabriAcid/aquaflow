@@ -1,57 +1,44 @@
 <?php
 session_start();
-// Only allow admin users to access this page
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     header('Location: ../login.php');
     exit;
 }
 
 $page_title = "Sales Reports";
+
+include 'partials/header.php';
+include 'partials/sidebar.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?> - Aquaflow</title>
-    <link rel="shortcut icon" href="../../favicon.png" type="image/x-icon">
-    <link rel="stylesheet" href="../css/tailwind.css">
-    <link rel="stylesheet" href="../css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+<div class="mb-6">
+    <h1 class="text-2xl font-semibold text-gray-700">Sales Reports</h1>
+</div>
 
-<body class="bg-gray-100 flex text-gray-800">
-
-    <?php include 'partials/sidebar.php'; ?>
-
-    <div class="flex-1 flex flex-col">
-        <?php include 'partials/topbar.php'; ?>
-
-        <main class="flex-1 p-6">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-gray-700">Sales Reports</h1>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg multi-shadow">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-600">Generate Sales Report</h3>
-                    <button id="generateReportBtn" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
-                        <span id="reportSpinner" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin hidden" aria-hidden="true"></span>
-                        <span>Generate Report</span>
-                    </button>
-                </div>
-
-                <div id="reportContent"></div>
-            </div>
-        </main>
-
-        <?php include 'partials/footer.php'; ?>
+<div class="bg-white p-6 rounded-lg multi-shadow">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-600">Generate Sales Report</h3>
+        <button id="generateReportBtn" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+            <span id="reportSpinner" class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin hidden" aria-hidden="true"></span>
+            <span>Generate Report</span>
+        </button>
     </div>
 
-    <!-- Page scripts -->
-    <script src="../js/admin-reports.js"></script>
+    <div id="reportContent">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-md font-semibold text-gray-600 mb-2">Top Selling Products</h4>
+                <canvas id="topProductsChart"></canvas>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="text-md font-semibold text-gray-600 mb-2">Sales Over Time</h4>
+                <canvas id="salesOverTimeChart"></canvas>
+            </div>
+        </div>
+        <div id="reportTable" class="mt-6"></div>
+    </div>
+</div>
 
-</body>
+<script src="../js/admin-reports.js"></script>
 
-</html>
+<?php include 'partials/footer.php'; ?>
