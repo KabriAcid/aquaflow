@@ -1,6 +1,3 @@
-<?php
-// customer/products.php
-?>
 <!DOCTYPE html>
 <html lang="en">
 

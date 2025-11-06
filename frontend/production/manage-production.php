@@ -16,12 +16,15 @@ include './partials/header.php';
     <?php include './partials/sidebar.php'; ?>
 
     <!-- Main Content -->
-    <main class="flex-1 bg-gray-100 p-6 md:p-10">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">Manage Products</h1>
+    <main class="flex-1 bg-gray-100 p-6">
+        <div class="container-fluid">
+            <div class="mb-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-700">Manage Products</h1>
+                    <p class="text-gray-500">Manage production items and record output.</p>
+                </div>
                 <button id="add-product-btn" class="btn-primary inline-flex items-center gap-2">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <i data-lucide="plus" class="w-4 h-4"></i>
                     Add Product
                 </button>
             </div>

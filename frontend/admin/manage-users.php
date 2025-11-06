@@ -44,63 +44,129 @@ include 'partials/sidebar.php';
             </div>
 
             <script src="../js/admin-users.js" defer></script>
+            <script>
+                // States and Cities Management
+                let statesData = {};
+
+                // Load states and cities data
+                async function loadStatesData() {
+                    try {
+                        const response = await fetch('../../backend/api/location/states_cities.php');
+                        statesData = await response.json();
+                        populateStates();
+                    } catch (error) {
+                        console.error('Error loading states data:', error);
+                    }
+                }
+
+                // Populate states dropdown
+                function populateStates() {
+                    const stateSelect = document.getElementById('state');
+                    stateSelect.innerHTML = '<option value="">Select State</option>';
+
+                    for (const [stateId, stateInfo] of Object.entries(statesData)) {
+                        const option = document.createElement('option');
+                        option.value = stateId;
+                        option.textContent = stateInfo.name;
+                        stateSelect.appendChild(option);
+                    }
+                }
+
+                // Populate cities based on selected state
+                function populateCities(selectedState) {
+                    const citySelect = document.getElementById('city');
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+
+                    if (selectedState && statesData[selectedState]) {
+                        const cities = statesData[selectedState].cities || [];
+                        cities.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.id;
+                            option.textContent = city.name;
+                            citySelect.appendChild(option);
+                        });
+                    }
+                }
+
+                // Set selected values for edit mode
+                function setSelectedStateCity(stateValue, cityValue) {
+                    const stateSelect = document.getElementById('state');
+                    const citySelect = document.getElementById('city');
+
+                    if (stateValue) {
+                        stateSelect.value = stateValue;
+                        populateCities(stateValue);
+
+                        setTimeout(() => {
+                            if (cityValue) {
+                                citySelect.value = cityValue;
+                            }
+                        }, 100);
+                    }
+                }
+
+                // Event listeners
+                document.addEventListener('DOMContentLoaded', function() {
+                    loadStatesData();
+
+                    // Ensure lucide replaces any static placeholders (header icons) after DOM load.
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                    const stateSelect = document.getElementById('state');
+                    stateSelect.addEventListener('change', function() {
+                        populateCities(this.value);
+                    });
+                });
+            </script>
         </div>
     </main>
 
-    <!-- Add User Modal -->
-    <div id="add-user-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6">Add New User</h2>
-            <form id="add-user-form">
-                <div class="mb-4">
-                    <label for="add-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input type="text" id="add-name" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+    <!-- Add/Edit User Modal -->
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg">
+            <h2 class="text-2xl font-bold mb-6" id="modal-title">Add New User</h2>
+            <form id="user-form">
+                <input type="hidden" id="user-id" name="user_id">
+                <!-- 2x2 Grid Layout for Form Fields -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="name" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="add-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="add-email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <select id="state" name="state" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select State</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="add-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input type="tel" id="add-phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div class="mb-6">
-                    <label for="add-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="add-password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                </div>
-                <div class="flex justify-end gap-4">
-                    <button type="button" id="cancel-add-btn" class="btn-secondary">Cancel</button>
-                    <button type="submit" class="btn-primary">Save User</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Edit User Modal -->
-    <div id="edit-user-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6">Edit User</h2>
-            <form id="edit-user-form">
-                <input type="hidden" id="edit-user-id" name="user_id">
-                <div class="mb-4">
-                    <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input type="text" id="edit-name" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="edit-email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="edit-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                    <input type="tel" id="edit-phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div class="mb-6">
-                    <label for="edit-password" class="block text-sm font-medium text-gray-700 mb-1">New Password (optional)</label>
-                    <input type="password" id="edit-password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City / LGA</label>
+                        <select id="city" name="city" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select City</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
                 </div>
                 <div class="flex justify-end gap-4">
-                    <button type="button" id="cancel-edit-btn" class="btn-secondary">Cancel</button>
-                    <button type="submit" class="btn-primary">Update User</button>
+                    <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
+                    <button type="submit" id="save-btn" class="btn-primary">Save User</button>
                 </div>
             </form>
         </div>
