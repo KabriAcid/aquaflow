@@ -15,7 +15,6 @@ $links = [
     ['href' => 'manage-orders.php', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7', 'text' => 'Orders'],
     ['href' => 'reports.php', 'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5', 'text' => 'Reports'],
     ['href' => 'manage-settings.php', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.165c1.58-.91 3.4.58 2.49 2.16a1.724 1.724 0 001.165 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.165 2.573c.91 1.58-.91 3.4-2.49 2.49a1.724 1.724 0 00-2.573 1.165c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.165c-1.58.91-3.4-.91-2.49-2.49a1.724 1.724 0 00-1.165-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.165-2.573c-.91-1.58.91-3.4 2.49-2.49.897.517 2.12.117 2.573-1.165z', 'text' => 'Settings'],
-    ['href' => 'logs.php', 'icon' => 'M8 17l4-4 4 4M8 7h8', 'text' => 'Logs'],
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -39,7 +38,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             'Orders' => 'shopping-cart',
             'Reports' => 'bar-chart-2',
             'Settings' => 'settings',
-            'Logs' => 'file-text'
         ];
         ?>
         <ul class="space-y-2">
@@ -58,7 +56,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </nav>
 
     <div class="mt-auto">
-        <a href="../../includes/logout.php" class="flex items-center gap-3 px-4 py-2 mt-4 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors">
+        <a href="logout.php" class="flex items-center gap-3 px-4 py-2 mt-4 rounded-lg text-gray-500 hover:bg-gray-200 transition-colors">
             <i data-lucide="log-out" class="w-5 h-5" aria-hidden="true"></i>
             <span>Logout</span>
         </a>
