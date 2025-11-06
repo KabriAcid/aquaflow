@@ -24,7 +24,7 @@
     <main class="py-10">
         <div class="max-w-4xl mx-auto px-4">
             <h1 class="text-3xl font-bold mb-6 text-gray-800">Checkout</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div id="checkoutGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Delivery Information -->
                 <div class="bg-white p-8 rounded-lg multi-shadow">
                     <h2 class="text-2xl font-bold mb-6">Delivery Information</h2>
@@ -75,9 +75,26 @@
                     <div id="orderSummary">
                         <!-- Order summary will be populated here -->
                     </div>
+                    <div id="codConfirm" class="mt-6 bg-yellow-50 p-4 rounded hidden">
+                        <p class="mb-3">You selected Cash on Delivery. Confirm that you want to place the order and pay on delivery.</p>
+                        <div class="flex gap-3">
+                            <button id="confirmCodBtn" class="flex-1 bg-green-600 text-white py-3 rounded-md hover:bg-green-700">Confirm & Place Order (COD)</button>
+                            <button id="cancelCodBtn" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-md hover:bg-gray-300">Cancel</button>
+                        </div>
+                    </div>
                     <div class="mt-6">
                         <button id="placeOrderBtn" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700">Place Order</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Full-page COD confirmation (hidden by default) -->
+            <div id="codFullConfirm" class="hidden bg-yellow-50 p-8 rounded-lg multi-shadow mt-6">
+                <h3 class="text-lg font-medium mb-3">Confirm Cash on Delivery</h3>
+                <p class="mb-4">You will pay on delivery. Click confirm to place the order and log the order and transaction statuses.</p>
+                <div class="flex gap-3">
+                    <button id="confirmCodFullBtn" class="flex-1 bg-green-600 text-white py-3 rounded-md hover:bg-green-700">Confirm & Place Order (COD)</button>
+                    <button id="cancelCodFullBtn" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-md hover:bg-gray-300">Cancel</button>
                 </div>
             </div>
         </div>
@@ -104,13 +121,97 @@
                     populateAddress();
                     populateStatesAndCities();
 
+                    // Ensure the place order button is disabled until validation passes
+                    const placeBtn = document.getElementById('placeOrderBtn');
+                    const confirmCodBtn = document.getElementById('confirmCodBtn');
+                    const cancelCodBtn = document.getElementById('cancelCodBtn');
+                    const codConfirm = document.getElementById('codConfirm');
+                    const checkoutGrid = document.getElementById('checkoutGrid');
+                    const codFullConfirm = document.getElementById('codFullConfirm');
+                    const confirmCodFullBtn = document.getElementById('confirmCodFullBtn');
+                    const cancelCodFullBtn = document.getElementById('cancelCodFullBtn');
+
+                    placeBtn.disabled = true;
+
+                    // Form validation: ensure required fields are filled and cart not empty
+                    const requiredFields = ['address', 'state', 'city', 'delivery_date'];
+
+                    function formIsValid() {
+                        // must have cart
+                        const cart = getCart();
+                        if (!cart || cart.length === 0) return false;
+                        for (const id of requiredFields) {
+                            const el = document.getElementById(id);
+                            if (!el) return false;
+                            if (!el.value || String(el.value).trim() === '') return false;
+                        }
+                        return true;
+                    }
+
+                    function updateUiForPaymentMethod() {
+                        const method = document.querySelector('input[name="payment_method"]:checked').value;
+                        if (method === 'cash_on_delivery') {
+                            // hide full checkout grid and show a single confirm container
+                            if (checkoutGrid) checkoutGrid.classList.add('hidden');
+                            if (codFullConfirm) codFullConfirm.classList.remove('hidden');
+                            // hide inline place button and inline cod confirm
+                            placeBtn.classList.add('hidden');
+                            if (codConfirm) codConfirm.classList.add('hidden');
+                            // set confirm button state based on form validity
+                            if (confirmCodBtn) confirmCodBtn.disabled = !formIsValid();
+                            if (confirmCodFullBtn) confirmCodFullBtn.disabled = !formIsValid();
+                        } else {
+                            // card payment — show regular checkout grid
+                            if (checkoutGrid) checkoutGrid.classList.remove('hidden');
+                            if (codFullConfirm) codFullConfirm.classList.add('hidden');
+                            placeBtn.classList.remove('hidden');
+                            if (codConfirm) codConfirm.classList.add('hidden');
+                            placeBtn.disabled = !formIsValid();
+                        }
+                    }
+
+                    // expose so other functions (renderOrderSummary) can trigger UI update when cart changes
+                    window.updateUiForPaymentMethod = updateUiForPaymentMethod;
+
+                    // Watch required fields and payment method changes
+                    requiredFields.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.addEventListener('input', () => updateUiForPaymentMethod());
+                        el.addEventListener('change', () => updateUiForPaymentMethod());
+                    });
+                    document.querySelectorAll('input[name="payment_method"]').forEach(r => r.addEventListener('change', updateUiForPaymentMethod));
+
+                    // wire place order and COD confirm/cancel (both inline and full)
                     document.getElementById('placeOrderBtn').addEventListener('click', placeOrder);
+                    if (confirmCodBtn) confirmCodBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        placeOrder();
+                    });
+                    if (cancelCodBtn) cancelCodBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelector('input[name="payment_method"][value="card"]').checked = true;
+                        updateUiForPaymentMethod();
+                    });
+                    if (confirmCodFullBtn) confirmCodFullBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        placeOrder();
+                    });
+                    if (cancelCodFullBtn) cancelCodFullBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.querySelector('input[name="payment_method"][value="card"]').checked = true;
+                        updateUiForPaymentMethod();
+                    });
+
                     // Set minimum delivery date to tomorrow
                     const today = new Date();
                     const tomorrow = new Date(today);
                     tomorrow.setDate(tomorrow.getDate() + 1);
                     const minDate = tomorrow.toISOString().split('T')[0];
                     document.getElementById('delivery_date').setAttribute('min', minDate);
+
+                    // initialize UI state
+                    updateUiForPaymentMethod();
                 })
                 .catch(err => {
                     console.error('Auth check failed', err);
@@ -183,6 +284,8 @@
                 </div>`;
 
             orderSummary.innerHTML = summaryHtml;
+            // notify UI that cart/summary changed so validation can update (if available)
+            if (typeof window.updateUiForPaymentMethod === 'function') window.updateUiForPaymentMethod();
         }
 
         function populateAddress() {
@@ -193,22 +296,21 @@
                 .then(data => {
                     if (data.success && data.data) {
                         document.getElementById('address').value = data.data.address || '';
-                        // select state and city once options are populated
-                        const setStateCity = () => {
-                            const stateSel = document.getElementById('state');
-                            const citySel = document.getElementById('city');
-                            if (stateSel.options.length > 1) {
-                                if (data.data.state) stateSel.value = data.data.state;
-                                // trigger change to populate cities
-                                const evt = new Event('change');
-                                stateSel.dispatchEvent(evt);
-                                if (data.data.city) citySel.value = data.data.city;
-                            } else {
-                                // try again shortly
-                                setTimeout(setStateCity, 150);
+                        // store defaults on selects — populateStatesAndCities will apply them when options are available
+                        const stateSel = document.getElementById('state');
+                        const citySel = document.getElementById('city');
+                        if (stateSel && data.data.state) stateSel.dataset.default = data.data.state;
+                        if (citySel && data.data.city) citySel.dataset.default = data.data.city;
+                        // also attempt to apply immediately if options already present
+                        try {
+                            if (stateSel && stateSel.options.length > 1 && stateSel.dataset.default) {
+                                stateSel.value = stateSel.dataset.default;
+                                stateSel.dispatchEvent(new Event('change'));
+                                if (citySel && citySel.dataset.default) citySel.value = citySel.dataset.default;
                             }
-                        };
-                        setStateCity();
+                        } catch (e) {
+                            // ignore
+                        }
                     }
                 });
         }
@@ -233,6 +335,11 @@
                         stateSel.appendChild(opt);
                     }
 
+                    // after populating states, if a default was provided by profile, select it
+                    if (stateSel.dataset && stateSel.dataset.default) {
+                        stateSel.value = stateSel.dataset.default;
+                    }
+
                     stateSel.addEventListener('change', function() {
                         const s = stateSel.value;
                         citySel.innerHTML = '<option value="">Select city</option>';
@@ -252,6 +359,10 @@
                                 o.textContent = c.name || c.id;
                                 citySel.appendChild(o);
                             });
+                            // if a default city was provided, select it
+                            if (citySel.dataset && citySel.dataset.default) {
+                                citySel.value = citySel.dataset.default;
+                            }
                         }
                     });
                 })
@@ -368,10 +479,36 @@
                             }
                         });
                     } else {
-                        // Cash on delivery — order already created
-                        clearCart();
-                        alert('Order placed successfully!');
-                        window.location.href = `payment.php?order_id=${orderId}`;
+                        // Cash on delivery — create a COD transaction and mark order
+                        fetch('../../backend/api/orders/confirm_cod.php', {
+                                method: 'POST',
+                                credentials: 'same-origin',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    order_id: orderId
+                                })
+                            })
+                            .then(r => r.json())
+                            .then(codResp => {
+                                if (!codResp.success) {
+                                    alert('Order placed but failed to confirm COD: ' + (codResp.message || 'Unknown'));
+                                    // still redirect to order page so user can see order
+                                    window.location.href = `payment.php?order_id=${orderId}`;
+                                    return;
+                                }
+                                // success — clear cart and redirect to order/payment page
+                                clearCart();
+                                alert('Order placed successfully!');
+                                window.location.href = `payment.php?order_id=${orderId}`;
+                            })
+                            .catch(err => {
+                                console.error('COD confirm error', err);
+                                // fallback: redirect to order page
+                                clearCart();
+                                window.location.href = `payment.php?order_id=${orderId}`;
+                            });
                     }
                 })
                 .catch(err => {

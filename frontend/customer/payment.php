@@ -59,10 +59,30 @@
                         .then(data => {
                             if (data.success && data.data) {
                                 const order = data.data;
-                                document.getElementById('orderDetails').innerHTML = `
-                            <p><strong>Order Number:</strong> ${order.order_number}</p>
-                            <p><strong>Total Amount:</strong> ₦${parseFloat(order.total_amount).toFixed(2)}</p>
-                        `;
+                                // load transactions for this order to show tx_ref if present
+                                fetch(`../../backend/api/payments/get_by_order.php?order_id=${orderId}`, {
+                                        credentials: 'same-origin'
+                                    })
+                                    .then(r => r.json())
+                                    .then(txData => {
+                                        let txHtml = '';
+                                        if (txData.success && Array.isArray(txData.data) && txData.data.length > 0) {
+                                            const tx = txData.data[0];
+                                            txHtml = `<p><strong>Transaction Ref:</strong> ${tx.tx_ref || ''}</p><p><strong>Transaction Status:</strong> ${tx.status || ''}</p>`;
+                                        }
+                                        document.getElementById('orderDetails').innerHTML = `
+                                                    <p><strong>Order Number:</strong> ${order.order_number}</p>
+                                                    <p><strong>Total Amount:</strong> ₦${parseFloat(order.total_amount).toFixed(2)}</p>
+                                                    ${txHtml}
+                                                `;
+                                    })
+                                    .catch(err => {
+                                        console.warn('Could not fetch transactions', err);
+                                        document.getElementById('orderDetails').innerHTML = `
+                                                    <p><strong>Order Number:</strong> ${order.order_number}</p>
+                                                    <p><strong>Total Amount:</strong> ₦${parseFloat(order.total_amount).toFixed(2)}</p>
+                                                `;
+                                    });
                             } else {
                                 alert('Could not retrieve order details.');
                             }

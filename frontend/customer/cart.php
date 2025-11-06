@@ -64,28 +64,47 @@
                 return;
             }
 
+            // Sanitize cart items: ensure minQty exists and quantity is at least minQty
+            let sanitized = false;
+            cart.forEach(item => {
+                // prefer explicit minQty, fallback to minimum_order_quantity or 1
+                const min = item.minQty ? Number(item.minQty) : (item.minimum_order_quantity ? Number(item.minimum_order_quantity) : 1);
+                if (!item.minQty || item.minQty !== min) item.minQty = min;
+                // coerce quantity to number and ensure at least min
+                const qty = Number(item.quantity) || 0;
+                if (qty < item.minQty) {
+                    item.quantity = item.minQty;
+                    sanitized = true;
+                } else {
+                    item.quantity = qty;
+                }
+            });
+            if (sanitized) saveCart(cart);
+
             let cartTable = `
                 <table class="min-w-full bg-white">
                     <thead>
                         <tr>
-                            <th class="py-2 px-4 border-b">Product</th>
-                            <th class="py-2 px-4 border-b">Price</th>
-                            <th class="py-2 px-4 border-b">Quantity</th>
-                            <th class="py-2 px-4 border-b">Subtotal</th>
-                            <th class="py-2 px-4 border-b">Action</th>
+                            <th class="py-2 px-4 border-b text-left">Product</th>
+                            <th class="py-2 px-4 border-b text-left">Price</th>
+                            <th class="py-2 px-4 border-b text-left">Quantity</th>
+                            <th class="py-2 px-4 border-b text-left">Subtotal</th>
+                            <th class="py-2 px-4 border-b text-left">Action</th>
                         </tr>
                     </thead>
                     <tbody>`;
 
             cart.forEach(item => {
+                const qty = Number(item.quantity) || item.minQty || 1;
+                const subtotal = Number(item.price) * qty;
                 cartTable += `
                     <tr>
                         <td class="py-2 px-4 border-b">${item.name}</td>
                         <td class="py-2 px-4 border-b">₦${parseFloat(item.price).toFixed(2)}</td>
                         <td class="py-2 px-4 border-b">
-                            <input type="number" value="${item.quantity}" min="${item.minQty}" onchange="updateQuantity(${item.id}, this.value)" class="w-20 text-center border rounded">
+                            <input type="number" value="${qty}" min="${item.minQty}" onchange="updateQuantity(${item.id}, this.value)" class="w-20 text-center border rounded">
                         </td>
-                        <td class="py-2 px-4 border-b">₦${(item.price * item.quantity).toFixed(2)}</td>
+                        <td class="py-2 px-4 border-b">₦${subtotal.toFixed(2)}</td>
                         <td class="py-2 px-4 border-b">
                             <button onclick="removeFromCart(${item.id}); renderCart();" class="text-red-500 hover:underline">Remove</button>
                         </td>
