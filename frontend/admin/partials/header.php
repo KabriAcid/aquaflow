@@ -10,6 +10,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +19,21 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide icons loaded once for admin pages -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.lucide) {
+                try {
+                    lucide.replace({
+                        'strokeWidth': 2
+                    });
+                } catch (e) {
+                    console.warn('Lucide replace failed', e);
+                }
+            }
+        });
+    </script>
 </head>
-<body class="bg-gray-100 flex font-sans text-gray-800">
 
+<body class="bg-gray-100 flex font-sans text-gray-800">
