@@ -13,6 +13,9 @@
 
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -21,43 +24,79 @@
 
     <!-- Dashboard Content -->
     <main class="py-10">
-        <div class="max-w-6xl mx-auto px-4">
-            <h1 class="text-3xl font-bold mb-6 text-gray-800">Welcome back, <span id="userName"></span>!</h1>
+        <div class="container-fluid">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-semibold text-gray-700">Customer Dashboard</h1>
+                    <p class="text-gray-500">Welcome back, <span id="userName"></span>!</p>
+                </div>
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-lg multi-shadow">
-                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Total Orders</h2>
-                    <p id="totalOrders" class="text-3xl font-bold text-blue-500">0</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg multi-shadow">
-                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Pending Orders</h2>
-                    <p id="pendingOrders" class="text-3xl font-bold text-yellow-500">0</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg multi-shadow">
-                    <h2 class="text-lg font-semibold text-gray-700 mb-2">Total Spent</h2>
-                    <p id="totalSpent" class="text-3xl font-bold text-green-500">₦0.00</p>
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-lg multi-shadow">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500 rounded-full p-3">
+                                <i data-lucide="shopping-bag" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm text-gray-500">Total Orders</p>
+                                <p id="totalOrders" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg multi-shadow">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-500 rounded-full p-3">
+                                <i data-lucide="clock" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm text-gray-500">Pending Orders</p>
+                                <p id="pendingOrders" class="text-2xl font-bold text-gray-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg multi-shadow">
+                        <div class="flex items-center">
+                            <div class="bg-green-500 rounded-full p-3">
+                                <i data-lucide="naira-sign" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm text-gray-500">Total Spent</p>
+                                <p id="totalSpent" class="text-2xl font-bold text-gray-800">₦0.00</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Recent Orders -->
-            <div class="bg-white p-8 rounded-lg multi-shadow">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Recent Orders</h2>
-                <table class="min-w-full bg-white">
-                    <thead>
-                        <tr>
-                            <th class="py-2 px-4 border-b">Order ID</th>
-                            <th class="py-2 px-4 border-b">Date</th>
-                            <th class="py-2 px-4 border-b">Total</th>
-                            <th class="py-2 px-4 border-b">Status</th>
-                            <th class="py-2 px-4 border-b">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recentOrdersTable">
-                        <!-- Orders will be populated by JavaScript -->
-                    </tbody>
-                </table>
+            <div class="bg-white p-6 rounded-lg multi-shadow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-600">Recent Orders</h3>
+                    <a href="orders.php" class="text-blue-500 hover:text-blue-700 flex items-center gap-1">
+                        <span>View All</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="text-left p-3">Order Number</th>
+                                <th class="text-left p-3">Date</th>
+                                <th class="text-left p-3">Total</th>
+                                <th class="text-left p-3">Status</th>
+                                <th class="text-left p-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersTable">
+                            <!-- Orders will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+        </div>
+        </div>
         </div>
     </main>
 
@@ -124,22 +163,27 @@
                 }
 
                 recentOrders.forEach(order => {
-                    const row = `
-                        <tr>
-                            <td class="py-2 px-4 border-b text-center">${order.order_number}</td>
-                            <td class="py-2 px-4 border-b text-center">${new Date(order.order_date).toLocaleDateString()}</td>
-                            <td class="py-2 px-4 border-b text-center">₦${parseFloat(order.total_amount).toFixed(2)}</td>
-                            <td class="py-2 px-4 border-b text-center">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}">
-                                    ${order.status}
-                                </span>
-                            </td>
-                            <td class="py-2 px-4 border-b text-center">
-                                <a href="order-details.php?id=${order.id}" class="text-blue-500 hover:underline">View</a>
-                            </td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="p-3 border-b">${order.order_number}</td>
+                        <td class="p-3 border-b">${new Date(order.order_date).toLocaleDateString()}</td>
+                        <td class="p-3 border-b">₦${parseFloat(order.total_amount).toFixed(2)}</td>
+                        <td class="p-3 border-b">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}">
+                                ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
+                        </td>
+                        <td class="p-3 border-b">
+                            <a href="order-details.php?id=${order.id}" class="text-blue-500 hover:text-blue-700 p-1 rounded inline-flex items-center" title="View Order Details">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                <span class="ml-1">View</span>
+                            </a>
+                        </td>
                     `;
-                    recentOrdersTable.innerHTML += row;
+                    recentOrdersTable.appendChild(tr);
                 });
             }
 
@@ -163,6 +207,11 @@
                 localStorage.removeItem('userName');
                 window.location.href = '../login.php';
             });
+
+            // Initialize Lucide icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         });
     </script>
 

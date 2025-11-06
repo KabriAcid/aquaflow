@@ -112,7 +112,7 @@ include 'partials/sidebar.php';
     <script>
         // States and Cities Management
         let statesData = {};
-        
+
         // Load states and cities data
         async function loadStatesData() {
             try {
@@ -128,7 +128,7 @@ include 'partials/sidebar.php';
         function populateStates() {
             const stateSelect = document.getElementById('add-state');
             stateSelect.innerHTML = '<option value="">Select State</option>';
-            
+
             for (const [stateId, stateInfo] of Object.entries(statesData)) {
                 const option = document.createElement('option');
                 option.value = stateId;
@@ -141,7 +141,7 @@ include 'partials/sidebar.php';
         function populateCities(selectedState) {
             const citySelect = document.getElementById('add-lga');
             citySelect.innerHTML = '<option value="">Select City</option>';
-            
+
             if (selectedState && statesData[selectedState]) {
                 const cities = statesData[selectedState].cities || [];
                 cities.forEach(city => {
@@ -157,11 +157,11 @@ include 'partials/sidebar.php';
         function setSelectedStateCity(stateValue, cityValue) {
             const stateSelect = document.getElementById('add-state');
             const citySelect = document.getElementById('add-lga');
-            
+
             if (stateValue) {
                 stateSelect.value = stateValue;
                 populateCities(stateValue);
-                
+
                 setTimeout(() => {
                     if (cityValue) {
                         citySelect.value = cityValue;
@@ -173,10 +173,10 @@ include 'partials/sidebar.php';
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
             loadStatesData();
-            
+
             // Ensure lucide replaces any static placeholders (header icons) after DOM load.
             lucide.createIcons();
-            
+
             const stateSelect = document.getElementById('add-state');
             stateSelect.addEventListener('change', function() {
                 populateCities(this.value);
