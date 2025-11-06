@@ -12,20 +12,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Authenticate the user and check their role
-// The user must be a production manager to access this endpoint
-if (!is_authenticated() || $_SESSION['role'] !== 'production_manager') {
-    send_response(403, "Access denied. You must be a production manager to access this data.");
-    exit;
-}
-
 /**
  * Fetches dashboard data for the production manager.
  *
  * @param PDO $pdo The database connection object.
  * @return array An associative array containing production metrics.
  */
-function get_production_dashboard_data($pdo) {
+function get_production_dashboard_data($pdo)
+{
     // For demonstration purposes, this function returns hardcoded data.
     // In a real application, you would fetch this data from the database.
     return [
@@ -47,11 +41,10 @@ function get_production_dashboard_data($pdo) {
 }
 
 // Get the database connection
-$pdo = get_database_connection();
+$pdo = get_db_connection();
 
 // Fetch the dashboard data
 $dashboard_data = get_production_dashboard_data($pdo);
 
 // Send a successful response with the fetched data
-send_response(200, "Production dashboard data retrieved successfully.", $dashboard_data);
-?>
+success_response("Production dashboard data retrieved successfully.", $dashboard_data, 200);

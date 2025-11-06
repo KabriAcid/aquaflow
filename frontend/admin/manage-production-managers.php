@@ -68,14 +68,18 @@ include 'partials/sidebar.php';
                         <input type="tel" id="add-phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="add-lga" class="block text-sm font-medium text-gray-700 mb-1">LGA / City</label>
-                        <input type="text" id="add-lga" name="lga" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <label for="add-state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <select id="add-state" name="state" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select State</option>
+                        </select>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label for="add-state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                        <input type="text" id="add-state" name="state" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <label for="add-lga" class="block text-sm font-medium text-gray-700 mb-1">City / LGA</label>
+                        <select id="add-lga" name="lga" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Select City</option>
+                        </select>
                     </div>
                     <div>
                         <label for="add-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
@@ -106,9 +110,77 @@ include 'partials/sidebar.php';
     </div>
     <script src="../js/admin-production-managers.js" defer></script>
     <script>
-        // Ensure lucide replaces any static placeholders (header icons) after DOM load.
+        // States and Cities Management
+        let statesData = {};
+        
+        // Load states and cities data
+        async function loadStatesData() {
+            try {
+                const response = await fetch('../../backend/api/location/states_cities.php');
+                statesData = await response.json();
+                populateStates();
+            } catch (error) {
+                console.error('Error loading states data:', error);
+            }
+        }
+
+        // Populate states dropdown
+        function populateStates() {
+            const stateSelect = document.getElementById('add-state');
+            stateSelect.innerHTML = '<option value="">Select State</option>';
+            
+            for (const [stateId, stateInfo] of Object.entries(statesData)) {
+                const option = document.createElement('option');
+                option.value = stateId;
+                option.textContent = stateInfo.name;
+                stateSelect.appendChild(option);
+            }
+        }
+
+        // Populate cities based on selected state
+        function populateCities(selectedState) {
+            const citySelect = document.getElementById('add-lga');
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            
+            if (selectedState && statesData[selectedState]) {
+                const cities = statesData[selectedState].cities || [];
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.id;
+                    option.textContent = city.name;
+                    citySelect.appendChild(option);
+                });
+            }
+        }
+
+        // Set selected values for edit mode
+        function setSelectedStateCity(stateValue, cityValue) {
+            const stateSelect = document.getElementById('add-state');
+            const citySelect = document.getElementById('add-lga');
+            
+            if (stateValue) {
+                stateSelect.value = stateValue;
+                populateCities(stateValue);
+                
+                setTimeout(() => {
+                    if (cityValue) {
+                        citySelect.value = cityValue;
+                    }
+                }, 100);
+            }
+        }
+
+        // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
-           lucide.createIcons();
+            loadStatesData();
+            
+            // Ensure lucide replaces any static placeholders (header icons) after DOM load.
+            lucide.createIcons();
+            
+            const stateSelect = document.getElementById('add-state');
+            stateSelect.addEventListener('change', function() {
+                populateCities(this.value);
+            });
         });
     </script>
     <?php include 'partials/footer.php'; ?>

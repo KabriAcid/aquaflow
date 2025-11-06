@@ -109,9 +109,8 @@ include 'partials/header.php';
 
         </div>
     </main>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="../js/production-dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../js/production-dashboard.js"></script>
 
-<?php include 'partials/footer.php'; ?>
+    <?php include 'partials/footer.php'; ?>

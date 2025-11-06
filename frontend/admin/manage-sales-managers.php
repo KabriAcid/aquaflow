@@ -44,6 +44,60 @@ include 'partials/sidebar.php';
             </div>
 
             <script src="../js/admin-sales-managers.js" defer></script>
+            <script>
+                // States and Cities Management
+                let statesData = {};
+                
+                // Load states and cities data
+                async function loadStatesData() {
+                    try {
+                        const response = await fetch('../../backend/api/location/states_cities.php');
+                        statesData = await response.json();
+                        populateStates();
+                    } catch (error) {
+                        console.error('Error loading states data:', error);
+                    }
+                }
+
+                // Populate states dropdown
+                function populateStates() {
+                    const stateSelect = document.getElementById('state');
+                    stateSelect.innerHTML = '<option value="">Select State</option>';
+                    
+                    for (const [stateId, stateInfo] of Object.entries(statesData)) {
+                        const option = document.createElement('option');
+                        option.value = stateId;
+                        option.textContent = stateInfo.name;
+                        stateSelect.appendChild(option);
+                    }
+                }
+
+                // Populate cities based on selected state
+                function populateCities(selectedState) {
+                    const citySelect = document.getElementById('city');
+                    citySelect.innerHTML = '<option value="">Select City</option>';
+                    
+                    if (selectedState && statesData[selectedState]) {
+                        const cities = statesData[selectedState].cities || [];
+                        cities.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.id;
+                            option.textContent = city.name;
+                            citySelect.appendChild(option);
+                        });
+                    }
+                }
+
+                // Event listener for state change
+                document.addEventListener('DOMContentLoaded', function() {
+                    loadStatesData();
+                    
+                    const stateSelect = document.getElementById('state');
+                    stateSelect.addEventListener('change', function() {
+                        populateCities(this.value);
+                    });
+                });
+            </script>
         </div>
     </main>
 
@@ -64,6 +118,18 @@ include 'partials/sidebar.php';
             <div class="mb-4">
                 <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                 <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="mb-4">
+                <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                <select id="state" name="state" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select State</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City / LGA</label>
+                <select id="city" name="city" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select City</option>
+                </select>
             </div>
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
