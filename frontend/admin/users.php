@@ -12,33 +12,37 @@ include 'partials/sidebar.php';
 
 <div class="flex-1 flex flex-col">
     <main class="flex-1 p-6 bg-gray-100">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-2xl font-semibold text-gray-700">User Management</h1>
-                <p class="text-gray-500">Add, edit, or remove users.</p>
+        <div class="container-fluid">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-700">User Management</h1>
+                    <p class="text-gray-500">Add, edit, or remove users.</p>
+                </div>
+                <button id="add-user-btn" class="btn-primary">Add New User</button>
             </div>
-            <button id="add-user-btn" class="btn-primary">Add New User</button>
-        </div>
 
-        <div class="bg-white p-6 rounded-lg multi-shadow">
-            <div class="overflow-x-auto">
-                <table class="w-full" id="users-table">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="text-left p-3">Username</th>
-                            <th class="text-left p-3">Email</th>
-                            <th class="text-left p-3">Role</th>
-                            <th class="text-left p-3">State</th>
-                            <th class="text-left p-3">LGA</th>
-                            <th class="text-left p-3">Phone</th>
-                            <th class="text-left p-3">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="users-tbody">
-                        <!-- User rows will be inserted here -->
-                    </tbody>
-                </table>
+            <div class="bg-white p-6 rounded-lg multi-shadow">
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="users-table">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="text-left p-3">Username</th>
+                                <th class="text-left p-3">Email</th>
+                                <th class="text-left p-3">Role</th>
+                                <th class="text-left p-3">State</th>
+                                <th class="text-left p-3">LGA</th>
+                                <th class="text-left p-3">Phone</th>
+                                <th class="text-left p-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody">
+                            <!-- User rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <script src="../js/admin-users.js" defer></script>
         </div>
     </main>
 </div>
@@ -88,7 +92,5 @@ include 'partials/sidebar.php';
         </form>
     </div>
 </div>
-
-<script src="../js/admin-users.js" defer></script>
 
 <?php include 'partials/footer.php'; ?>

@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'production_manager') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_manager') {
     header('Location: ../login.php');
     exit;
 }
@@ -25,7 +25,7 @@ $page_title = "Manage Production";
             <!-- Production Recording Form -->
             <div class="bg-white p-8 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-bold mb-6">New Production Log</h2>
-                
+
                 <form id="manage-production-form">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Product Selection -->

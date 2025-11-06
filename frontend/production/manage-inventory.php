@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'production_manager') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_manager') {
     header('Location: ../login.php');
     exit;
 }
@@ -53,7 +53,7 @@ $page_title = "Manage Inventory";
     <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
         <h2 class="text-2xl font-bold mb-4">Update Inventory</h2>
         <p class="mb-4">Updating stock for: <strong id="modal-product-name"></strong></p>
-        
+
         <form id="update-inventory-form">
             <input type="hidden" id="update-product-id">
             <div class="mb-4">

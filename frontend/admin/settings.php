@@ -12,12 +12,14 @@ include 'partials/sidebar.php';
 
 <div class="flex-1 flex flex-col">
     <main class="flex-1 p-6 bg-gray-100">
-        <div class="mb-6">
-            <h1 class="text-2xl font-semibold text-gray-700">Settings</h1>
-        </div>
+        <div class="container-fluid">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-700">Settings</h1>
+            </div>
 
-        <div class="bg-white p-6 rounded-lg multi-shadow">
-            <p class="text-gray-600">This is a placeholder for future settings. More options will be available here in upcoming updates.</p>
+            <div class="bg-white p-6 rounded-lg multi-shadow">
+                <p class="text-gray-600">This is a placeholder for future settings. More options will be available here in upcoming updates.</p>
+            </div>
         </div>
     </main>
 </div>

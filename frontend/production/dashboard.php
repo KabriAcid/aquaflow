@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Check if the user is logged in and has the correct role
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'production_manager') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_manager') {
     // Redirect to the login page if not authenticated
     header('Location: ../login.php');
     exit;
