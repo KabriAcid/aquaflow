@@ -28,13 +28,17 @@ document.addEventListener("DOMContentLoaded", function () {
         return null;
       }
 
+      // Only fetch sales, users and orders. We'll derive customer counts from users to avoid permission issues.
       const salesRes = await tryFetch("/backend/api/sales/summary.php");
-      const customersRes = await tryFetch("/backend/api/customers/get_all.php");
       const usersRes = await tryFetch("/backend/api/users/get_all.php");
       const ordersRes = await tryFetch("/backend/api/orders/get_all.php");
 
-      // helper to safely parse JSON or return null
+      // helper to safely parse JSON or return null (handles null responses)
       async function safeJson(res) {
+        if (!res) {
+          console.warn("safeJson: response is null");
+          return null;
+        }
         if (!res.ok) {
           const text = await res.text();
           console.error("Dashboard fetch error", res.status, text);
@@ -49,26 +53,28 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       const salesData = await safeJson(salesRes);
-      const customersData = await safeJson(customersRes);
       const usersData = await safeJson(usersRes);
       const ordersData = await safeJson(ordersRes);
 
       if (salesData && salesData.data) {
-        const totalSales = parseFloat(salesData.data.total_sales || 0).toFixed(
-          2
-        );
-        if (salesEl) salesEl.textContent = `$${totalSales}`;
-      }
-
-      if (customersData && Array.isArray(customersData.data)) {
-        if (customersEl) customersEl.textContent = customersData.data.length;
+        const totalSalesValue = Number(salesData.data.total_sales || 0);
+        const formatted = totalSalesValue.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        if (salesEl) salesEl.textContent = `₦${formatted}`;
       }
 
       if (usersData && Array.isArray(usersData.data)) {
-        // count users with role containing 'sales'
-        const salesManagers = usersData.data.filter((u) =>
+        // derive customers and sales managers from users
+        const users = usersData.data;
+        const customersCount = users.filter(
+          (u) => (u.role || "").toLowerCase() === "customer"
+        ).length;
+        const salesManagers = users.filter((u) =>
           (u.role || "").toLowerCase().includes("sales")
         ).length;
+        if (customersEl) customersEl.textContent = customersCount;
         if (salesManagersEl) salesManagersEl.textContent = salesManagers;
       }
 

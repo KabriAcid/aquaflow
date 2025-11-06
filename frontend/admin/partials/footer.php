@@ -1,7 +1,5 @@
-        </main>
-        </div>
-        <!-- App-wide JS: prefer existing app.js instead of missing main.js -->
-        <script src="../js/app.js"></script>
-        </body>
-
-        </html>
+<footer>
+    <div class="text-center text-xs">
+        @copyright 2024 Aquaflow. All rights reserved.
+    </div>
+</footer>

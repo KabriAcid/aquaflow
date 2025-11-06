@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$userName = $_SESSION['user_name'] ?? 'Admin';
+$userName = 'Admin';
 
 // Links for the sidebar
 $links = [
@@ -78,5 +78,3 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </a>
     </div>
 </aside>
-<div class="flex-1 flex flex-col">
-    <main class="flex-1 p-6 bg-gray-100">
