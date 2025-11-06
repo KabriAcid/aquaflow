@@ -1,30 +1,143 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const salesActivityData = {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-            label: 'Orders',
-            data: [5, 8, 3, 6, 7, 9, 4],
-            borderColor: '#10B981',
-            backgroundColor: 'rgba(16, 185, 129, 0.2)',
-            fill: true,
-            tension: 0.4
-        }]
-    };
+document.addEventListener("DOMContentLoaded", function () {
+  const salesActivityCtx = document
+    .getElementById("salesActivityChart")
+    ?.getContext("2d");
 
-    const salesActivityCtx = document.getElementById('salesActivityChart')?.getContext('2d');
-    if (salesActivityCtx) {
-        new Chart(salesActivityCtx, {
-            type: 'line',
-            data: salesActivityData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+  // Render a simple placeholder chart (will be updated after orders load)
+  let salesChart = null;
+  if (salesActivityCtx) {
+    salesChart = new Chart(salesActivityCtx, {
+      type: "line",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [
+          {
+            label: "Orders",
+            data: [0, 0, 0, 0, 0, 0, 0],
+            borderColor: "#10B981",
+            backgroundColor: "rgba(16, 185, 129, 0.2)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } },
+      },
+    });
+  }
+
+  // small helper to escape HTML
+  function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) return "";
+    return String(unsafe)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Fetch recent orders and populate stats + table
+  function loadRecentOrders() {
+    fetch("../../backend/api/orders/get_all.php?limit=10", {
+      credentials: "same-origin",
+    })
+      .then((r) => r.json())
+      .then((res) => {
+        if (!res.success) {
+          console.error("Failed to load orders", res);
+          return;
+        }
+        const orders = res.data || [];
+
+        // compute stats
+        const pending = orders.filter(
+          (o) => (o.status || "").toLowerCase() === "pending"
+        ).length;
+        const salesTotal = orders.reduce(
+          (acc, o) =>
+            acc + (parseFloat(o.total_amount || o.total_amount || 0) || 0),
+          0
+        );
+        // new customers count is not available from orders endpoint; leave as 0 for now
+        const newCustomers = 0;
+
+        document.getElementById("pendingCount").textContent = pending;
+        document.getElementById("mySalesTotal").textContent =
+          "₦" + salesTotal.toFixed(2);
+        document.getElementById("newCustomersCount").textContent = newCustomers;
+
+        // populate table
+        const tbody = document.querySelector("#recentOrdersTable tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        if (orders.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="py-6 text-center text-gray-500">No recent orders</td></tr>';
+        } else {
+          orders.forEach((o) => {
+            const tr = document.createElement("tr");
+            tr.className = "border-b";
+            const orderDate = new Date(o.order_date || o.created_at || "");
+            tr.innerHTML = `
+                            <td class="py-3 px-3"><a href="order-details.php?id=${
+                              o.id
+                            }" class="text-sm text-blue-600">${escapeHtml(
+              o.order_number || "#" + o.id
+            )}</a></td>
+                            <td class="py-3 px-3 text-sm">${escapeHtml(
+                              o.customer_id || ""
+                            )}</td>
+                            <td class="py-3 px-3 text-sm">₦${(
+                              parseFloat(o.total_amount || 0) || 0
+                            ).toFixed(2)}</td>
+                            <td class="py-3 px-3 text-sm">${escapeHtml(
+                              o.status || ""
+                            )}</td>
+                            <td class="py-3 px-3 text-sm">${escapeHtml(
+                              o.payment_status || ""
+                            )}</td>
+                            <td class="py-3 px-3 text-sm">${
+                              isNaN(orderDate.getTime())
+                                ? escapeHtml(o.order_date || "")
+                                : orderDate.toLocaleString()
+                            }</td>
+                        `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // update chart data (simple aggregation by day name from order_date)
+        if (salesChart) {
+          const dayCounts = {
+            Sun: 0,
+            Mon: 0,
+            Tue: 0,
+            Wed: 0,
+            Thu: 0,
+            Fri: 0,
+            Sat: 0,
+          };
+          orders.forEach((o) => {
+            const d = new Date(o.order_date || o.created_at || "");
+            if (!isNaN(d.getTime())) {
+              const day = d.toLocaleDateString(undefined, { weekday: "short" });
+              dayCounts[day] = (dayCounts[day] || 0) + 1;
             }
-        });
-    }
+          });
+          const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+          salesChart.data.labels = labels;
+          salesChart.data.datasets[0].data = labels.map(
+            (l) => dayCounts[l] || 0
+          );
+          salesChart.update();
+        }
+      })
+      .catch((err) => console.error("Could not load recent orders", err));
+  }
+
+  loadRecentOrders();
 });
