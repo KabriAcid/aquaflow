@@ -1,12 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const addManagerBtn = document.getElementById('add-manager-btn');
-    const addManagerModal = document.getElementById('add-manager-modal');
-    const cancelAddBtn = document.getElementById('cancel-add-btn');
-    const addManagerForm = document.getElementById('add-manager-form');
-
-    const editManagerModal = document.getElementById('edit-manager-modal');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const editManagerForm = document.getElementById('edit-manager-form');
+    const managerModal = document.getElementById('manager-modal');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const managerForm = document.getElementById('manager-form');
+    const modalTitle = document.getElementById('modal-title');
+    const saveBtn = document.getElementById('save-btn');
 
     const deleteManagerModal = document.getElementById('delete-manager-modal');
     const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
@@ -19,30 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const UPDATE_URL = '../../backend/api/users/update.php';
     const DELETE_URL = '../../backend/api/users/delete.php';
 
-    // Function to open modal
     const openModal = (modal) => {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     };
 
-    // Function to close modal
     const closeModal = (modal) => {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     };
 
-    // Event listeners for modals
-    addManagerBtn.addEventListener('click', () => openModal(addManagerModal));
-    cancelAddBtn.addEventListener('click', () => closeModal(addManagerModal));
-    cancelEditBtn.addEventListener('click', () => closeModal(editManagerModal));
-    cancelDeleteBtn.addEventListener('click', () => closeModal(deleteManagerModal));
-
-    // Fetch and display managers
     const fetchManagers = async () => {
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(API_URL, { credentials: 'same-origin' });
             const { data } = await response.json();
-            
+
             managersTbody.innerHTML = '';
             data.filter(user => user.role === 'sales_manager').forEach(manager => {
                 const tr = document.createElement('tr');
@@ -63,81 +52,86 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Add new manager
-    addManagerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(addManagerForm);
-        formData.append('role', 'sales_manager');
+    const prepareAddForm = () => {
+        managerForm.reset();
+        document.getElementById('user_id').value = '';
+        modalTitle.textContent = 'Add New Manager';
+        saveBtn.textContent = 'Save Manager';
+        document.getElementById('password').required = true;
+        openModal(managerModal);
+    };
 
+    const prepareEditForm = async (userId) => {
         try {
-            const response = await fetch(CREATE_URL, {
-                method: 'POST',
-                body: JSON.stringify(Object.fromEntries(formData))
-            });
-            const result = await response.json();
-            if (result.status === 'success') {
-                closeModal(addManagerModal);
-                fetchManagers();
-                addManagerForm.reset();
-            } else {
-                console.error('Error adding manager:', result.message);
-            }
+            const response = await fetch(`${API_URL}?user_id=${userId}`, { credentials: 'same-origin' });
+            const { data } = await response.json();
+
+            managerForm.reset();
+            document.getElementById('user_id').value = data.user_id;
+            document.getElementById('name').value = data.name;
+            document.getElementById('email').value = data.email;
+            document.getElementById('phone').value = data.phone;
+            document.getElementById('password').required = false;
+
+            modalTitle.textContent = 'Edit Manager';
+            saveBtn.textContent = 'Update Manager';
+            openModal(managerModal);
         } catch (error) {
-            console.error('Error adding manager:', error);
+            console.error('Error fetching manager data:', error);
         }
-    });
+    };
 
-    // Edit manager
-    managersTbody.addEventListener('click', async (e) => {
-        if (e.target.closest('.edit-btn')) {
-            const userId = e.target.closest('.edit-btn').dataset.id;
-            try {
-                const response = await fetch(`${API_URL}?user_id=${userId}`);
-                const { data } = await response.json();
-                
-                document.getElementById('edit-user-id').value = data.user_id;
-                document.getElementById('edit-name').value = data.name;
-                document.getElementById('edit-email').value = data.email;
-                document.getElementById('edit-phone').value = data.phone;
-                openModal(editManagerModal);
-            } catch (error) {
-                console.error('Error fetching manager data:', error);
-            }
-        }
-    });
+    addManagerBtn.addEventListener('click', prepareAddForm);
+    cancelBtn.addEventListener('click', () => closeModal(managerModal));
 
-    editManagerForm.addEventListener('submit', async (e) => {
+    managerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(editManagerForm);
+        const formData = new FormData(managerForm);
         const data = Object.fromEntries(formData.entries());
+        const userId = data.user_id;
+
+        if (data.password !== data.confirm_password) {
+            alert('Passwords do not match.');
+            return;
+        }
+
+        const url = userId ? UPDATE_URL : CREATE_URL;
+        if (!userId) {
+            data.role = 'sales_manager';
+        }
 
         try {
-            const response = await fetch(UPDATE_URL, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
                 body: JSON.stringify(data)
             });
             const result = await response.json();
 
             if (result.status === 'success') {
-                closeModal(editManagerModal);
+                closeModal(managerModal);
                 fetchManagers();
             } else {
-                console.error('Update failed:', result.message);
+                console.error('Operation failed:', result.message);
             }
         } catch (error) {
-            console.error('Error updating manager:', error);
+            console.error('Error saving manager:', error);
         }
     });
 
-    // Delete manager
     managersTbody.addEventListener('click', (e) => {
-        if (e.target.closest('.delete-btn')) {
-            const userId = e.target.closest('.delete-btn').dataset.id;
-            document.getElementById('delete-user-id').value = userId;
+        const editBtn = e.target.closest('.edit-btn');
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (editBtn) {
+            prepareEditForm(editBtn.dataset.id);
+        } else if (deleteBtn) {
+            document.getElementById('delete-user-id').value = deleteBtn.dataset.id;
             openModal(deleteManagerModal);
         }
     });
+
+    cancelDeleteBtn.addEventListener('click', () => closeModal(deleteManagerModal));
 
     deleteManagerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -147,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(DELETE_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
                 body: JSON.stringify({ user_id: userId })
             });
             const result = await response.json();

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fetch products to populate the dropdown
     function loadProducts() {
-        fetch('../../backend/api/production/production.php')
+        fetch('../../backend/api/production/production.php', { credentials: 'same-origin' })
             .then(response => response.json())
             .then(apiResponse => {
                 if (!apiResponse.data) {
@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'same-origin',
             body: JSON.stringify(data)
         })
         .then(response => response.json())
