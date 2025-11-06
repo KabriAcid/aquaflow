@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { data } = await response.json();
             
             managersTbody.innerHTML = '';
-            data.filter(user => user.role === 'sales_manager').forEach(manager => {
+            data.filter(user => user.role === 'production_manager').forEach(manager => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="p-3 border-b">${manager.name}</td>
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addManagerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(addManagerForm);
-        formData.append('role', 'sales_manager');
+        formData.append('role', 'production_manager');
 
         try {
             const response = await fetch(CREATE_URL, {
