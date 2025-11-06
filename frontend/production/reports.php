@@ -3,7 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_manager') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_manager' || !isset($_SESSION['production_manager_id'])) {
     header('Location: ../login.php');
     exit;
 }

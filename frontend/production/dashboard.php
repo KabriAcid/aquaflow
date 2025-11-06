@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Check if the user is a production manager
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'production_manager') {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_manager') {
     header('Location: ../login.php');
     exit;
 }

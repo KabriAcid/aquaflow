@@ -28,7 +28,19 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Event listeners for modals
-  addManagerBtn.addEventListener("click", () => openModal(addManagerModal));
+  addManagerBtn.addEventListener("click", () => {
+    // Reset form for add mode
+    addManagerForm.reset();
+    document.getElementById("add-user-id").value = "";
+    document.getElementById("add-password").setAttribute("required", "");
+    const title = document.querySelector("#add-manager-modal h2");
+    const submitBtn = addManagerForm.querySelector('button[type="submit"]');
+    const passwordLabel = document.querySelector('label[for="add-password"]');
+    if (title) title.textContent = "Add New Manager";
+    if (submitBtn) submitBtn.textContent = "Save Manager";
+    if (passwordLabel) passwordLabel.textContent = "Password";
+    openModal(addManagerModal);
+  });
   cancelAddBtn.addEventListener("click", () => closeModal(addManagerModal));
   cancelDeleteBtn.addEventListener("click", () =>
     closeModal(deleteManagerModal)
@@ -156,11 +168,19 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("add-phone").value = data.phone || "";
         document.getElementById("add-lga").value = data.city || "";
         document.getElementById("add-state").value = data.state || "";
-        // change modal title & submit text
+        // Clear password field and make it optional for edit
+        document.getElementById("add-password").value = "";
+        document.getElementById("add-password").removeAttribute("required");
+        // change modal title & submit text and password label
         const title = document.querySelector("#add-manager-modal h2");
         const submitBtn = addManagerForm.querySelector('button[type="submit"]');
+        const passwordLabel = document.querySelector(
+          'label[for="add-password"]'
+        );
         if (title) title.textContent = "Edit Manager";
         if (submitBtn) submitBtn.textContent = "Update Manager";
+        if (passwordLabel)
+          passwordLabel.textContent = "New Password (optional)";
         openModal(addManagerModal);
       } catch (error) {
         console.error("Error fetching manager data:", error);

@@ -45,105 +45,70 @@ include 'partials/sidebar.php';
             </div>
     </main>
 
-<!-- Add Manager Modal -->
-<div id="add-manager-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-6">Add New Manager</h2>
-        <form id="add-manager-form">
-            <input type="hidden" id="add-user-id" name="user_id">
-            <div class="mb-4">
-                <label for="add-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" id="add-name" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-            <div class="mb-4">
-                <label for="add-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="add-email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-            <div class="mb-4">
-                <label for="add-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input type="tel" id="add-phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="mb-4">
-                <label for="add-lga" class="block text-sm font-medium text-gray-700 mb-1">LGA / City</label>
-                <input type="text" id="add-lga" name="lga" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="mb-4">
-                <label for="add-state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                <input type="text" id="add-state" name="state" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="mb-6">
-                <label for="add-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" id="add-password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-            <div class="flex justify-end gap-4">
-                <button type="button" id="cancel-add-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-primary">Save Manager</button>
-            </div>
-        </form>
+    <!-- Add Manager Modal -->
+    <div id="add-manager-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg">
+            <h2 class="text-2xl font-bold mb-6">Add New Manager</h2>
+            <form id="add-manager-form">
+                <input type="hidden" id="add-user-id" name="user_id">
+                <!-- 2x2 Grid Layout for Form Fields -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="add-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="add-name" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="add-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="add-email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="add-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                        <input type="tel" id="add-phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="add-lga" class="block text-sm font-medium text-gray-700 mb-1">LGA / City</label>
+                        <input type="text" id="add-lga" name="lga" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="add-state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                        <input type="text" id="add-state" name="state" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="add-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="add-password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="cancel-add-btn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Manager</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Edit Manager Modal -->
-<div id="edit-manager-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-6">Edit Manager</h2>
-        <form id="edit-manager-form">
-            <input type="hidden" id="edit-user-id" name="user_id">
-            <div class="mb-4">
-                <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input type="text" id="edit-name" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-            <div class="mb-4">
-                <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="edit-email" name="email" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-            <div class="mb-4">
-                <label for="edit-phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input type="tel" id="edit-phone" name="phone" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="mb-4">
-                <label for="edit-lga" class="block text-sm font-medium text-gray-700 mb-1">LGA / City</label>
-                <input type="text" id="edit-lga" name="lga" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="mb-4">
-                <label for="edit-state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                <input type="text" id="edit-state" name="state" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="mb-6">
-                <label for="edit-password" class="block text-sm font-medium text-gray-700 mb-1">New Password (optional)</label>
-                <input type="password" id="edit-password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div class="flex justify-end gap-4">
-                <button type="button" id="cancel-edit-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-primary">Update Manager</button>
-            </div>
-        </form>
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-manager-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold mb-4">Confirm Deletion</h2>
+            <p class="text-gray-600 mb-6">Are you sure you want to delete this manager? This action cannot be undone.</p>
+            <form id="delete-manager-form">
+                <input type="hidden" id="delete-user-id" name="user_id">
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="cancel-delete-btn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div id="delete-manager-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
-        <h2 class="text-2xl font-bold mb-4">Confirm Deletion</h2>
-        <p class="text-gray-600 mb-6">Are you sure you want to delete this manager? This action cannot be undone.</p>
-        <form id="delete-manager-form">
-            <input type="hidden" id="delete-user-id" name="user_id">
-            <div class="flex justify-end gap-4">
-                <button type="button" id="cancel-delete-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-danger">Delete</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-<script src="../js/admin-production-managers.js" defer></script>
-<script>
-    // Ensure lucide replaces any static placeholders (header icons) after DOM load.
-    document.addEventListener('DOMContentLoaded', function() {
-        if (window.lucide && typeof window.lucide.replace === 'function') {
-            window.lucide.replace();
-        }
-    });
-</script>
-<?php include 'partials/footer.php'; ?>
+    <script src="../js/admin-production-managers.js" defer></script>
+    <script>
+        // Ensure lucide replaces any static placeholders (header icons) after DOM load.
+        document.addEventListener('DOMContentLoaded', function() {
+           lucide.createIcons();
+        });
+    </script>
+    <?php include 'partials/footer.php'; ?>
