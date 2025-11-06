@@ -45,7 +45,6 @@ include 'partials/sidebar.php';
             <script src="../js/admin-users.js" defer></script>
         </div>
     </main>
-</div>
 
 <!-- Add/Edit User Modal -->
 <div id="user-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">

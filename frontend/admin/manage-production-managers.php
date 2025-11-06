@@ -44,7 +44,6 @@ include 'partials/sidebar.php';
                 </div>
             </div>
     </main>
-</div>
 
 <!-- Add Manager Modal -->
 <div id="add-manager-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">

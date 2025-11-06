@@ -22,6 +22,5 @@ include 'partials/sidebar.php';
             </div>
         </div>
     </main>
-</div>
 
 <?php include 'partials/footer.php'; ?>

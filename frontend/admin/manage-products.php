@@ -46,7 +46,6 @@ include 'partials/sidebar.php';
             <script src="../js/admin-products.js" defer></script>
         </div>
     </main>
-</div>
 
 <!-- Add/Edit Product Modal -->
 <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">

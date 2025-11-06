@@ -49,7 +49,6 @@ include 'partials/sidebar.php';
 
             <script src="../js/admin-reports.js"></script>
         </div>
-    </main>
 
     <?php include 'partials/footer.php'; ?>
 </div>

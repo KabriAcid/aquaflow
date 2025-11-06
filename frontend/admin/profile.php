@@ -52,6 +52,5 @@ include 'partials/sidebar.php';
             <script src="../js/admin-profile.js" defer></script>
         </div>
     </main>
-</div>
 </script>
 <?php include 'partials/footer.php'; ?>

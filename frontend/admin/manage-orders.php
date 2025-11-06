@@ -55,7 +55,6 @@ include 'partials/sidebar.php';
             <script src="../js/admin-orders.js" defer></script>
         </div>
     </main>
-</div>
 
 <!-- Order Details Modal -->
 <div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
