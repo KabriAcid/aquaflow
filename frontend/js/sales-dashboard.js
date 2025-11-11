@@ -1,4 +1,29 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Ensure formatting functions are available (fallback if utils.js doesn't load)
+  if (typeof formatNaira === "undefined") {
+    window.formatNaira = function (amount, decimals = 2) {
+      if (amount === null || amount === undefined || isNaN(amount)) {
+        return "₦0.00";
+      }
+      const num = parseFloat(amount);
+      return "₦" + num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+  }
+
+  if (typeof formatDate === "undefined") {
+    window.formatDate = function (date) {
+      if (!date) return "";
+      return new Date(date).toLocaleDateString();
+    };
+  }
+
+  if (typeof capitalizeWords === "undefined") {
+    window.capitalizeWords = function (str) {
+      if (!str) return "";
+      return str.replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+  }
+
   const salesActivityCtx = document
     .getElementById("salesActivityChart")
     ?.getContext("2d");
@@ -118,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("pendingCount").textContent = pending;
         document.getElementById("mySalesTotal").textContent =
-          "₦" + salesTotal.toFixed(2);
+          formatNaira(salesTotal);
         document.getElementById("newCustomersCount").textContent = newCustomers;
 
         // populate table
@@ -142,19 +167,19 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td class="py-3 px-3 text-sm">${escapeHtml(
                               o.customer_name || o.customer_id || ""
                             )}</td>
-                            <td class="py-3 px-3 text-sm">₦${(
+                            <td class="py-3 px-3 text-sm">${formatNaira(
                               parseFloat(o.total_amount || 0) || 0
-                            ).toFixed(2)}</td>
+                            )}</td>
                             <td class="py-3 px-3 text-sm">${renderStatusBadge(
                               o.status || "pending"
                             )}</td>
-                            <td class="py-3 px-3 text-sm">${escapeHtml(
-                              o.payment_status || ""
+                            <td class="py-3 px-3 text-sm">${capitalizeWords(
+                              escapeHtml(o.payment_status || "")
                             )}</td>
                             <td class="py-3 px-3 text-sm">${
                               isNaN(orderDate.getTime())
                                 ? escapeHtml(o.order_date || "")
-                                : orderDate.toLocaleString()
+                                : formatDate(o.order_date)
                             }</td>
                         `;
             tbody.appendChild(tr);
@@ -221,18 +246,18 @@ document.addEventListener("DOMContentLoaded", function () {
         html += `<div class="mb-2"><strong>Status</strong> ${renderStatusBadge(
           o.status || "pending"
         )}</div>`;
-        html += `<div class="mb-2"><strong>Payment</strong> ${escapeHtml(
-          o.payment_status || ""
+        html += `<div class="mb-2"><strong>Payment</strong> ${capitalizeWords(
+          escapeHtml(o.payment_status || "")
         )}</div>`;
-        html += `<div class="mb-2"><strong>Amount</strong> ₦${(
+        html += `<div class="mb-2"><strong>Amount</strong> ${formatNaira(
           parseFloat(o.total_amount || o.subtotal || 0) || 0
-        ).toFixed(2)}</div>`;
+        )}</div>`;
         html +=
           '<div class="mt-4"><strong>Items</strong><ul class="list-disc pl-6">';
         (o.items || []).forEach((it) => {
           html += `<li>${escapeHtml(it.product_name)} — ${escapeHtml(
             String(it.quantity)
-          )} × ₦${(parseFloat(it.unit_price) || 0).toFixed(2)}</li>`;
+          )} × ${formatNaira(parseFloat(it.unit_price) || 0)}</li>`;
         });
         html += "</ul></div>";
         content.innerHTML = html;

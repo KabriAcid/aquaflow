@@ -79,6 +79,9 @@
                             <button id="cancelCodBtn" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-md hover:bg-gray-300">Cancel</button>
                         </div>
                     </div>
+                    <div id="validationMessage" class="mt-6 p-4 bg-red-50 border border-red-200 rounded-md hidden">
+                        <p class="text-red-700 text-sm" id="validationText"></p>
+                    </div>
                     <div class="mt-6">
                         <button id="placeOrderBtn" class="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700">Place Order</button>
                     </div>
@@ -100,6 +103,7 @@
     <script src="../js/cart.js"></script>
     <!-- Flutterwave inline script -->
     <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script src="../js/utils.js"></script>
     <script>
         // Flutterwave public key from env (set FLW_PUBLIC_KEY in your environment or replace below)
         const FLW_PUBLIC_KEY = '<?= htmlspecialchars("FLWPUBK_TEST-14973597272a7c26e4c3dc1f63affa33-X") ?>';
@@ -127,6 +131,8 @@
                     const codFullConfirm = document.getElementById('codFullConfirm');
                     const confirmCodFullBtn = document.getElementById('confirmCodFullBtn');
                     const cancelCodFullBtn = document.getElementById('cancelCodFullBtn');
+                    const validationMessage = document.getElementById('validationMessage');
+                    const validationText = document.getElementById('validationText');
 
                     placeBtn.disabled = true;
 
@@ -145,26 +151,81 @@
                         return true;
                     }
 
+                    function getValidationMessage() {
+                        // Check each required field and return specific message for first missing field
+                        const cart = getCart();
+                        if (!cart || cart.length === 0) {
+                            return 'Your cart is empty.';
+                        }
+
+                        const address = document.getElementById('address').value.trim();
+                        if (!address) {
+                            return 'Please enter a delivery address.';
+                        }
+
+                        const state = document.getElementById('state').value.trim();
+                        if (!state) {
+                            return 'Please select a state.';
+                        }
+
+                        const city = document.getElementById('city').value.trim();
+                        if (!city) {
+                            return 'Please select a city.';
+                        }
+
+                        const deliveryDate = document.getElementById('delivery_date').value.trim();
+                        if (!deliveryDate) {
+                            return 'Please select a delivery date.';
+                        }
+
+                        return '';
+                    }
+
+                    function updateValidationDisplay() {
+                        const isValid = formIsValid();
+                        if (isValid) {
+                            validationMessage.classList.add('hidden');
+                            validationText.textContent = '';
+                        } else {
+                            validationMessage.classList.remove('hidden');
+                            validationText.textContent = getValidationMessage();
+                        }
+                    }
+
                     function updateUiForPaymentMethod() {
                         const method = document.querySelector('input[name="payment_method"]:checked').value;
+                        const isValid = formIsValid();
+
                         if (method === 'cash_on_delivery') {
-                            // hide full checkout grid and show a single confirm container
-                            if (checkoutGrid) checkoutGrid.classList.add('hidden');
-                            if (codFullConfirm) codFullConfirm.classList.remove('hidden');
-                            // hide inline place button and inline cod confirm
-                            placeBtn.classList.add('hidden');
-                            if (codConfirm) codConfirm.classList.add('hidden');
-                            // set confirm button state based on form validity
-                            if (confirmCodBtn) confirmCodBtn.disabled = !formIsValid();
-                            if (confirmCodFullBtn) confirmCodFullBtn.disabled = !formIsValid();
+                            // For COD: only show COD container if form is valid
+                            if (isValid) {
+                                // hide full checkout grid and show a single confirm container
+                                if (checkoutGrid) checkoutGrid.classList.add('hidden');
+                                if (codFullConfirm) codFullConfirm.classList.remove('hidden');
+                                // hide inline place button and inline cod confirm
+                                placeBtn.classList.add('hidden');
+                                if (codConfirm) codConfirm.classList.add('hidden');
+                                // set confirm button state based on form validity
+                                if (confirmCodBtn) confirmCodBtn.disabled = false;
+                                if (confirmCodFullBtn) confirmCodFullBtn.disabled = false;
+                            } else {
+                                // Form not valid — keep checkout grid visible with validation message
+                                if (checkoutGrid) checkoutGrid.classList.remove('hidden');
+                                if (codFullConfirm) codFullConfirm.classList.add('hidden');
+                                placeBtn.classList.add('hidden');
+                                if (codConfirm) codConfirm.classList.add('hidden');
+                            }
                         } else {
                             // card payment — show regular checkout grid
                             if (checkoutGrid) checkoutGrid.classList.remove('hidden');
                             if (codFullConfirm) codFullConfirm.classList.add('hidden');
                             placeBtn.classList.remove('hidden');
                             if (codConfirm) codConfirm.classList.add('hidden');
-                            placeBtn.disabled = !formIsValid();
+                            placeBtn.disabled = !isValid;
                         }
+
+                        // Update validation message display
+                        updateValidationDisplay();
                     }
 
                     // expose so other functions (renderOrderSummary) can trigger UI update when cart changes
@@ -260,7 +321,7 @@
                 summaryHtml += `
                     <div class="flex justify-between items-center mb-2">
                         <span>${escapeHtml(name)} (x${qty})</span>
-                        <span>₦${price * qty ? (price * qty).toFixed(2) : '0.00'}</span>
+                        <span>${formatNaira(price * qty)}</span>
                     </div>`;
             });
 
@@ -272,15 +333,15 @@
                 <hr class="my-4">
                 <div class="flex justify-between font-semibold">
                     <span>Subtotal</span>
-                    <span>₦${total.toFixed(2)}</span>
+                    <span>${formatNaira(total)}</span>
                 </div>
                  <div class="flex justify-between font-semibold">
                     <span>Delivery Fee</span>
-                    <span>₦${deliveryFee.toFixed(2)}</span>
+                    <span>${formatNaira(deliveryFee)}</span>
                 </div>
                 <div class="flex justify-between font-bold text-xl mt-2">
                     <span>Total</span>
-                    <span>₦${grandTotal.toFixed(2)}</span>
+                    <span>${formatNaira(grandTotal)}</span>
                 </div>`;
 
             orderSummary.innerHTML = summaryHtml;
@@ -378,7 +439,34 @@
                 alert('Your cart is empty.');
                 return;
             }
-            const deliveryAddress = [document.getElementById('address').value, document.getElementById('city').value, document.getElementById('state').value].filter(Boolean).join(', ');
+
+            // Validate required fields before processing order
+            const address = document.getElementById('address').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const deliveryDate = document.getElementById('delivery_date').value.trim();
+
+            if (!address) {
+                alert('Please enter a delivery address.');
+                return;
+            }
+
+            if (!state) {
+                alert('Please select a state.');
+                return;
+            }
+
+            if (!city) {
+                alert('Please select a city.');
+                return;
+            }
+
+            if (!deliveryDate) {
+                alert('Please select a delivery date.');
+                return;
+            }
+
+            const deliveryAddress = [address, city, state].filter(Boolean).join(', ');
 
             // sanitize and normalize cart items before sending to server
             const sanitizedItems = cart.map(it => {

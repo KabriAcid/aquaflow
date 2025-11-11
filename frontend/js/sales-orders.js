@@ -1,4 +1,29 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Ensure formatting functions are available (fallback if utils.js doesn't load)
+  if (typeof formatNaira === "undefined") {
+    window.formatNaira = function (amount, decimals = 2) {
+      if (amount === null || amount === undefined || isNaN(amount)) {
+        return "₦0.00";
+      }
+      const num = parseFloat(amount);
+      return "₦" + num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+  }
+
+  if (typeof formatDate === "undefined") {
+    window.formatDate = function (date) {
+      if (!date) return "";
+      return new Date(date).toLocaleDateString();
+    };
+  }
+
+  if (typeof capitalizeWords === "undefined") {
+    window.capitalizeWords = function (str) {
+      if (!str) return "";
+      return str.replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+  }
+
   const ordersTableBody = document.querySelector("#ordersTable tbody");
   const statusOptions = [
     { v: "pending", t: "Pending" },
@@ -84,6 +109,22 @@ document.addEventListener("DOMContentLoaded", function () {
     return `<span class="${classes}">${escapeHtml(label)}</span>`;
   }
 
+  // Determine payment status based on order status
+  function getPaymentStatusForOrderStatus(orderStatus) {
+    switch ((orderStatus || "").toLowerCase()) {
+      case "delivered":
+        return "paid";
+      case "cancelled":
+        return "refunded";
+      case "processing":
+      case "out_for_delivery":
+        return "paid";
+      case "pending":
+      default:
+        return "unpaid";
+    }
+  }
+
   function renderOrders(orders) {
     ordersTableBody.innerHTML = "";
     if (!orders || orders.length === 0) {
@@ -113,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   order.total_amount || order.subtotal || 0
                 ).toLocaleString()}</td>
                 <td class="py-2 px-3" data-status-cell></td>
-                <td class="py-2 px-3">${escapeHtml(
+                <td class="py-2 px-3" data-payment-cell>${escapeHtml(
                   order.payment_status || ""
                 )}</td>
                 <td class="py-2 px-3">${escapeHtml(date)}</td>
@@ -141,13 +182,18 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.textContent = "Update";
       btn.addEventListener("click", function () {
         const newStatus = select.value;
+        const newPaymentStatus = getPaymentStatusForOrderStatus(newStatus);
         btn.disabled = true;
         btn.textContent = "Updating...";
         fetch(API_BASE + "/orders/update_status.php", {
           method: "POST",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ order_id: order.id, status: newStatus }),
+          body: JSON.stringify({
+            order_id: order.id,
+            status: newStatus,
+            payment_status: newPaymentStatus,
+          }),
         })
           .then(safeJson)
           .then((data) => {
@@ -165,7 +211,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.success) {
               tr.querySelector("[data-status-cell]").innerHTML =
                 renderStatusBadge(newStatus);
-              createAlert("Order status updated");
+              tr.querySelector("[data-payment-cell]").textContent =
+                newPaymentStatus;
+              createAlert("Order status and payment status updated");
             } else {
               createAlert(data.message || "Failed to update", "error");
             }

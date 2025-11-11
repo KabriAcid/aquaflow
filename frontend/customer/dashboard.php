@@ -16,6 +16,7 @@
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../js/utils.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -133,7 +134,7 @@
                         // populate numeric cards from stats
                         document.getElementById('totalOrders').textContent = stats.total_orders ?? orders.length;
                         document.getElementById('pendingOrders').textContent = stats.pending_orders ?? orders.filter(o => o.status === 'pending').length;
-                        document.getElementById('totalSpent').textContent = `₦${(stats.total_spent ?? orders.reduce((a,o)=>a+parseFloat(o.total_amount||0),0)).toFixed(2)}`;
+                        document.getElementById('totalSpent').textContent = formatNaira(stats.total_spent ?? orders.reduce((a, o) => a + parseFloat(o.total_amount || 0), 0));
                         populateDashboard(orders);
                     } else {
                         console.error('Failed to fetch dashboard data:', data.message);
@@ -151,7 +152,7 @@
 
                 document.getElementById('totalOrders').textContent = totalOrders;
                 document.getElementById('pendingOrders').textContent = pendingOrders;
-                document.getElementById('totalSpent').textContent = `₦${totalSpent.toFixed(2)}`;
+                document.getElementById('totalSpent').textContent = formatNaira(totalSpent);
 
                 const recentOrdersTable = document.getElementById('recentOrdersTable');
                 recentOrdersTable.innerHTML = '';
@@ -166,11 +167,11 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td class="p-3 border-b">${order.order_number}</td>
-                        <td class="p-3 border-b">${new Date(order.order_date).toLocaleDateString()}</td>
-                        <td class="p-3 border-b">₦${parseFloat(order.total_amount).toFixed(2)}</td>
+                        <td class="p-3 border-b">${formatDate(order.order_date)}</td>
+                        <td class="p-3 border-b">${formatNaira(order.total_amount)}</td>
                         <td class="p-3 border-b">
                             <span class="px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}">
-                                ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                ${capitalizeWords(order.status.replace(/_/g, ' '))}
                             </span>
                         </td>
                         <td class="p-3 border-b">

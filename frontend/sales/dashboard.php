@@ -87,6 +87,7 @@ include 'partials/sidebar.php';
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/utils.js"></script>
 <script src="../js/sales-dashboard.js"></script>
 
 

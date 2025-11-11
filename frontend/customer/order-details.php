@@ -7,6 +7,8 @@
     <title>Order Details - Aquaflow</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
+
+    <script src="../js/utils.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -73,8 +75,8 @@
                     <tr>
                         <td class="py-2 px-4 border-b">${item.product_name}</td>
                         <td class="py-2 px-4 border-b text-center">${item.quantity}</td>
-                        <td class="py-2 px-4 border-b text-right">₦${parseFloat(item.unit_price).toFixed(2)}</td>
-                        <td class="py-2 px-4 border-b text-right">₦${parseFloat(item.subtotal).toFixed(2)}</td>
+                        <td class="py-2 px-4 border-b text-right">${formatNaira(item.unit_price)}</td>
+                        <td class="py-2 px-4 border-b text-right">${formatNaira(item.subtotal)}</td>
                     </tr>`;
             });
 
@@ -92,17 +94,17 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                         <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
-                        <p><strong>Order Date:</strong> ${new Date(order.order_date).toLocaleDateString()}</p>
-                        <p><strong>Delivery Date:</strong> ${new Date(order.delivery_date).toLocaleDateString()}</p>
+                        <p><strong>Order Date:</strong> ${formatDate(order.order_date)}</p>
+                        <p><strong>Delivery Date:</strong> ${formatDate(order.delivery_date)}</p>
                         <p><strong>Delivery Address:</strong> ${order.delivery_address}</p>
-                         <p><strong>Payment Method:</strong> ${order.payment_method}</p>
-                        <p><strong>Payment Status:</strong> ${order.payment_status}</p>
+                         <p><strong>Payment Method:</strong> ${capitalizeWords(order.payment_method.replace(/_/g, ' '))}</p>
+                        <p><strong>Payment Status:</strong> ${capitalizeWords(order.payment_status)}</p>
                     </div>
                      <div>
                         <h2 class="text-xl font-semibold mb-4">Financials</h2>
-                        <p><strong>Subtotal:</strong> ₦${parseFloat(order.subtotal).toFixed(2)}</p>
-                        <p><strong>Delivery Fee:</strong> ₦${parseFloat(order.delivery_fee).toFixed(2)}</p>
-                        <p class="font-bold"><strong>Total:</strong> ₦${parseFloat(order.total_amount).toFixed(2)}</p>
+                        <p><strong>Subtotal:</strong> ${formatNaira(order.subtotal)}</p>
+                        <p><strong>Delivery Fee:</strong> ${formatNaira(order.delivery_fee)}</p>
+                        <p class="font-bold"><strong>Total:</strong> ${formatNaira(order.total_amount)}</p>
                     </div>
                 </div>
 
@@ -122,7 +124,7 @@
                 </div>
 
                  <div class="mt-8 text-right">
-                    <button class="bg-gray-700 text-white px-6 py-2 rounded-md hover:bg-gray-800">Download Invoice</button>
+                    <button class="bg-gray-700 text-white px-6 py-2 rounded-md hover:bg-gray-800" onclick="window.print()">Download Invoice</button>
                 </div>
             `;
 

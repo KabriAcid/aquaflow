@@ -38,6 +38,7 @@ include 'partials/sidebar.php';
     </div>
 </div>
 
+<script src="../js/utils.js"></script>
 <script src="../js/sales-orders.js"></script>
 
 <?php include 'partials/footer.php'; ?>

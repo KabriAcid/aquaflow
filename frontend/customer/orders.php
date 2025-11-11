@@ -13,6 +13,7 @@
 
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/utils.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -120,11 +121,11 @@
                     const row = `
                         <tr>
                             <td class="py-2 px-4 border-b text-center">${order.order_number}</td>
-                            <td class="py-2 px-4 border-b text-center">${new Date(order.order_date).toLocaleDateString()}</td>
-                            <td class="py-2 px-4 border-b text-center">₦${parseFloat(order.total_amount).toFixed(2)}</td>
+                            <td class="py-2 px-4 border-b text-center">${formatDate(order.order_date)}</td>
+                            <td class="py-2 px-4 border-b text-center">${formatNaira(order.total_amount)}</td>
                             <td class="py-2 px-4 border-b text-center">
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}">
-                                    ${order.status}
+                                    ${capitalizeWords(order.status.replace(/_/g, ' '))}
                                 </span>
                             </td>
                             <td class="py-2 px-4 border-b text-center">

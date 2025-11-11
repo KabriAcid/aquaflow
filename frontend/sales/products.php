@@ -85,10 +85,7 @@ include 'partials/sidebar.php';
                 <h3 class="font-semibold text-lg">${escapeHtml(product.name)}</h3>
                 <p class="text-gray-600">${escapeHtml(product.size)} ${escapeHtml(product.volume)}</p>
                 <p class="text-blue-500 font-bold mt-2">₦${(parseFloat(product.unit_price)||0).toFixed(2)}</p>
-                <p class="text-sm text-gray-500 mt-1">Min. Order: ${escapeHtml(String(product.minimum_order_quantity||1))}</p>
-                <div class="mt-4">
-                    <a href="../customer/product-details.php?id=${product.id}" class="text-sm text-blue-600">View</a>
-                </div>
+                <p class="p-2 font-semibold text-sm text-gray-500 mt-1">Min. Order: ${escapeHtml(String(product.minimum_order_quantity||1))}</p>
             `;
                 productsGrid.appendChild(card);
             });

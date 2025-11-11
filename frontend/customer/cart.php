@@ -1,6 +1,3 @@
-<?php
-// customer/cart.php
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,6 +27,7 @@
     </main>
 
     <script src="../js/cart.js"></script>
+    <script src="../js/utils.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // detect session
@@ -100,13 +98,13 @@
                 cartTable += `
                     <tr>
                         <td class="py-2 px-4 border-b">${item.name}</td>
-                        <td class="py-2 px-4 border-b">₦${parseFloat(item.price).toFixed(2)}</td>
+                        <td class="py-2 px-4 border-b">${formatNaira(item.price)}</td>
                         <td class="py-2 px-4 border-b">
-                            <input type="number" value="${qty}" min="${item.minQty}" onchange="updateQuantity(${item.id}, this.value)" class="w-20 text-center border rounded">
+                            <input type="number" value="${qty}" min="${item.minQty}" onchange="handleQuantityChange(${item.id}, this.value)" class="w-20 text-center border rounded">
                         </td>
-                        <td class="py-2 px-4 border-b">₦${subtotal.toFixed(2)}</td>
+                        <td class="py-2 px-4 border-b">${formatNaira(subtotal)}</td>
                         <td class="py-2 px-4 border-b">
-                            <button onclick="removeFromCart(${item.id}); renderCart();" class="text-red-500 hover:underline">Remove</button>
+                            <button onclick="handleRemoveFromCart(${item.id})" class="text-red-500 hover:underline">Remove</button>
                         </td>
                     </tr>`;
             });
@@ -119,15 +117,15 @@
 
             let summary = `
                 <div class="mt-6 text-right">
-                    <p class="text-lg mb-3">Subtotal: <span>₦${total.toFixed(2)}</span></p>
-                    <p class="text-lg mb-3">Delivery Fee: <span>₦${deliveryFee.toFixed(2)}</span></p>
-                    <p class="text-2xl font-bold">Total: <span class="text-blue-600">₦${grandTotal.toFixed(2)}</span></p>
+                    <p class="text-lg mb-3">Subtotal: <span>${formatNaira(total)}</span></p>
+                    <p class="text-lg mb-3">Delivery Fee: <span>${formatNaira(deliveryFee)}</span></p>
+                    <p class="text-2xl font-bold">Total: <span class="text-blue-600">${formatNaira(grandTotal)}</span></p>
                     <div class="mt-6 flex justify-end space-x-4">
                         <a href="products.php" class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300">Continue Shopping</a>
                         <a href="checkout.php" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600">Proceed to Checkout</a>
                     </div>
                      <div class="mt-4">
-                        <button onclick="clearCart(); renderCart();" class="text-red-500 hover:underline">Clear Cart</button>
+                        <button onclick="handleClearCart()" class="text-red-500 hover:underline">Clear Cart</button>
                     </div>
                 </div>`;
 
@@ -140,6 +138,24 @@
                     .then(() => window.location.href = '../login.php')
                     .catch(() => window.location.href = '../login.php');
             });
+        }
+
+        // Handle quantity changes with immediate UI update
+        function handleQuantityChange(productId, newQuantity) {
+            updateQuantity(productId, newQuantity);
+            renderCart();
+        }
+
+        // Handle remove from cart with immediate UI update
+        function handleRemoveFromCart(productId) {
+            removeFromCart(productId);
+            renderCart();
+        }
+
+        // Handle clear cart with immediate UI update
+        function handleClearCart() {
+            clearCart();
+            renderCart();
         }
     </script>
 
