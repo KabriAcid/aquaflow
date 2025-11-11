@@ -90,16 +90,16 @@ document.addEventListener("DOMContentLoaded", function () {
   function statusBadgeClasses(s) {
     switch ((s || "").toLowerCase()) {
       case "processing":
-        return "inline-block px-2 py-0.5 rounded text-white bg-blue-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-blue-100 text-blue-800";
       case "out_for_delivery":
-        return "inline-block px-2 py-0.5 rounded text-white bg-indigo-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-indigo-100 text-indigo-800";
       case "delivered":
-        return "inline-block px-2 py-0.5 rounded text-white bg-green-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-green-100 text-green-800";
       case "cancelled":
-        return "inline-block px-2 py-0.5 rounded text-white bg-red-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-red-100 text-red-800";
       case "pending":
       default:
-        return "inline-block px-2 py-0.5 rounded text-yellow-800 bg-yellow-100";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-yellow-100 text-yellow-800";
     }
   }
 
@@ -107,6 +107,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const label = statusLabel(s);
     const classes = statusBadgeClasses(s);
     return `<span class="${classes}">${escapeHtml(label)}</span>`;
+  }
+
+  function renderPaymentStatus(paymentStatus) {
+    const status = (paymentStatus || "").toLowerCase();
+    if (status === "paid") {
+      return `<span class="inline-flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+        <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+      </span>`;
+    } else {
+      return `<span class="inline-flex items-center justify-center w-6 h-6 bg-red-100 rounded-full">
+        <i data-lucide="x" class="w-4 h-4 text-red-600"></i>
+      </span>`;
+    }
   }
 
   // Determine payment status based on order status
@@ -150,20 +163,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td class="py-2 px-3">${escapeHtml(
                   order.customer_name || order.customer_id || ""
                 )}</td>
-                <td class="py-2 px-3">₦${Number(
-                  order.total_amount || order.subtotal || 0
-                ).toLocaleString()}</td>
-                <td class="py-2 px-3" data-status-cell></td>
-                <td class="py-2 px-3" data-payment-cell>${escapeHtml(
-                  order.payment_status || ""
+                <td class="py-2 px-3">${formatNaira(
+                  parseFloat(order.total_amount || order.subtotal || 0) || 0
                 )}</td>
-                <td class="py-2 px-3">${escapeHtml(date)}</td>
+                <td class="py-2 px-3" data-status-cell></td>
+                <td class="py-2 px-3 text-center" data-payment-cell></td>
+                <td class="py-2 px-3">${formatDate(order.order_date || "")}</td>
                 <td class="py-2 px-3" data-actions></td>
             `;
 
       // render status badge
       const statusCell = tr.querySelector("[data-status-cell]");
       statusCell.innerHTML = renderStatusBadge(order.status || "pending");
+
+      // render payment status icon
+      const paymentCell = tr.querySelector("[data-payment-cell]");
+      paymentCell.innerHTML = renderPaymentStatus(order.payment_status || "");
 
       // create status select + update button
       const actionsCell = tr.querySelector("[data-actions]");
@@ -211,8 +226,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.success) {
               tr.querySelector("[data-status-cell]").innerHTML =
                 renderStatusBadge(newStatus);
-              tr.querySelector("[data-payment-cell]").textContent =
-                newPaymentStatus;
+              tr.querySelector("[data-payment-cell]").innerHTML =
+                renderPaymentStatus(newPaymentStatus);
               createAlert("Order status and payment status updated");
             } else {
               createAlert(data.message || "Failed to update", "error");

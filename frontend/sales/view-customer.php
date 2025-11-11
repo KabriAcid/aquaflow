@@ -48,6 +48,15 @@ $customer_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
         const info = document.getElementById('customerInfo');
         const tbody = document.querySelector('#customerOrdersTable tbody');
 
+        // Formatting functions
+        function formatNaira(amount, decimals = 2) {
+            if (amount === null || amount === undefined || isNaN(amount)) {
+                return "₦0.00";
+            }
+            const num = parseFloat(amount);
+            return "₦" + num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
         // helper: map status to badge classes and render a small badge
         function statusBadgeClasses(s) {
             if (!s) return 'bg-gray-100 text-gray-800';
@@ -69,6 +78,19 @@ $customer_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
             const classes = statusBadgeClasses(s);
             const label = statusLabel(s);
             return `<span class="inline-block px-2 py-1 rounded-full text-xs font-medium ${classes}">${label}</span>`;
+        }
+
+        function renderPaymentStatus(paymentStatus) {
+            const status = (paymentStatus || "").toLowerCase();
+            if (status === "paid") {
+                return `<span class="inline-flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+                    <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                </span>`;
+            } else {
+                return `<span class="inline-flex items-center justify-center w-6 h-6 bg-red-100 rounded-full">
+                    <i data-lucide="x" class="w-4 h-4 text-red-600"></i>
+                </span>`;
+            }
         }
 
         function API_BASE() {
@@ -119,9 +141,9 @@ $customer_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
                     tr.innerHTML = `
           <td class="py-3 px-3"><a href="order-details.php?id=${o.id}" class="text-blue-600">${o.order_number}</a></td>
           <td class="py-3 px-3">${isNaN(dt.getTime())? (o.order_date||'') : dt.toLocaleString()}</td>
-          <td class="py-3 px-3">₦${(parseFloat(o.total_amount)||0).toFixed(2)}</td>
+          <td class="py-3 px-3">${formatNaira(parseFloat(o.total_amount)||0)}</td>
           <td class="py-3 px-3">${renderStatusBadge(o.status || 'pending')}</td>
-          <td class="py-3 px-3">${o.payment_status}</td>
+          <td class="py-3 px-3 text-center">${renderPaymentStatus(o.payment_status || '')}</td>
           <td class="py-3 px-3"><a href="order-details.php?id=${o.id}" class="text-blue-600">View</a></td>
         `;
                     tbody.appendChild(tr);

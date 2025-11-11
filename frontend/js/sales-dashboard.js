@@ -97,16 +97,16 @@ document.addEventListener("DOMContentLoaded", function () {
   function statusBadgeClasses(s) {
     switch ((s || "").toLowerCase()) {
       case "processing":
-        return "inline-block px-2 py-0.5 rounded text-white bg-blue-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-blue-100 text-blue-800";
       case "out_for_delivery":
-        return "inline-block px-2 py-0.5 rounded text-white bg-indigo-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-indigo-100 text-indigo-800";
       case "delivered":
-        return "inline-block px-2 py-0.5 rounded text-white bg-green-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-green-100 text-green-800";
       case "cancelled":
-        return "inline-block px-2 py-0.5 rounded text-white bg-red-600";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-red-100 text-red-800";
       case "pending":
       default:
-        return "inline-block px-2 py-0.5 rounded text-yellow-800 bg-yellow-100";
+        return "inline-block px-2 py-0.5 rounded text-sm font-medium bg-yellow-100 text-yellow-800";
     }
   }
 
@@ -114,6 +114,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const label = statusLabel(s);
     const classes = statusBadgeClasses(s);
     return `<span class="${classes}">${escapeHtml(label)}</span>`;
+  }
+
+  function renderPaymentStatus(paymentStatus) {
+    const status = (paymentStatus || "").toLowerCase();
+    if (status === "paid") {
+      return `<span class="inline-flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </span>`;
+    } else {
+      return `<span class="inline-flex items-center justify-center w-6 h-6 bg-red-100 rounded-full">
+        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </span>`;
+    }
   }
 
   // Fetch recent orders and populate stats + table
@@ -164,26 +181,28 @@ document.addEventListener("DOMContentLoaded", function () {
             tr.className = "border-b";
             const orderDate = new Date(o.order_date || o.created_at || "");
             tr.innerHTML = `
-                            <td class="py-3 px-3"><a href="order-details.php?id=${o.id
-              }" class="text-sm text-blue-600">${escapeHtml(
-                o.order_number || "#" + o.id
-              )}</a></td>
+                            <td class="py-3 px-3"><a href="order-details.php?id=${
+                              o.id
+                            }" class="text-sm text-blue-600">${escapeHtml(
+              o.order_number || "#" + o.id
+            )}</a></td>
                             <td class="py-3 px-3 text-sm">${escapeHtml(
-                o.customer_name || o.customer_id || ""
-              )}</td>
+                              o.customer_name || o.customer_id || ""
+                            )}</td>
                             <td class="py-3 px-3 text-sm">${formatNaira(
-                parseFloat(o.total_amount || 0) || 0
-              )}</td>
+                              parseFloat(o.total_amount || 0) || 0
+                            )}</td>
                             <td class="py-3 px-3 text-sm">${renderStatusBadge(
-                o.status || "pending"
-              )}</td>
-                            <td class="py-3 px-3 text-sm">${capitalizeWords(
-                escapeHtml(o.payment_status || "")
-              )}</td>
-                            <td class="py-3 px-3 text-sm">${isNaN(orderDate.getTime())
-                ? escapeHtml(o.order_date || "")
-                : formatDate(o.order_date)
-              }</td>
+                              o.status || "pending"
+                            )}</td>
+                            <td class="py-3 px-3 text-center">${renderPaymentStatus(
+                              o.payment_status || ""
+                            )}</td>
+                            <td class="py-3 px-3 text-sm">${
+                              isNaN(orderDate.getTime())
+                                ? escapeHtml(o.order_date || "")
+                                : formatDate(o.order_date)
+                            }</td>
                         `;
             tbody.appendChild(tr);
           });
@@ -219,5 +238,4 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   loadRecentOrders();
-
 });

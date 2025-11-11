@@ -19,6 +19,11 @@ $links = [
 
 $current_page = basename($_SERVER['PHP_SELF']);
 
+// Allow pages to override active nav link (e.g., sub-pages want their parent link active)
+if (!empty($active_page_override)) {
+    $current_page = $active_page_override;
+}
+
 ?>
 <aside class="fixed left-0 top-0 w-64 h-screen bg-white text-gray-800 p-6 flex flex-col shadow-lg hidden md:flex z-40">
     <div class="flex items-center gap-3 mb-8 border-b pb-3">
