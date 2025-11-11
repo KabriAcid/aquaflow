@@ -80,7 +80,7 @@ include 'partials/sidebar.php';
 
     <div class="bg-white p-6 rounded-lg multi-shadow mt-6">
         <h3 class="text-lg font-medium text-gray-600 mb-4">My Recent Activity</h3>
-        <div class="h-64">
+        <div class="h-64">  
             <canvas id="salesActivityChart"></canvas>
         </div>
     </div>
@@ -92,15 +92,3 @@ include 'partials/sidebar.php';
 
 
 <?php include 'partials/footer.php'; ?>
-
-<!-- Order details modal -->
-<div id="orderDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
-        <button id="orderModalClose" class="absolute top-3 right-3 text-gray-600">&times;</button>
-        <h3 class="text-lg font-medium mb-4">Order Details</h3>
-        <div id="orderModalContent" class="text-sm text-gray-700 max-h-96 overflow-auto">
-            <!-- populated by JS -->
-            <p class="text-gray-500">Loading...</p>
-        </div>
-    </div>
-</div>

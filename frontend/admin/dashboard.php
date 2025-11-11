@@ -12,7 +12,7 @@ include 'partials/header.php';
 include 'partials/sidebar.php';
 // Page layout wrapper (kept in page so partials only render their component)
 ?>
-<div class="flex-1 flex flex-col">
+<div class="flex-1 flex flex-col md:ml-64">
     <main class="flex-1 p-6 bg-gray-100">
         <?php
         ?>

@@ -10,7 +10,7 @@ include 'partials/header.php';
 include 'partials/sidebar.php';
 ?>
 
-<div class="flex-1 flex flex-col">
+<div class="flex-1 flex flex-col md:ml-64">
     <main class="flex-1 p-6 bg-gray-100">
         <div class="container-fluid">
             <div class="flex justify-between items-center mb-6">
@@ -46,50 +46,50 @@ include 'partials/sidebar.php';
         </div>
     </main>
 
-<!-- Add/Edit User Modal -->
-<div id="user-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-    <div class="bg-white rounded-lg p-8 max-w-lg w-full multi-shadow">
-        <h2 id="modal-title" class="text-xl font-bold mb-4"></h2>
-        <form id="user-form">
-            <input type="hidden" id="user-id" name="user_id">
-            <div class="mb-4">
-                <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                <input type="text" id="username" name="username" class="form-input w-full mt-1" required>
-            </div>
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" id="email" name="email" class="form-input w-full mt-1" required>
-            </div>
-            <div class="mb-4" id="password-field">
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input type="password" id="password" name="password" class="form-input w-full mt-1">
-            </div>
-            <div class="mb-4">
-                <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
-                <select id="role" name="role" class="form-select w-full mt-1" required>
-                    <option value="customer">Customer</option>
-                    <option value="sales_manager">Sales Manager</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="state" class="block text-sm font-medium text-gray-700">State</label>
-                <input type="text" id="state" name="state" class="form-input w-full mt-1">
-            </div>
-            <div class="mb-4">
-                <label for="lga" class="block text-sm font-medium text-gray-700">LGA</label>
-                <input type="text" id="lga" name="lga" class="form-input w-full mt-1">
-            </div>
-            <div class="mb-4">
-                <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                <input type="tel" id="phone" name="phone" class="form-input w-full mt-1">
-            </div>
-            <div class="flex justify-end space-x-4 mt-6">
-                <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-primary">Save</button>
-            </div>
-        </form>
+    <!-- Add/Edit User Modal -->
+    <div id="user-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+        <div class="bg-white rounded-lg p-8 max-w-lg w-full multi-shadow">
+            <h2 id="modal-title" class="text-xl font-bold mb-4"></h2>
+            <form id="user-form">
+                <input type="hidden" id="user-id" name="user_id">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" name="username" class="form-input w-full mt-1" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" name="email" class="form-input w-full mt-1" required>
+                </div>
+                <div class="mb-4" id="password-field">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" name="password" class="form-input w-full mt-1">
+                </div>
+                <div class="mb-4">
+                    <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                    <select id="role" name="role" class="form-select w-full mt-1" required>
+                        <option value="customer">Customer</option>
+                        <option value="sales_manager">Sales Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                    <input type="text" id="state" name="state" class="form-input w-full mt-1">
+                </div>
+                <div class="mb-4">
+                    <label for="lga" class="block text-sm font-medium text-gray-700">LGA</label>
+                    <input type="text" id="lga" name="lga" class="form-input w-full mt-1">
+                </div>
+                <div class="mb-4">
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-input w-full mt-1">
+                </div>
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<?php include 'partials/footer.php'; ?>
+    <?php include 'partials/footer.php'; ?>

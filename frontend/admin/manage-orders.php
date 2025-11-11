@@ -10,7 +10,7 @@ include 'partials/header.php';
 include 'partials/sidebar.php';
 ?>
 
-<div class="flex-1 flex flex-col">
+<div class="flex-1 flex flex-col md:ml-64">
     <main class="flex-1 p-6 bg-gray-100">
         <div class="container-fluid">
             <div class="mb-6">
@@ -56,27 +56,27 @@ include 'partials/sidebar.php';
         </div>
     </main>
 
-<!-- Order Details Modal -->
-<div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">Order Details</h2>
-            <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="modal-content">
-            <!-- Order details will be loaded here -->
-        </div>
-        <div class="mt-6 flex justify-end gap-4">
-            <select id="update-status-select" class="form-input">
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-            <button id="update-status-btn" class="btn-primary">Update Status</button>
+    <!-- Order Details Modal -->
+    <div id="order-details-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Order Details</h2>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-content">
+                <!-- Order details will be loaded here -->
+            </div>
+            <div class="mt-6 flex justify-end gap-4">
+                <select id="update-status-select" class="form-input">
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+                <button id="update-status-btn" class="btn-primary">Update Status</button>
+            </div>
         </div>
     </div>
-</div>
-</script>
-<?php include 'partials/footer.php'; ?>
+    </script>
+    <?php include 'partials/footer.php'; ?>

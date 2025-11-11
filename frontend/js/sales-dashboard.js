@@ -133,14 +133,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const pending = orders.filter(
           (o) => (o.status || "").toLowerCase() === "pending"
         ).length;
-        const salesTotal = orders.reduce(
-          (acc, o) =>
-            acc + (parseFloat(o.total_amount || o.total_amount || 0) || 0),
-          0
-        );
+        const salesTotal = orders.reduce((acc, o) => {
+          const amount = parseFloat(o.total_amount) || 0;
+          return acc + amount;
+        }, 0);
         // new customers count is not available from orders endpoint; leave as 0 for now
         const newCustomers = 0;
 
+        console.log(
+          "Sales Total:",
+          salesTotal,
+          "Formatted:",
+          formatNaira(salesTotal)
+        );
         document.getElementById("pendingCount").textContent = pending;
         document.getElementById("mySalesTotal").textContent =
           formatNaira(salesTotal);
@@ -159,28 +164,26 @@ document.addEventListener("DOMContentLoaded", function () {
             tr.className = "border-b";
             const orderDate = new Date(o.order_date || o.created_at || "");
             tr.innerHTML = `
-                            <td class="py-3 px-3"><a href="order-details.php?id=${
-                              o.id
-                            }" class="text-sm text-blue-600">${escapeHtml(
-              o.order_number || "#" + o.id
-            )}</a></td>
+                            <td class="py-3 px-3"><a href="order-details.php?id=${o.id
+              }" class="text-sm text-blue-600">${escapeHtml(
+                o.order_number || "#" + o.id
+              )}</a></td>
                             <td class="py-3 px-3 text-sm">${escapeHtml(
-                              o.customer_name || o.customer_id || ""
-                            )}</td>
+                o.customer_name || o.customer_id || ""
+              )}</td>
                             <td class="py-3 px-3 text-sm">${formatNaira(
-                              parseFloat(o.total_amount || 0) || 0
-                            )}</td>
+                parseFloat(o.total_amount || 0) || 0
+              )}</td>
                             <td class="py-3 px-3 text-sm">${renderStatusBadge(
-                              o.status || "pending"
-                            )}</td>
+                o.status || "pending"
+              )}</td>
                             <td class="py-3 px-3 text-sm">${capitalizeWords(
-                              escapeHtml(o.payment_status || "")
-                            )}</td>
-                            <td class="py-3 px-3 text-sm">${
-                              isNaN(orderDate.getTime())
-                                ? escapeHtml(o.order_date || "")
-                                : formatDate(o.order_date)
-                            }</td>
+                escapeHtml(o.payment_status || "")
+              )}</td>
+                            <td class="py-3 px-3 text-sm">${isNaN(orderDate.getTime())
+                ? escapeHtml(o.order_date || "")
+                : formatDate(o.order_date)
+              }</td>
                         `;
             tbody.appendChild(tr);
           });
@@ -217,72 +220,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
   loadRecentOrders();
 
-  // Hook order details modal behavior: intercept recent orders links and show modal
-  function showOrderModal(orderId) {
-    const modal = document.getElementById("orderDetailsModal");
-    const content = document.getElementById("orderModalContent");
-    if (!modal || !content) return;
-    modal.classList.remove("hidden");
-    content.innerHTML = '<p class="text-gray-500">Loading...</p>';
-    fetch(
-      API_BASE + `/orders/get_single.php?id=${encodeURIComponent(orderId)}`,
-      { credentials: "same-origin" }
-    )
-      .then((r) => r.json())
-      .then((res) => {
-        if (!res || !res.success) {
-          content.innerHTML = `<div class="text-red-600">${escapeHtml(
-            (res && res.message) || "Failed to load order"
-          )}</div>`;
-          return;
-        }
-        const o = res.data;
-        let html = `<div class="mb-3"><strong>Order #</strong> ${escapeHtml(
-          o.order_number
-        )}</div>`;
-        html += `<div class="mb-2"><strong>Customer</strong> ${escapeHtml(
-          o.customer_name || o.customer_id || ""
-        )}</div>`;
-        html += `<div class="mb-2"><strong>Status</strong> ${renderStatusBadge(
-          o.status || "pending"
-        )}</div>`;
-        html += `<div class="mb-2"><strong>Payment</strong> ${capitalizeWords(
-          escapeHtml(o.payment_status || "")
-        )}</div>`;
-        html += `<div class="mb-2"><strong>Amount</strong> ${formatNaira(
-          parseFloat(o.total_amount || o.subtotal || 0) || 0
-        )}</div>`;
-        html +=
-          '<div class="mt-4"><strong>Items</strong><ul class="list-disc pl-6">';
-        (o.items || []).forEach((it) => {
-          html += `<li>${escapeHtml(it.product_name)} — ${escapeHtml(
-            String(it.quantity)
-          )} × ${formatNaira(parseFloat(it.unit_price) || 0)}</li>`;
-        });
-        html += "</ul></div>";
-        content.innerHTML = html;
-      })
-      .catch((err) => {
-        console.error(err);
-        content.innerHTML =
-          '<div class="text-red-600">Network or server error</div>';
-      });
-  }
-
-  document.addEventListener("click", function (e) {
-    const a = e.target.closest('a[href^="order-details.php"]');
-    if (a) {
-      e.preventDefault();
-      const url = new URL(a.href, window.location.href);
-      const id = url.searchParams.get("id");
-      if (id) showOrderModal(id);
-    }
-  });
-
-  const modalClose = document.getElementById("orderModalClose");
-  if (modalClose)
-    modalClose.addEventListener("click", function () {
-      const modal = document.getElementById("orderDetailsModal");
-      if (modal) modal.classList.add("hidden");
-    });
 });

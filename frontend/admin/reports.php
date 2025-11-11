@@ -11,7 +11,7 @@ include 'partials/header.php';
 include 'partials/sidebar.php';
 ?>
 
-<div class="flex-1 flex flex-col">
+<div class="flex-1 flex flex-col md:ml-64">
 
     <main class="flex-1 p-6 bg-gray-100">
         <div class="container-fluid">
@@ -50,5 +50,5 @@ include 'partials/sidebar.php';
             <script src="../js/admin-reports.js"></script>
         </div>
 
-    <?php include 'partials/footer.php'; ?>
+        <?php include 'partials/footer.php'; ?>
 </div>

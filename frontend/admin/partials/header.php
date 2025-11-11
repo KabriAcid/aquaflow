@@ -28,4 +28,4 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </script>
 </head>
 
-<body class="bg-gray-100 flex font-sans text-gray-800">
+<body class="bg-gray-100 font-sans text-gray-800">

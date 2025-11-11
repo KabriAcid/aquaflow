@@ -15,7 +15,7 @@ $links = [
 $current_page = basename($_SERVER['PHP_SELF']);
 
 ?>
-<aside class="w-64 bg-white text-gray-800 p-6 flex flex-col h-screen shadow-lg hidden md:flex">
+<aside class="fixed left-0 top-0 w-64 h-screen bg-white text-gray-800 p-6 flex flex-col shadow-lg hidden md:flex z-40">
     <div class="flex items-center gap-3 mb-8 border-b pb-3">
         <img src="../../favicon.png" alt="Aquaflow Logo" class="w-10 h-10">
         <h1 class="text-2xl font-bold">Aquaflow</h1>
@@ -52,5 +52,5 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </a>
     </div>
 </aside>
-<div class="flex-1 flex flex-col">
+<div class="flex-1 flex flex-col md:ml-64">
     <main class="flex-1 p-6 bg-gray-100">

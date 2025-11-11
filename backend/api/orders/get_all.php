@@ -30,10 +30,10 @@ if (!$userId && !empty($_SESSION['user_id'])) {
 try {
     $pdo = get_db_connection();
 
-    // Allow admin and sales_manager to view all orders; customers only their own
+    // Allow admin, sales_manager, and sales to view all orders; customers only their own
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 0;
 
-    if (in_array($role, ['admin', 'sales_manager'])) {
+    if (in_array($role, ['admin', 'sales_manager', 'sales'])) {
         // include customer full name for admin/sales views
         $sql = 'SELECT orders.id, orders.order_number, orders.order_date, orders.customer_id, users.full_name AS customer_name, orders.subtotal, orders.delivery_fee, orders.total_amount, orders.status, orders.payment_status FROM orders LEFT JOIN users ON orders.customer_id = users.id ORDER BY orders.order_date DESC';
         if ($limit > 0) {

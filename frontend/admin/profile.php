@@ -10,7 +10,7 @@ include 'partials/header.php';
 include 'partials/sidebar.php';
 ?>
 
-<div class="flex-1 flex flex-col">
+<div class="flex-1 flex flex-col md:ml-64">
     <main class="flex-1 p-6 bg-gray-100">
         <div class="container-fluid">
             <div class="mb-6">
@@ -52,5 +52,5 @@ include 'partials/sidebar.php';
             <script src="../js/admin-profile.js" defer></script>
         </div>
     </main>
-</script>
-<?php include 'partials/footer.php'; ?>
+    </script>
+    <?php include 'partials/footer.php'; ?>
