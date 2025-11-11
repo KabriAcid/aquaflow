@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // API Endpoints - Use correct paths for API structure
   const API_PRODUCTS_GET = "/aquaflow/backend/api/products/get_all.php";
+  const API_PRODUCTS_GET_SINGLE =
+    "/aquaflow/backend/api/products/get_single.php";
   const API_PRODUCTS_CREATE = "/aquaflow/backend/api/products/create.php";
   const API_PRODUCTS_UPDATE = "/aquaflow/backend/api/products/update.php";
   const API_PRODUCTS_DELETE = "/aquaflow/backend/api/products/delete.php";
@@ -345,15 +347,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const editBtn = e.target.closest(".edit-product-btn");
     if (editBtn) {
       const productId = editBtn.dataset.productId;
-      
+
       try {
         // Fetch product details
         const response = await fetch(
-          `${API_PRODUCTS_GET}?product_id=${productId}`,
+          `${API_PRODUCTS_GET_SINGLE}?id=${productId}`,
           { credentials: "same-origin" }
         );
         const result = await response.json();
-        const product = result.data[0] || result.data;
+        const product = result.data || result.product;
 
         if (!product) {
           alert("Failed to load product details");
@@ -369,7 +371,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("volume").value = product.volume || "";
         document.getElementById("min_order_qty").value =
           product.minimum_order_quantity || 1;
-        document.getElementById("description").value = product.description || "";
+        document.getElementById("description").value =
+          product.description || "";
 
         // Update modal title and button
         productModalTitle.textContent = "Edit Product";
@@ -416,7 +419,9 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("Product deleted successfully");
           fetchProducts();
         } else {
-          alert("Failed to delete product: " + (result.message || "Unknown error"));
+          alert(
+            "Failed to delete product: " + (result.message || "Unknown error")
+          );
         }
       } catch (error) {
         console.error("Error deleting product:", error);
