@@ -21,49 +21,57 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (empty($input['name']) || empty($input['description']) || !isset($input['unit_price']) || !isset($input['current_stock'])) {
-    error_response('Missing required fields: name, description, unit_price, current_stock.', null, 400);
+if (empty($input['name']) || !isset($input['unit_price'])) {
+    error_response('Missing required fields: name, unit_price.', null, 400);
     exit;
 }
 
 $name = trim($input['name']);
-$description = trim($input['description']);
+$description = isset($input['description']) ? trim($input['description']) : '';
+$category = isset($input['category']) ? trim($input['category']) : 'beverage';
+$size = isset($input['size']) ? trim($input['size']) : null;
+$volume = isset($input['volume']) ? trim($input['volume']) : null;
 $unit_price = filter_var($input['unit_price'], FILTER_VALIDATE_FLOAT);
-$current_stock = filter_var($input['current_stock'], FILTER_VALIDATE_INT);
-$image_url = isset($input['image_url']) ? trim($input['image_url']) : null;
+$minimum_order_quantity = isset($input['minimum_order_quantity']) ? filter_var($input['minimum_order_quantity'], FILTER_VALIDATE_INT) : 1;
+$image_url = isset($input['image_url']) ? trim($input['image_url']) : 'default.png';
 
 if ($unit_price === false || $unit_price < 0) {
     error_response('Invalid unit price.', null, 400);
     exit;
 }
-if ($current_stock === false || $current_stock < 0) {
-    error_response('Invalid stock quantity.', null, 400);
-    exit;
+if ($minimum_order_quantity === false || $minimum_order_quantity < 1) {
+    $minimum_order_quantity = 1;
 }
-if (!empty($image_url) && !filter_var($image_url, FILTER_VALIDATE_URL)) {
+if (!empty($image_url) && $image_url !== 'default.png' && !filter_var($image_url, FILTER_VALIDATE_URL) && !file_exists(__DIR__ . '/../../uploads/products/' . $image_url)) {
     error_response('Invalid image URL.', null, 400);
     exit;
+}
+if (!in_array($category, ['bottled_water', 'beverage', 'package'])) {
+    $category = 'beverage';
 }
 
 try {
     $pdo = get_db_connection();
 
     $stmt = $pdo->prepare(
-        "INSERT INTO products (name, description, unit_price, current_stock, image_url) VALUES (:name, :description, :unit_price, :current_stock, :image_url)"
+        "INSERT INTO products (name, category, size, volume, unit_price, minimum_order_quantity, description, image_url, status) 
+         VALUES (:name, :category, :size, :volume, :unit_price, :minimum_order_quantity, :description, :image_url, 'active')"
     );
 
     $stmt->execute([
         ':name' => $name,
-        ':description' => $description,
+        ':category' => $category,
+        ':size' => $size,
+        ':volume' => $volume,
         ':unit_price' => $unit_price,
-        ':current_stock' => $current_stock,
+        ':minimum_order_quantity' => $minimum_order_quantity,
+        ':description' => $description,
         ':image_url' => $image_url
     ]);
 
     $new_product_id = $pdo->lastInsertId();
 
     success_response('Product created successfully', ['id' => $new_product_id], 201);
-
 } catch (PDOException $e) {
     if ($e->errorInfo[1] == 1062) { // Duplicate entry
         error_response('A product with this name already exists.', null, 409);

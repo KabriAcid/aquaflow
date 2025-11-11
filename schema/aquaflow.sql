@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 06, 2025 at 03:37 PM
+-- Generation Time: Nov 11, 2025 at 02:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,7 +50,9 @@ CREATE TABLE `inventory` (
   `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `current_stock` int(11) NOT NULL DEFAULT 0,
+  `quantity` int(11) DEFAULT 0,
   `minimum_stock_level` int(11) NOT NULL DEFAULT 10,
+  `reorder_point` int(11) DEFAULT 50,
   `last_restocked` date DEFAULT NULL,
   `last_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -59,25 +61,25 @@ CREATE TABLE `inventory` (
 -- Dumping data for table `inventory`
 --
 
-INSERT INTO `inventory` (`id`, `product_id`, `current_stock`, `minimum_stock_level`, `last_restocked`, `last_updated`) VALUES
-(1, 1, 500, 100, NULL, '2025-10-31 01:24:42'),
-(2, 2, 400, 80, NULL, '2025-10-31 01:24:42'),
-(3, 3, 300, 60, NULL, '2025-10-31 01:24:42'),
-(4, 4, 200, 40, NULL, '2025-10-31 01:24:42'),
-(5, 5, 200, 40, NULL, '2025-10-31 01:24:42'),
-(6, 6, 150, 30, NULL, '2025-10-31 01:24:42'),
-(7, 7, 100, 20, NULL, '2025-10-31 01:24:42'),
-(8, 8, 80, 15, NULL, '2025-10-31 01:24:42'),
-(9, 9, 300, 50, NULL, '2025-10-31 01:24:43'),
-(10, 10, 250, 50, NULL, '2025-10-31 01:24:43'),
-(11, 11, 120, 30, NULL, '2025-10-31 01:24:43'),
-(12, 12, 600, 100, NULL, '2025-10-31 01:24:43'),
-(13, 13, 200, 40, NULL, '2025-10-31 01:24:43'),
-(14, 14, 220, 40, NULL, '2025-10-31 01:24:43'),
-(15, 15, 180, 30, NULL, '2025-10-31 01:24:44'),
-(16, 16, 60, 10, NULL, '2025-10-31 01:24:44'),
-(17, 17, 80, 10, NULL, '2025-10-31 01:24:44'),
-(18, 18, 30, 5, NULL, '2025-10-31 01:24:44');
+INSERT INTO `inventory` (`id`, `product_id`, `current_stock`, `quantity`, `minimum_stock_level`, `reorder_point`, `last_restocked`, `last_updated`) VALUES
+(1, 1, 500, 0, 100, 50, NULL, '2025-10-31 01:24:42'),
+(2, 2, 400, 0, 80, 50, NULL, '2025-10-31 01:24:42'),
+(3, 3, 300, 0, 60, 50, NULL, '2025-10-31 01:24:42'),
+(4, 4, 200, 0, 40, 50, NULL, '2025-10-31 01:24:42'),
+(5, 5, 200, 0, 40, 50, NULL, '2025-10-31 01:24:42'),
+(6, 6, 150, 0, 30, 50, NULL, '2025-10-31 01:24:42'),
+(7, 7, 100, 0, 20, 50, NULL, '2025-10-31 01:24:42'),
+(8, 8, 80, 0, 15, 50, NULL, '2025-10-31 01:24:42'),
+(9, 9, 300, 0, 50, 50, NULL, '2025-10-31 01:24:43'),
+(10, 10, 250, 0, 50, 50, NULL, '2025-10-31 01:24:43'),
+(11, 11, 120, 0, 30, 50, NULL, '2025-10-31 01:24:43'),
+(12, 12, 600, 0, 100, 50, NULL, '2025-10-31 01:24:43'),
+(13, 13, 200, 0, 40, 50, NULL, '2025-10-31 01:24:43'),
+(14, 14, 220, 0, 40, 50, NULL, '2025-10-31 01:24:43'),
+(15, 15, 180, 0, 30, 50, NULL, '2025-10-31 01:24:44'),
+(16, 16, 60, 0, 10, 50, NULL, '2025-10-31 01:24:44'),
+(17, 17, 80, 0, 10, 50, NULL, '2025-10-31 01:24:44'),
+(18, 18, 30, 0, 5, 50, NULL, '2025-10-31 01:24:44');
 
 -- --------------------------------------------------------
 
@@ -158,9 +160,13 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `order_number`, `customer_id`, `order_date`, `delivery_address`, `delivery_city`, `delivery_state`, `delivery_date`, `special_instructions`, `subtotal`, `delivery_fee`, `total_amount`, `status`, `payment_status`, `created_at`, `updated_at`) VALUES
-(10, 'AF1762436426361', 4, '2025-11-06 13:40:26', '639 White Second Boulevard, Surulere, Lagos', 'Surulere', 'Lagos', '2025-11-19', 'No special instructions', 24780.00, 500.00, 25280.00, 'pending', 'unpaid', '2025-11-06 13:40:26', '2025-11-06 13:42:19'),
-(11, 'AF1762438964726', 4, '2025-11-06 14:22:44', '639 White Second Boulevard, Bonny, Rivers', 'Bonny', 'Rivers', '2025-11-22', '', 36530.00, 500.00, 37030.00, 'pending', 'unpaid', '2025-11-06 14:22:44', '2025-11-06 14:22:44'),
-(12, 'AF1762439662896', 4, '2025-11-06 14:34:22', '639 White Second Boulevard, Surulere, Lagos', 'Surulere', 'Lagos', '2025-11-06', '', 9600.00, 500.00, 10100.00, '', 'unpaid', '2025-11-06 14:34:22', '2025-11-06 14:34:27');
+(10, 'AF1762436426361', 4, '2025-11-06 13:40:26', '639 White Second Boulevard, Surulere, Lagos', 'Surulere', 'Lagos', '2025-11-19', 'No special instructions', 24780.00, 500.00, 25280.00, 'cancelled', 'unpaid', '2025-11-06 13:40:26', '2025-11-06 15:31:42'),
+(11, 'AF1762438964726', 4, '2025-11-06 14:22:44', '639 White Second Boulevard, Bonny, Rivers', 'Bonny', 'Rivers', '2025-11-22', '', 36530.00, 500.00, 37030.00, 'delivered', 'unpaid', '2025-11-06 14:22:44', '2025-11-06 15:31:37'),
+(12, 'AF1762439662896', 4, '2025-11-06 14:34:22', '639 White Second Boulevard, Surulere, Lagos', 'Surulere', 'Lagos', '2025-11-06', '', 9600.00, 500.00, 10100.00, 'delivered', 'unpaid', '2025-11-06 14:34:22', '2025-11-06 15:28:58'),
+(13, 'AF1762858367856', 4, '2025-11-11 10:52:47', '639 White Second Boulevard, Ikeja, Lagos', 'Ikeja', 'Lagos', '2025-11-11', '', 9320.00, 500.00, 9820.00, 'out_for_delivery', 'paid', '2025-11-11 10:52:47', '2025-11-11 11:46:42'),
+(14, 'AF1762859624775', 4, '2025-11-11 11:13:44', '639 White Second Boulevard, Nassarawa, Kano', 'Nassarawa', 'Kano', '2025-11-11', '', 11300.00, 500.00, 11800.00, 'delivered', 'paid', '2025-11-11 11:13:44', '2025-11-11 11:44:18'),
+(15, 'AF1762859940441', 4, '2025-11-11 11:19:00', '382 South Milton Parkway, Zaria, Kaduna', 'Zaria', 'Kaduna', '2025-11-11', '', 4080.00, 500.00, 4580.00, 'delivered', 'unpaid', '2025-11-11 11:19:00', '2025-11-11 11:42:40'),
+(16, 'AF1762860558363', 4, '2025-11-11 11:29:18', '639 White Second Boulevard, Gwale, Kano', 'Gwale', 'Kano', '2025-11-11', '', 3800.00, 500.00, 4300.00, 'delivered', 'unpaid', '2025-11-11 11:29:18', '2025-11-11 11:42:46');
 
 -- --------------------------------------------------------
 
@@ -213,7 +219,16 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `quan
 (46, 11, 8, 'Office Pack Water', 3, 1000.00, 3000.00),
 (47, 12, 13, 'Tropical Punch', 24, 160.00, 3840.00),
 (48, 12, 14, 'Iced Tea - Lemon', 24, 140.00, 3360.00),
-(49, 12, 12, 'Natural Spring Water', 60, 40.00, 2400.00);
+(49, 12, 12, 'Natural Spring Water', 60, 40.00, 2400.00),
+(50, 13, 11, 'Mineral Water - Still', 12, 180.00, 2160.00),
+(51, 13, 14, 'Iced Tea - Lemon', 24, 140.00, 3360.00),
+(52, 13, 16, 'Family Mega Pack Water', 2, 1900.00, 3800.00),
+(53, 14, 17, 'Office Starter Pack', 4, 1400.00, 5600.00),
+(54, 14, 16, 'Family Mega Pack Water', 3, 1900.00, 5700.00),
+(55, 15, 10, 'Sparkling Water - Berry', 24, 80.00, 1920.00),
+(56, 15, 11, 'Mineral Water - Still', 12, 180.00, 2160.00),
+(57, 16, 10, 'Sparkling Water - Berry', 25, 80.00, 2000.00),
+(58, 16, 9, 'Sparkling Water - Lime', 24, 75.00, 1800.00);
 
 -- --------------------------------------------------------
 
@@ -238,29 +253,60 @@ CREATE TABLE `payments` (
 --
 
 INSERT INTO `payments` (`id`, `order_id`, `payment_method`, `amount`, `transaction_reference`, `payment_status`, `payment_date`, `receipt_url`, `notes`) VALUES
-(1, 12, 'cash_on_delivery', 10100.00, 'COD-12-1762439667', 'pending', '2025-11-06 14:34:27', NULL, '{\"note\":\"Cash on Delivery created via confirm_cod endpoint\",\"created_by\":4}');
+(1, 12, 'cash_on_delivery', 10100.00, 'COD-12-1762439667', 'pending', '2025-11-06 14:34:27', NULL, '{\"note\":\"Cash on Delivery created via confirm_cod endpoint\",\"created_by\":4}'),
+(2, 13, '', 9820.00, '9783307', 'completed', '2025-11-11 10:53:14', NULL, '{\"warning\":\"FLW_SECRET_KEY not set; skipping remote verification in dev mode.\"}'),
+(3, 14, '', 11800.00, '9783365', 'completed', '2025-11-11 11:16:50', NULL, '{\"warning\":\"FLW_SECRET_KEY not set; skipping remote verification in dev mode.\"}'),
+(4, 15, 'cash_on_delivery', 4580.00, 'COD-15-1762859943', 'pending', '2025-11-11 11:19:03', NULL, '{\"note\":\"Cash on Delivery created via confirm_cod endpoint\",\"created_by\":4}'),
+(5, 16, 'cash_on_delivery', 4300.00, 'COD-16-1762860558', 'pending', '2025-11-11 11:29:18', NULL, '{\"note\":\"Cash on Delivery created via confirm_cod endpoint\",\"created_by\":4}');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `production`
+-- Table structure for table `production_logs`
 --
 
-CREATE TABLE `production` (
+CREATE TABLE `production_logs` (
   `id` int(11) NOT NULL,
   `production_date` date NOT NULL,
   `product_id` int(11) NOT NULL,
   `product_name` varchar(100) NOT NULL,
-  `shift` enum('morning','afternoon','night') NOT NULL,
-  `quantity_produced` int(11) NOT NULL,
-  `equipment_used` varchar(255) DEFAULT NULL,
+  `product_type` enum('bottled_water','sparkling_beverages','other') NOT NULL DEFAULT 'bottled_water',
+  `quantity_produced` int(11) NOT NULL DEFAULT 0,
+  `shift` enum('morning','afternoon','night') DEFAULT NULL,
   `operator_id` int(11) DEFAULT NULL,
   `operator_name` varchar(100) DEFAULT NULL,
+  `equipment_used` varchar(255) DEFAULT NULL,
   `notes` text DEFAULT NULL,
   `status` enum('completed','in_progress','failed') NOT NULL DEFAULT 'completed',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `production_logs`
+--
+
+INSERT INTO `production_logs` (`id`, `production_date`, `product_id`, `product_name`, `product_type`, `quantity_produced`, `shift`, `operator_id`, `operator_name`, `equipment_used`, `notes`, `status`, `created_at`, `created_by`) VALUES
+(1, '2025-11-11', 1, 'Pure Life Water', 'bottled_water', 2500, 'morning', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(2, '2025-11-11', 9, 'Sparkling Water - Lime', 'sparkling_beverages', 1800, 'morning', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(3, '2025-11-11', 2, 'Pure Life Water', 'bottled_water', 2200, 'afternoon', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(4, '2025-11-11', 10, 'Sparkling Water - Berry', 'sparkling_beverages', 1500, 'afternoon', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(5, '2025-11-10', 1, 'Pure Life Water', 'bottled_water', 2400, 'morning', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(6, '2025-11-10', 13, 'Tropical Punch', 'sparkling_beverages', 1900, 'morning', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(7, '2025-11-10', 3, 'Pure Life Water', 'bottled_water', 2100, 'afternoon', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(8, '2025-11-10', 14, 'Iced Tea - Lemon', 'sparkling_beverages', 1700, 'afternoon', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(9, '2025-11-09', 1, 'Pure Life Water', 'bottled_water', 2300, 'morning', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(10, '2025-11-09', 4, 'Fruit Juice - Orange', 'sparkling_beverages', 1600, 'morning', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(11, '2025-11-09', 2, 'Pure Life Water', 'bottled_water', 2200, 'afternoon', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(12, '2025-11-09', 5, 'Fruit Juice - Apple', 'sparkling_beverages', 1800, 'afternoon', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(13, '2025-11-08', 1, 'Pure Life Water', 'bottled_water', 2600, 'morning', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(14, '2025-11-08', 9, 'Sparkling Water - Lime', 'sparkling_beverages', 1900, 'morning', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(15, '2025-11-08', 3, 'Pure Life Water', 'bottled_water', 2400, 'afternoon', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(16, '2025-11-08', 10, 'Sparkling Water - Berry', 'sparkling_beverages', 1700, 'afternoon', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(17, '2025-11-07', 1, 'Pure Life Water', 'bottled_water', 2500, 'morning', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(18, '2025-11-07', 4, 'Fruit Juice - Orange', 'sparkling_beverages', 1650, 'morning', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(19, '2025-11-07', 2, 'Pure Life Water', 'bottled_water', 2300, 'afternoon', 3, 'Francesca Douglas', 'Line A', NULL, 'completed', '2025-11-11 12:33:59', 3),
+(20, '2025-11-07', 13, 'Tropical Punch', 'sparkling_beverages', 1750, 'afternoon', 3, 'Francesca Douglas', 'Line B', NULL, 'completed', '2025-11-11 12:33:59', 3);
 
 -- --------------------------------------------------------
 
@@ -272,6 +318,7 @@ CREATE TABLE `products` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `category` enum('bottled_water','beverage','package') NOT NULL,
+  `product_type` enum('bottled_water','sparkling_beverages','other') DEFAULT 'bottled_water',
   `size` varchar(50) DEFAULT NULL,
   `volume` varchar(50) DEFAULT NULL,
   `unit_price` decimal(10,2) NOT NULL,
@@ -288,25 +335,25 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `category`, `size`, `volume`, `unit_price`, `minimum_order_quantity`, `description`, `image_url`, `status`, `created_at`, `updated_at`, `created_by`) VALUES
-(1, 'Pure Life Water', 'bottled_water', 'Small', '500ml', 50.00, 50, 'Pure drinking water in 500ml bottles', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(2, 'Pure Life Water', 'bottled_water', 'Medium', '750ml', 70.00, 40, 'Pure drinking water in 750ml bottles', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(3, 'Pure Life Water', 'bottled_water', 'Large', '1.5L', 100.00, 30, 'Pure drinking water in 1.5L bottles', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(4, 'Fruit Juice - Orange', 'beverage', 'Regular', '500ml', 150.00, 20, 'Fresh orange juice', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(5, 'Fruit Juice - Apple', 'beverage', 'Regular', '500ml', 150.00, 20, 'Fresh apple juice', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(6, 'Energy Drink', 'beverage', 'Standard', '330ml', 200.00, 24, 'Energy boost drink', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(7, 'Family Pack Water', 'package', 'Pack of 12', '500ml x 12', 550.00, 5, 'Pack of 12 bottles - 500ml each', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(8, 'Office Pack Water', 'package', 'Pack of 24', '500ml x 24', 1000.00, 3, 'Pack of 24 bottles - 500ml each', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
-(9, 'Sparkling Water - Lime', 'bottled_water', 'Regular', '500ml', 75.00, 24, 'Sparkling water with a hint of lime', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(10, 'Sparkling Water - Berry', 'bottled_water', 'Regular', '500ml', 80.00, 24, 'Sparkling water with mixed berry flavor', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(11, 'Mineral Water - Still', 'bottled_water', 'Large', '2L', 180.00, 12, 'Mineral still water - 2L bottle', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(12, 'Natural Spring Water', 'bottled_water', 'Small', '330ml', 40.00, 60, 'Small 330ml natural spring water', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(13, 'Tropical Punch', 'beverage', 'Regular', '500ml', 160.00, 24, 'Tropical fruit punch drink', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(14, 'Iced Tea - Lemon', 'beverage', 'Regular', '500ml', 140.00, 24, 'Refreshing iced lemon tea', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(15, 'ElectroBoost - Mango', 'beverage', 'Standard', '330ml', 210.00, 24, 'Electrolyte beverage - mango flavor', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(16, 'Family Mega Pack Water', 'package', 'Pack of 48', '500ml x 48', 1900.00, 2, 'Bulk pack of 48 x 500ml bottles', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(17, 'Office Starter Pack', 'package', 'Pack of 36', '500ml x 36', 1400.00, 2, 'Office starter pack - 36 bottles', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
-(18, 'Party Pack - Mixed', 'package', 'Pack of 60', 'various', 3500.00, 1, 'Large party pack with mixed beverages', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL);
+INSERT INTO `products` (`id`, `name`, `category`, `product_type`, `size`, `volume`, `unit_price`, `minimum_order_quantity`, `description`, `image_url`, `status`, `created_at`, `updated_at`, `created_by`) VALUES
+(1, 'Pure Life Water', 'bottled_water', 'bottled_water', 'Small', '500ml', 50.00, 50, 'Pure drinking water in 500ml bottles', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(2, 'Pure Life Water', 'bottled_water', 'bottled_water', 'Medium', '750ml', 70.00, 40, 'Pure drinking water in 750ml bottles', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(3, 'Pure Life Water', 'bottled_water', 'bottled_water', 'Large', '1.5L', 100.00, 30, 'Pure drinking water in 1.5L bottles', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(4, 'Fruit Juice - Orange', 'beverage', 'bottled_water', 'Regular', '500ml', 150.00, 20, 'Fresh orange juice', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(5, 'Fruit Juice - Apple', 'beverage', 'bottled_water', 'Regular', '500ml', 150.00, 20, 'Fresh apple juice', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(6, 'Energy Drink', 'beverage', 'bottled_water', 'Standard', '330ml', 200.00, 24, 'Energy boost drink', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(7, 'Family Pack Water', 'package', 'bottled_water', 'Pack of 12', '500ml x 12', 550.00, 5, 'Pack of 12 bottles - 500ml each', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(8, 'Office Pack Water', 'package', 'bottled_water', 'Pack of 24', '500ml x 24', 1000.00, 3, 'Pack of 24 bottles - 500ml each', 'default.png', 'active', '2025-10-31 01:24:42', '2025-10-31 01:37:10', NULL),
+(9, 'Sparkling Water - Lime', 'bottled_water', 'bottled_water', 'Regular', '500ml', 75.00, 24, 'Sparkling water with a hint of lime', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(10, 'Sparkling Water - Berry', 'bottled_water', 'bottled_water', 'Regular', '500ml', 80.00, 24, 'Sparkling water with mixed berry flavor', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(11, 'Mineral Water - Still', 'bottled_water', 'bottled_water', 'Large', '2L', 180.00, 12, 'Mineral still water - 2L bottle', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(12, 'Natural Spring Water', 'bottled_water', 'bottled_water', 'Small', '330ml', 40.00, 60, 'Small 330ml natural spring water', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(13, 'Tropical Punch', 'beverage', 'bottled_water', 'Regular', '500ml', 160.00, 24, 'Tropical fruit punch drink', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(14, 'Iced Tea - Lemon', 'beverage', 'bottled_water', 'Regular', '500ml', 140.00, 24, 'Refreshing iced lemon tea', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(15, 'ElectroBoost - Mango', 'beverage', 'bottled_water', 'Standard', '330ml', 210.00, 24, 'Electrolyte beverage - mango flavor', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(16, 'Family Mega Pack Water', 'package', 'bottled_water', 'Pack of 48', '500ml x 48', 1900.00, 2, 'Bulk pack of 48 x 500ml bottles', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(17, 'Office Starter Pack', 'package', 'bottled_water', 'Pack of 36', '500ml x 36', 1400.00, 2, 'Office starter pack - 36 bottles', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL),
+(18, 'Party Pack - Mixed', 'package', 'bottled_water', 'Pack of 60', 'various', 3500.00, 1, 'Large party pack with mixed beverages', 'default.png', 'active', '2025-10-31 01:24:43', '2025-10-31 01:37:10', NULL);
 
 -- --------------------------------------------------------
 
@@ -365,9 +412,11 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password_hash`, `role`, `status`, `address`, `city`, `state`, `postal_code`, `created_at`, `updated_at`, `last_login`) VALUES
 (2, 'Cecilia Mercer', 'admin@aquaflow.com', '08037573455', '$2y$10$67i1QxLgA51VsAbKqpHex.4C.q5/Q4hCM6lO6HlkYRxnokV6jAche', 'admin', 'active', '10 Milton Avenue', 'Lorem incididunt pro', 'Laudantium quo pari', 'Et archite', '2025-10-31 00:22:56', '2025-10-31 19:13:42', NULL),
-(3, 'Francesca Douglas', 'production@aquaflow.com', '08035587073', '$2y$10$gKB746O.txDM7HAF0VGNEeUHZwSZk1MytoGIZM3Cd93UTxMiczryW', 'production_manager', 'active', '36 Green New Court', 'Adamawa', 'Yola', '184520', '2025-10-31 00:42:52', '2025-10-31 19:14:17', NULL),
+(3, 'Francesca Douglas', 'production@aquaflow.com', '08035587073', '$2y$10$gKB746O.txDM7HAF0VGNEeUHZwSZk1MytoGIZM3Cd93UTxMiczryW', 'production_manager', 'active', '36 Green New Court', 'kaduna_north', 'kaduna', '184520', '2025-10-31 00:42:52', '2025-11-06 17:56:23', NULL),
 (4, 'Bevis Todd', 'customer@aquaflow.com', '08046816018', '$2y$10$e8o4dq11EeUIUPMHTFTKOO..vIpVxUQmv.oZJ3x4hEJXd9ejB7LNa', 'customer', 'active', '639 White Second Boulevard', 'zaria', 'kaduna', '206794', '2025-10-31 00:53:49', '2025-10-31 19:13:57', NULL),
-(6, 'Kristen Fernandez', 'sales@aquaflow.com', '08053194908', '$2y$10$1IIT1pJqPpGuVTqt79skbuCtCE79OToURPld7H.R/pnNAFc1jAbY.', 'sales_manager', 'active', '432 North White New Avenue', 'gokana', 'rivers', 'Reprehende', '2025-10-31 02:28:04', '2025-10-31 19:13:10', NULL);
+(6, 'Kristen Fernandez', 'sales@aquaflow.com', '08053194908', '$2y$10$1IIT1pJqPpGuVTqt79skbuCtCE79OToURPld7H.R/pnNAFc1jAbY.', 'sales_manager', 'active', '432 North White New Avenue', 'gokana', 'rivers', 'Reprehende', '2025-10-31 02:28:04', '2025-10-31 19:13:10', NULL),
+(7, 'Abdullahi Kabri', 'kabriacid01@gmail.com', '07037943396', '$2y$10$ysHgAVRPC.WahD00007RXuN/A52wY8Pd21i.EMa/wCCUOYEukvOo6', 'production_manager', 'active', NULL, 'gwale', 'kano', NULL, '2025-11-06 16:43:07', '2025-11-06 18:02:56', NULL),
+(8, 'Jameson Mercado', 'nunuk@gmail.com', '08077324553', '$2y$10$fJqnYfl.YlP98v/jX.daTOSl/2R5jp7Ej5PdB6tjI0Kuh37W5kGHm', 'sales_manager', 'active', NULL, 'zaria', 'kaduna', NULL, '2025-11-06 18:01:24', '2025-11-06 18:01:24', NULL);
 
 --
 -- Indexes for dumped tables
@@ -439,14 +488,15 @@ ALTER TABLE `payments`
   ADD KEY `idx_transaction_reference` (`transaction_reference`);
 
 --
--- Indexes for table `production`
+-- Indexes for table `production_logs`
 --
-ALTER TABLE `production`
+ALTER TABLE `production_logs`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_production_date` (`production_date`),
   ADD KEY `idx_product_id` (`product_id`),
+  ADD KEY `idx_product_type` (`product_type`),
   ADD KEY `idx_status` (`status`),
-  ADD KEY `idx_operator_id` (`operator_id`);
+  ADD KEY `idx_quantity` (`quantity_produced`);
 
 --
 -- Indexes for table `products`
@@ -508,25 +558,25 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `production`
+-- AUTO_INCREMENT for table `production_logs`
 --
-ALTER TABLE `production`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `production_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -544,7 +594,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

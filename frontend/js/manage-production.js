@@ -252,9 +252,12 @@ document.addEventListener("DOMContentLoaded", () => {
         credentials: "same-origin",
         body: JSON.stringify({
           name: data.product_name,
+          category: data.category,
+          size: data.size,
+          volume: data.volume,
+          unit_price: parseFloat(data.unit_price),
+          minimum_order_quantity: parseInt(data.min_order_qty) || 1,
           description: data.description,
-          unit_price: parseFloat(data.price),
-          current_stock: 0,
           image_url: imageUrl,
         }),
       });

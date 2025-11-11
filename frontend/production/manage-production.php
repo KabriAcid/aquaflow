@@ -54,46 +54,90 @@ include './partials/header.php';
             <input type="hidden" id="product_id" name="product_id">
 
             <!-- Form Fields Grid - 2 columns responsive -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                <div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Product Name -->
+                <div class="md:col-span-2">
                     <label for="product_name" class="block text-sm font-semibold text-gray-700 mb-2">Product Name *</label>
                     <input type="text" id="product_name" name="product_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter product name" required>
                 </div>
 
+                <!-- Category -->
                 <div>
-                    <label for="price" class="block text-sm font-semibold text-gray-700 mb-2">Unit Price (₦) *</label>
-                    <input type="number" step="0.01" id="price" name="price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="0.00" required>
+                    <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
+                    <select id="category" name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                        <option value="">Select category...</option>
+                        <option value="bottled_water">💧 Bottled Water</option>
+                        <option value="beverage">🥤 Beverage</option>
+                        <option value="package">📦 Package</option>
+                    </select>
+                </div>
+
+                <!-- Unit Price -->
+                <div>
+                    <label for="unit_price" class="block text-sm font-semibold text-gray-700 mb-2">Unit Price (₦) *</label>
+                    <input type="number" step="0.01" id="unit_price" name="unit_price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="0.00" required>
+                </div>
+
+                <!-- Size -->
+                <div>
+                    <label for="size" class="block text-sm font-semibold text-gray-700 mb-2">Size</label>
+                    <select name="size" id="size" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="Small">Small</option>
+                        <option value="Large">Large</option>
+                        <option value="Bundle">Bundle (pack of 12)</option>
+                    </select>
+                </div>
+
+                <!-- Volume -->
+                <div>
+                    <label for="volume" class="block text-sm font-semibold text-gray-700 mb-2">Volume</label>
+                    <select name="voluem" id="voluem" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="500ml">500ml</option>
+                        <option value="1.5L">1.5L</option>
+                        <option value="1L">1L</option>
+                        <option value="2L">2L</option>
+                        <option value="5L">5L</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="mb-5">
+            <!-- Minimum Order Quantity -->
+            <div class="mt-3">
+                <label for="min_order_qty" class="block text-sm font-semibold text-gray-700 mb-2">Minimum Order Qty *</label>
+                <input type="number" id="min_order_qty" name="min_order_qty" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Minimum units" required min="1" value="1">
+            </div>
+
+            <!-- Description -->
+            <div class="md:col-span-2">
                 <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                <textarea id="description" name="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter product description"></textarea>
+                <textarea id="description" name="description" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter product description"></textarea>
             </div>
-
-            <!-- Image Upload Section -->
-            <div class="mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition">
-                <label for="image_upload" class="block text-sm font-semibold text-gray-700 mb-3">Product Image</label>
-                <div class="flex items-center justify-center">
-                    <div class="flex flex-col items-center gap-2 cursor-pointer">
-                        <i data-lucide="cloud-upload-2" class="w-8 h-8 text-gray-400"></i>
-                        <p class="text-xs text-gray-500">Click to upload or drag and drop</p>
-                        <input type="file" id="image_upload" name="image_upload" accept="image/*" class="hidden" />
-                    </div>
-                </div>
-                <div id="image-preview" class="mt-3 hidden text-center">
-                    <img id="preview-img" src="" alt="Preview" class="w-full h-24 object-cover rounded-lg">
-                    <button type="button" id="clear-image" class="mt-2 text-xs text-red-500 hover:text-red-700">Remove Image</button>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                <button type="button" id="cancel-product-btn" class="btn-secondary">Cancel</button>
-                <button type="submit" class="btn-primary">Save Product</button>
-            </div>
-        </form>
     </div>
+
+    <!-- Image Upload Section -->
+    <div class="mt-5 mb-6 p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-400 transition">
+        <label for="image_upload" class="block text-sm font-semibold text-gray-700 mb-3">Product Image</label>
+        <div class="flex items-center justify-center">
+            <div class="flex flex-col items-center gap-2 cursor-pointer" onclick="document.getElementById('image_upload').click()">
+                <i data-lucide="cloud-upload-2" class="w-8 h-8 text-gray-400"></i>
+                <p class="text-xs text-gray-500 text-center">Click to upload or drag and drop</p>
+                <p class="text-xs text-gray-400">(PNG, JPG, GIF up to 5MB)</p>
+                <input type="file" id="image_upload" name="image_upload" accept="image/*" class="hidden" />
+            </div>
+        </div>
+        <div id="image-preview" class="mt-3 hidden text-center">
+            <img id="preview-img" src="" alt="Preview" class="w-full h-24 object-cover rounded-lg">
+            <button type="button" id="clear-image" class="mt-2 text-xs text-red-500 hover:text-red-700">Remove Image</button>
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+        <button type="button" id="cancel-product-btn" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-primary">Save Product</button>
+    </div>
+    </form>
+</div>
 </div>
 
 <!-- Record Production Modal -->
