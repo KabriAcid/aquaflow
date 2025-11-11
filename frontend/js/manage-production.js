@@ -35,6 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // API Endpoints - Use correct paths for API structure
   const API_PRODUCTS_GET = "/aquaflow/backend/api/products/get_all.php";
   const API_PRODUCTS_CREATE = "/aquaflow/backend/api/products/create.php";
+  const API_PRODUCTS_UPDATE = "/aquaflow/backend/api/products/update.php";
+  const API_PRODUCTS_DELETE = "/aquaflow/backend/api/products/delete.php";
   const API_PRODUCTION_RECORD =
     "/aquaflow/backend/api/production/production.php";
 
@@ -155,14 +157,16 @@ document.addEventListener("DOMContentLoaded", () => {
             : "../images/default-product.png";
         const productName = product.name || "Unnamed Product";
         const description = product.description || "No description provided";
-        const price = parseFloat(product.price || 0).toLocaleString("en-NG", {
+        const price = parseFloat(
+          product.unit_price || product.price || 0
+        ).toLocaleString("en-NG", {
           style: "currency",
           currency: "NGN",
         });
 
         const card = document.createElement("div");
         card.className =
-          "bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden flex flex-col group";
+          "bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden flex flex-col group relative";
         card.innerHTML = `
                     <div class="relative h-48 overflow-hidden bg-gray-200">
                         <img src="${imageUrl}" alt="${productName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
@@ -170,13 +174,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="p-4 flex flex-col flex-grow">
                         <h3 class="text-lg font-bold text-gray-800 truncate">${productName}</h3>
                         <p class="text-gray-600 text-sm line-clamp-2 flex-grow">${description}</p>
-                        <div class="mt-4 flex justify-between items-center">
+                        <div class="mt-4 flex justify-between items-center gap-2">
                             <span class="text-2xl font-bold text-blue-600">${price}</span>
-                            <button class="record-production-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition inline-flex items-center gap-1 text-sm font-medium" data-product-id="${product.id}" data-product-name="${productName}">
-                                <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                                Record
-                            </button>
+                            <div class="flex gap-1">
+                                <button class="edit-product-btn bg-amber-500 hover:bg-amber-600 text-white p-2 rounded-lg transition inline-flex items-center text-sm" data-product-id="${product.id}" title="Edit">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </button>
+                                <button class="delete-product-btn bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition inline-flex items-center text-sm" data-product-id="${product.id}" data-product-name="${productName}" title="Delete">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
                         </div>
+                        <button class="record-production-btn w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition inline-flex items-center justify-center gap-1 text-sm font-medium" data-product-id="${product.id}" data-product-name="${productName}">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            Record Production
+                        </button>
                     </div>
                 `;
         productsGrid.appendChild(card);
@@ -211,10 +223,28 @@ document.addEventListener("DOMContentLoaded", () => {
     openModal(productModal);
   });
 
-  cancelProductBtn.addEventListener("click", () => closeModal(productModal));
-  closeProductModalBtn.addEventListener("click", () =>
-    closeModal(productModal)
-  );
+  cancelProductBtn.addEventListener("click", () => {
+    productForm.reset();
+    document.getElementById("product_id").value = "";
+    productModalTitle.textContent = "Add New Product";
+    const submitBtn = productForm.querySelector('button[type="submit"]');
+    submitBtn.textContent = "Save Product";
+    selectedImageFile = null;
+    imagePreview.classList.add("hidden");
+    imageUpload.value = "";
+    closeModal(productModal);
+  });
+  closeProductModalBtn.addEventListener("click", () => {
+    productForm.reset();
+    document.getElementById("product_id").value = "";
+    productModalTitle.textContent = "Add New Product";
+    const submitBtn = productForm.querySelector('button[type="submit"]');
+    submitBtn.textContent = "Save Product";
+    selectedImageFile = null;
+    imagePreview.classList.add("hidden");
+    imageUpload.value = "";
+    closeModal(productModal);
+  });
 
   // Close modal when clicking outside
   productModal.addEventListener("click", (e) => {
@@ -246,20 +276,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      const response = await fetch(API_PRODUCTS_CREATE, {
+      const isEdit = document.getElementById("product_id").value;
+      const apiUrl = isEdit ? API_PRODUCTS_UPDATE : API_PRODUCTS_CREATE;
+
+      const payload = {
+        name: data.product_name,
+        category: data.category,
+        size: data.size,
+        volume: data.volume,
+        unit_price: parseFloat(data.unit_price),
+        minimum_order_quantity: parseInt(data.min_order_qty) || 1,
+        description: data.description,
+        image_url: imageUrl,
+      };
+
+      if (isEdit) {
+        payload.product_id = isEdit;
+      }
+
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({
-          name: data.product_name,
-          category: data.category,
-          size: data.size,
-          volume: data.volume,
-          unit_price: parseFloat(data.unit_price),
-          minimum_order_quantity: parseInt(data.min_order_qty) || 1,
-          description: data.description,
-          image_url: imageUrl,
-        }),
+        body: JSON.stringify(payload),
       });
       const result = await response.json();
 
@@ -271,12 +310,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const successMsg = document.createElement("div");
         successMsg.className =
           "bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 mb-4 font-medium";
+        const actionType = isEdit ? "updated" : "created";
         successMsg.textContent =
-          result.message || "Product saved successfully!";
+          result.message || `Product ${actionType} successfully!`;
         productForm.parentElement.insertBefore(successMsg, productForm);
 
         setTimeout(() => {
           selectedImageFile = null;
+          productForm.reset();
+          document.getElementById("product_id").value = "";
+          productModalTitle.textContent = "Add New Product";
+          const submitBtn = productForm.querySelector('button[type="submit"]');
+          submitBtn.textContent = "Save Product";
           closeModal(productModal);
           fetchProducts();
           successMsg.remove();
@@ -292,6 +337,91 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("An error occurred while saving the product: " + error.message);
       submitBtn.innerHTML = originalText;
       submitBtn.disabled = false;
+    }
+  });
+
+  // --- Edit Product Logic ---
+  productsGrid.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest(".edit-product-btn");
+    if (editBtn) {
+      const productId = editBtn.dataset.productId;
+      
+      try {
+        // Fetch product details
+        const response = await fetch(
+          `${API_PRODUCTS_GET}?product_id=${productId}`,
+          { credentials: "same-origin" }
+        );
+        const result = await response.json();
+        const product = result.data[0] || result.data;
+
+        if (!product) {
+          alert("Failed to load product details");
+          return;
+        }
+
+        // Populate form with product data
+        document.getElementById("product_id").value = product.id;
+        document.getElementById("product_name").value = product.name || "";
+        document.getElementById("category").value = product.category || "";
+        document.getElementById("unit_price").value = product.unit_price || "";
+        document.getElementById("size").value = product.size || "";
+        document.getElementById("volume").value = product.volume || "";
+        document.getElementById("min_order_qty").value =
+          product.minimum_order_quantity || 1;
+        document.getElementById("description").value = product.description || "";
+
+        // Update modal title and button
+        productModalTitle.textContent = "Edit Product";
+        const submitBtn = productForm.querySelector('button[type="submit"]');
+        submitBtn.textContent = "Update Product";
+
+        selectedImageFile = null;
+        imagePreview.classList.add("hidden");
+        imageUpload.value = "";
+
+        openModal(productModal);
+      } catch (error) {
+        console.error("Error loading product:", error);
+        alert("Failed to load product details");
+      }
+    }
+  });
+
+  // --- Delete Product Logic ---
+  productsGrid.addEventListener("click", async (e) => {
+    const deleteBtn = e.target.closest(".delete-product-btn");
+    if (deleteBtn) {
+      const productId = deleteBtn.dataset.productId;
+      const productName = deleteBtn.dataset.productName;
+
+      if (
+        !confirm(
+          `Are you sure you want to delete "${productName}"? This action cannot be undone.`
+        )
+      ) {
+        return;
+      }
+
+      try {
+        const response = await fetch(API_PRODUCTS_DELETE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ id: productId }),
+        });
+        const result = await response.json();
+
+        if (result.status === "success" || result.status === 200) {
+          alert("Product deleted successfully");
+          fetchProducts();
+        } else {
+          alert("Failed to delete product: " + (result.message || "Unknown error"));
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert("An error occurred while deleting the product");
+      }
     }
   });
 

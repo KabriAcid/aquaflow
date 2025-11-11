@@ -80,9 +80,11 @@ include './partials/header.php';
 
                 <!-- Size -->
                 <div>
-                    <label for="size" class="block text-sm font-semibold text-gray-700 mb-2">Size</label>
-                    <select name="size" id="size" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    <label for="size" class="block text-sm font-semibold text-gray-700 mb-2">Size *</label>
+                    <select name="size" id="size" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                        <option value="">Select size...</option>
                         <option value="Small">Small</option>
+                        <option value="Medium">Medium</option>
                         <option value="Large">Large</option>
                         <option value="Bundle">Bundle (pack of 12)</option>
                     </select>
@@ -90,13 +92,17 @@ include './partials/header.php';
 
                 <!-- Volume -->
                 <div>
-                    <label for="volume" class="block text-sm font-semibold text-gray-700 mb-2">Volume</label>
-                    <select name="voluem" id="voluem" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    <label for="volume" class="block text-sm font-semibold text-gray-700 mb-2">Volume *</label>
+                    <select name="volume" id="volume" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                        <option value="">Select volume...</option>
+                        <option value="250ml">250ml</option>
                         <option value="500ml">500ml</option>
-                        <option value="1.5L">1.5L</option>
                         <option value="1L">1L</option>
+                        <option value="1.5L">1.5L</option>
                         <option value="2L">2L</option>
                         <option value="5L">5L</option>
+                        <option value="10L">10L</option>
+                        <option value="20L">20L</option>
                     </select>
                 </div>
             </div>
