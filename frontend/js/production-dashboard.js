@@ -33,10 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Error fetching dashboard data:", error);
-            const mainContent = document.querySelector('.container-fluid');
-            if (mainContent) {
-                mainContent.innerHTML = '<p class="text-red-500 text-center">Failed to load dashboard data. Please try again later.</p>';
-            }
         }
     };
 
