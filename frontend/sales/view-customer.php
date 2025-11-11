@@ -84,12 +84,16 @@ $customer_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
             const status = (paymentStatus || "").toLowerCase();
             if (status === "paid") {
                 return `<span class="inline-flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
-                    <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                </span>`;
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </span>`;
             } else {
                 return `<span class="inline-flex items-center justify-center w-6 h-6 bg-red-100 rounded-full">
-                    <i data-lucide="x" class="w-4 h-4 text-red-600"></i>
-                </span>`;
+          <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </span>`;
             }
         }
 
