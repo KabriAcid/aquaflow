@@ -9,61 +9,80 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'production_man
 }
 
 $page_title = "Manage Inventory";
+include './partials/header.php';
 ?>
 
-<?php include './partials/header.php'; ?>
+<?php include './partials/sidebar.php'; ?>
 
-<div class="flex-1 flex">
-    <!-- Sidebar -->
-    <?php include './partials/sidebar.php'; ?>
+<!-- Main Content -->
+<main class="md:ml-64 bg-gray-100 min-h-screen p-4 md:p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Manage Inventory</h1>
+            <p class="text-gray-600 mt-1">Monitor and update product stock levels</p>
+        </div>
 
-    <!-- Main Content -->
-    <main class="flex-1 bg-gray-100 p-6 md:p-10">
-        <div class="max-w-7xl mx-auto">
-            <h1 class="text-3xl font-bold text-gray-800 mb-8">Manage Inventory</h1>
+        <!-- Inventory Table -->
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800">Product Stock Levels</h2>
+            </div>
 
-            <!-- Inventory Table -->
-            <div class="bg-white p-6 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-bold mb-4">Product Stock Levels</h2>
-                <div id="loading-indicator" class="text-center hidden">
-                    <p class="text-gray-500">Loading inventory...</p>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr>
-                                <th class="text-left py-3 px-4 border-b-2 font-bold">Product</th>
-                                <th class="text-right py-3 px-4 border-b-2 font-bold">Quantity</th>
-                                <th class="text-left py-3 px-4 border-b-2 font-bold">Last Updated</th>
-                                <th class="text-center py-3 px-4 border-b-2 font-bold">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventory-table-body">
-                            <!-- Rows will be injected by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
+            <div id="loading-indicator" class="text-center p-6 hidden">
+                <p class="text-gray-500">Loading inventory...</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="text-left py-3 px-6 font-semibold text-gray-700">Product</th>
+                            <th class="text-right py-3 px-6 font-semibold text-gray-700">Current Stock</th>
+                            <th class="text-left py-3 px-6 font-semibold text-gray-700">Last Updated</th>
+                            <th class="text-center py-3 px-6 font-semibold text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table-body">
+                        <!-- Rows will be injected by JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
-    </main>
-</div>
+    </div>
+</main>
 
 <!-- Update Inventory Modal -->
-<div id="update-inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-4">Update Inventory</h2>
-        <p class="mb-4">Updating stock for: <strong id="modal-product-name"></strong></p>
+<div id="update-inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-md">
+        <!-- Modal Header -->
+        <div class="border-b border-gray-200 p-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-gray-800">Update Stock</h2>
+                <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
 
-        <form id="update-inventory-form">
+        <!-- Modal Body -->
+        <form id="update-inventory-form" class="p-6">
             <input type="hidden" id="update-product-id">
+
             <div class="mb-4">
-                <label for="update-quantity" class="block text-sm font-medium text-gray-700">New Quantity</label>
-                <input type="number" id="update-quantity" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Product</label>
+                <p id="modal-product-name" class="px-4 py-2 bg-gray-100 rounded-lg text-gray-700 font-medium"></p>
             </div>
 
-            <div class="flex justify-end space-x-4">
-                <button type="button" onclick="closeUpdateModal()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Changes</button>
+            <div class="mb-6">
+                <label for="update-quantity" class="block text-sm font-semibold text-gray-700 mb-2">New Quantity *</label>
+                <input type="number" id="update-quantity" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter new quantity" required min="0">
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button type="button" id="cancel-modal-btn" class="btn-secondary">Cancel</button>
+                <button type="submit" class="btn-primary">Update Stock</button>
             </div>
         </form>
     </div>
