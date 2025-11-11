@@ -6,8 +6,8 @@ require_once __DIR__ . '/../../utils/auth.php';
 
 set_json_headers();
 
-// Only sales_manager can delete products
-require_role(['sales_manager']);
+// Allow sales_manager and production_manager to delete products
+require_role(['sales_manager', 'production_manager']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -40,7 +40,6 @@ try {
     }
 
     success_response('Product deleted successfully');
-
 } catch (PDOException $e) {
     error_log('Database error deleting product: ' . $e->getMessage());
     error_response('A database error occurred.', null, 500);

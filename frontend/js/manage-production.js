@@ -153,10 +153,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       productsGrid.innerHTML = "";
       result.data.forEach((product) => {
-        const imageUrl =
-          product.image_url && product.image_url.trim()
-            ? product.image_url
-            : "../images/default-product.png";
+        // Proper image URL fallback - check if it's default.png from DB
+        let imageUrl = "../../assets/images/default.png";
+        if (
+          product.image_url &&
+          product.image_url.trim() &&
+          product.image_url !== "default.png"
+        ) {
+          imageUrl = product.image_url;
+        }
+
         const productName = product.name || "Unnamed Product";
         const description = product.description || "No description provided";
         const price = parseFloat(
@@ -171,25 +177,25 @@ document.addEventListener("DOMContentLoaded", () => {
           "bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden flex flex-col group relative";
         card.innerHTML = `
                     <div class="relative h-48 overflow-hidden bg-gray-200">
-                        <img src="${imageUrl}" alt="${productName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <img src="${imageUrl}" alt="${productName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='../../assets/images/default.png'">
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
                         <h3 class="text-lg font-bold text-gray-800 truncate">${productName}</h3>
                         <p class="text-gray-600 text-sm line-clamp-2 flex-grow">${description}</p>
-                        <div class="mt-4 flex justify-between items-center gap-2">
-                            <span class="text-2xl font-bold text-blue-600">${price}</span>
-                            <div class="flex gap-1">
-                                <button class="edit-product-btn bg-amber-500 hover:bg-amber-600 text-white p-2 rounded-lg transition inline-flex items-center text-sm" data-product-id="${product.id}" title="Edit">
+                        <div class="mt-4 flex items-center justify-between gap-2">
+                            <span class="text-lg font-bold text-blue-600">${price}</span>
+                            <div class="flex gap-2">
+                                <button class="edit-product-btn bg-amber-500 hover:bg-amber-600 text-white p-2 rounded-md transition inline-flex items-center" data-product-id="${product.id}" title="Edit">
                                     <i data-lucide="edit-2" class="w-4 h-4"></i>
                                 </button>
-                                <button class="delete-product-btn bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition inline-flex items-center text-sm" data-product-id="${product.id}" data-product-name="${productName}" title="Delete">
+                                <button class="delete-product-btn bg-red-500 hover:bg-red-600 text-white p-2 rounded-md transition inline-flex items-center" data-product-id="${product.id}" data-product-name="${productName}" title="Delete">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
                         </div>
-                        <button class="record-production-btn w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition inline-flex items-center justify-center gap-1 text-sm font-medium" data-product-id="${product.id}" data-product-name="${productName}">
+                        <button class="record-production-btn w-full mt-3 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md transition inline-flex items-center justify-center gap-2 text-sm font-medium" data-product-id="${product.id}" data-product-name="${productName}">
                             <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                            Record Production
+                            Record
                         </button>
                     </div>
                 `;

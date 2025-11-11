@@ -6,8 +6,8 @@ require_once __DIR__ . '/../../utils/auth.php';
 
 set_json_headers();
 
-// Allow admin or sales_manager to update products
-require_role(['admin', 'sales_manager']);
+// Allow admin, sales_manager, and production_manager to update products
+require_role(['admin', 'sales_manager', 'production_manager']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
@@ -30,7 +30,7 @@ $product_id = trim($input['product_id']);
 
 try {
     $pdo = get_db_connection();
-    
+
     // Fetch the existing product to ensure it exists
     $stmt = $pdo->prepare("SELECT * FROM products WHERE product_id = :product_id");
     $stmt->execute([':product_id' => $product_id]);
@@ -85,7 +85,6 @@ try {
     } else {
         success_response('Product updated successfully');
     }
-
 } catch (PDOException $e) {
     error_log('Database error updating product: ' . $e->getMessage());
     error_response('A database error occurred.', null, 500);

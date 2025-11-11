@@ -105,7 +105,6 @@ include './partials/header.php';
                         <option value="20L">20L</option>
                     </select>
                 </div>
-            </div>
 
             <!-- Minimum Order Quantity -->
             <div class="mt-3">
@@ -139,7 +138,7 @@ include './partials/header.php';
 
     <!-- Form Actions -->
     <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-        <button type="button" id="cancel-product-btn" class="btn-secondary">Cancel</button>
+        <button type="button" id="cancel-product-btn" class="btn-secondary border rounded px-3 py-2">Cancel</button>
         <button type="submit" class="btn-primary">Save Product</button>
     </div>
     </form>

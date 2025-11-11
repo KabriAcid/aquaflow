@@ -6,8 +6,8 @@ require_once __DIR__ . '/../../utils/auth.php';
 
 set_json_headers();
 
-// Only sales_manager can create products
-require_role(['sales_manager']);
+// Allow sales_manager and production_manager to create products
+require_role(['sales_manager', 'production_manager']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
