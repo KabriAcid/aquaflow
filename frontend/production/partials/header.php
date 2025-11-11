@@ -19,7 +19,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="../css/tailwind.css">
     <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Lucide icons loaded once for production pages -->
+    <script src="../js/utils.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -28,4 +28,4 @@ $current_page = basename($_SERVER['PHP_SELF']);
     </script>
 </head>
 
-<body class="bg-gray-100 flex font-sans text-gray-800">
+<body class="bg-gray-100 font-sans text-gray-800">

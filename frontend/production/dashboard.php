@@ -15,15 +15,15 @@ $page_title = "Production Dashboard";
 include 'partials/header.php';
 ?>
 
-<div class="flex-1 flex">
+<div class="flex">
     <?php include './partials/sidebar.php'; ?>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 bg-gray-100">
+    <main class="flex-1 md:ml-64 p-6 bg-gray-100 min-h-screen">
         <div class="container-fluid">
-            <div class="mb-6">
-                <h1 class="text-2xl font-semibold text-gray-700">Production Dashboard</h1>
-                <p class="text-gray-500">Welcome, <?php echo htmlspecialchars($userName); ?>!</p>
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-gray-800">Production Dashboard</h1>
+                <p class="text-gray-600 mt-2">Welcome, <span class="font-semibold"><?php echo htmlspecialchars($userName); ?></span>! Here's your production overview.</p>
             </div>
 
             <!-- Stats Cards -->
@@ -108,8 +108,8 @@ include 'partials/header.php';
             </div>
 
         </div>
-        <?php include 'partials/footer.php'; ?>
     </main>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/production-dashboard.js"></script>
+<script src="../js/production-dashboard.js"></script>
+<?php include 'partials/footer.php'; ?>
