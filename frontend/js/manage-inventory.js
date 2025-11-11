@@ -2,7 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // DOM Elements
   const inventoryTableBody = document.getElementById("inventory-table-body");
   const loadingIndicator = document.getElementById("loading-indicator");
-  const updateInventoryModal = document.getElementById("update-inventory-modal");
+  const updateInventoryModal = document.getElementById(
+    "update-inventory-modal"
+  );
   const updateInventoryForm = document.getElementById("update-inventory-form");
   const cancelModalBtn = document.getElementById("cancel-modal-btn");
   const closeModalBtn = document.getElementById("close-modal-btn");
@@ -13,12 +15,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // Modal handlers
   const openModal = () => {
     updateInventoryModal.classList.remove("hidden");
-    updateInventoryModal.classList.add("flex", "items-center", "justify-center");
+    updateInventoryModal.style.display = "flex";
+    lucide.createIcons();
   };
 
   const closeModal = () => {
     updateInventoryModal.classList.add("hidden");
-    updateInventoryModal.classList.remove("flex", "items-center", "justify-center");
+    updateInventoryModal.style.display = "none";
   };
 
   // Close modal when clicking outside
@@ -90,11 +93,17 @@ document.addEventListener("DOMContentLoaded", function () {
       const quantity = parseInt(item.quantity || 0).toLocaleString();
 
       row.innerHTML = `
-        <td class="py-4 px-6 text-gray-800 font-medium">${item.product_name || "Unknown Product"}</td>
+        <td class="py-4 px-6 text-gray-800 font-medium">${
+          item.product_name || "Unknown Product"
+        }</td>
         <td class="py-4 px-6 text-right font-semibold text-lg text-blue-600">${quantity}</td>
         <td class="py-4 px-6 text-gray-600 text-sm">${lastUpdated}</td>
         <td class="py-4 px-6 text-center">
-          <button class="update-stock-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition font-medium" data-product-id="${item.id}" data-product-name="${item.product_name}" data-quantity="${item.quantity}">
+          <button class="update-stock-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition font-medium" data-product-id="${
+            item.id
+          }" data-product-name="${item.product_name}" data-quantity="${
+        item.quantity
+      }">
             Update
           </button>
         </td>
@@ -128,7 +137,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const productId = document.getElementById("update-product-id").value;
     const newQuantity = document.getElementById("update-quantity").value;
-    const submitBtn = updateInventoryForm.querySelector('button[type="submit"]');
+    const submitBtn = updateInventoryForm.querySelector(
+      'button[type="submit"]'
+    );
     const originalText = submitBtn.innerHTML;
 
     try {
@@ -153,7 +164,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const successMsg = document.createElement("div");
         successMsg.className =
           "fixed top-4 right-4 bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 shadow-lg";
-        successMsg.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 inline"></i> ${result.message || "Stock updated successfully!"}`;
+        successMsg.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 inline"></i> ${
+          result.message || "Stock updated successfully!"
+        }`;
         document.body.appendChild(successMsg);
         lucide.createIcons();
 

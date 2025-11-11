@@ -53,14 +53,16 @@ include './partials/header.php';
 </main>
 
 <!-- Update Inventory Modal -->
-<div id="update-inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-lg shadow-2xl w-full max-w-md">
+<div id="update-inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 p-4" style="display: none; align-items: center; justify-content: center;">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <!-- Modal Header -->
-        <div class="border-b border-gray-200 p-6">
+        <div class="border-b border-gray-200 p-6 sticky top-0 bg-white">
             <div class="flex items-center justify-between">
                 <h2 class="text-2xl font-bold text-gray-800">Update Stock</h2>
-                <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition">
-                    <i data-lucide="x" class="w-6 h-6"></i>
+                <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition p-1 rounded hover:bg-gray-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                 </button>
             </div>
         </div>
