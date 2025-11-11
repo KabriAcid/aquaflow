@@ -1,21 +1,18 @@
 <?php
 header('Content-Type: application/json');
-require_once '../../config/database.php';
-require_once '../../utils/response.php';
-require_once '../../utils/auth.php';
+require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../../utils/response.php';
+require_once __DIR__ . '/../../utils/auth.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+set_json_headers();
 
 // Authenticate and check for production_manager role
-if (!is_authenticated() || $_SESSION['role'] !== 'production_manager') {
-    send_response(403, "Access Denied: You do not have permission to access this resource.");
+require_role(['production_manager']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
     exit;
 }
-
-$pdo = get_database_connection();
-$method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
     // For now, return static data. Later, this will fetch from the database.
@@ -26,7 +23,6 @@ if ($method === 'GET') {
         ['id' => 4, 'product_name' => 'Flavored Water - Berry 500ml', 'quantity' => 6000, 'last_updated' => '2024-07-27 15:00:00'],
     ];
     send_response(200, "Inventory data retrieved successfully.", $inventory);
-
 } elseif ($method === 'POST') {
     // This part will handle inventory updates. 
     // For now, we simulate an update.
@@ -41,8 +37,6 @@ if ($method === 'GET') {
     // e.g., UPDATE products SET quantity = :quantity WHERE id = :product_id
 
     send_response(200, "Inventory updated successfully for product ID: " . htmlspecialchars($data['product_id']));
-
 } else {
     send_response(405, "Method Not Allowed");
 }
-?>
