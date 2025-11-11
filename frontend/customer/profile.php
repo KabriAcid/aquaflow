@@ -75,7 +75,7 @@
                                 <input type="text" id="postal_code" name="postal_code" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500">
                             </div>
                             <button type="submit" class="btn-primary w-full flex items-center justify-center gap-2">
-                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <i data-lucide="save" class="w-6 h-6 inline"></i>
                                 Update Profile
                             </button>
                         </form>
@@ -103,7 +103,7 @@
                                 <input type="password" id="confirm_new_password" name="confirm_new_password" class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
                             </div>
                             <button type="submit" class="btn-primary w-full flex items-center justify-center gap-2">
-                                <i data-lucide="key" class="w-4 h-4"></i>
+                                <i data-lucide="key" class="w-6 h-6 inline"></i>
                                 Change Password
                             </button>
                         </form>
