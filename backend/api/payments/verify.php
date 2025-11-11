@@ -15,6 +15,7 @@ $data = json_decode($raw, true) ?: [];
 $tx_ref = $data['tx_ref'] ?? null;
 $transaction_id = $data['transaction_id'] ?? null;
 $order_id = isset($data['order_id']) ? (int)$data['order_id'] : null;
+$payment_status_from_client = $data['payment_status'] ?? 'completed';
 
 if (!$tx_ref || !$transaction_id || !$order_id) {
     error_response('Missing verification parameters', null, 422);
@@ -120,9 +121,16 @@ try {
             ':receipt_url' => $receiptUrl
         ]);
 
-        // mark order as paid
-        $stmt = $pdo->prepare('UPDATE orders SET payment_status = :payment_status, updated_at = NOW() WHERE id = :id');
-        $stmt->execute([':payment_status' => 'paid', ':id' => $order_id]);
+        // Determine order status based on payment result
+        $order_status = ($payment_status_from_client === 'completed') ? 'processing' : 'pending';
+
+        // mark order as paid and update status to processing if payment successful
+        $stmt = $pdo->prepare('UPDATE orders SET payment_status = :payment_status, status = :order_status, updated_at = NOW() WHERE id = :id');
+        $stmt->execute([
+            ':payment_status' => 'paid',
+            ':order_status' => $order_status,
+            ':id' => $order_id
+        ]);
 
         success_response('Payment verified, order marked paid and payment recorded', ['verification' => $verification_info, 'payment_id' => (int)$pdo->lastInsertId()]);
     } else {

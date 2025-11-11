@@ -1,6 +1,3 @@
-<?php
-// customer/checkout.php
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -431,7 +428,7 @@
                     // Clear the client-side cart immediately after the order is created server-side
                     // This prevents duplicate submissions and aligns with server-side order logging.
                     try {
-                        clearCart();
+                        clearCart(true);
                     } catch (e) {
                         console.warn('clearCart not available', e);
                     }
@@ -460,7 +457,7 @@
                             },
                             callback: function(res) {
                                 // res.status === 'successful' normally
-                                // send data to backend to verify
+                                // send data to backend to verify and update payment status
                                 fetch('../../backend/api/payments/verify.php', {
                                     method: 'POST',
                                     credentials: 'same-origin',
@@ -470,18 +467,23 @@
                                     body: JSON.stringify({
                                         tx_ref: res.tx_ref,
                                         transaction_id: res.transaction_id,
-                                        order_id: orderId
+                                        order_id: orderId,
+                                        payment_status: res.status === 'successful' ? 'completed' : 'failed'
                                     })
                                 }).then(r => r.json()).then(v => {
                                     if (v.success) {
-                                        clearCart();
+                                        // Cart already cleared above
                                         window.location.href = `payment.php?order_id=${orderId}`;
                                     } else {
                                         alert('Payment verification failed: ' + v.message);
+                                        // Still navigate to order page so user can see the order
+                                        window.location.href = `payment.php?order_id=${orderId}`;
                                     }
                                 }).catch(err => {
                                     console.error('Verification error', err);
                                     alert('Payment completed but verification failed. Contact support.');
+                                    // Still navigate to order page
+                                    window.location.href = `payment.php?order_id=${orderId}`;
                                 });
                             },
                             onclose: function() {
@@ -490,7 +492,7 @@
                             }
                         });
                     } else {
-                        // Cash on delivery — create a COD transaction and mark order
+                        // Cash on delivery — create a COD transaction and mark order with pending status
                         fetch('../../backend/api/orders/confirm_cod.php', {
                                 method: 'POST',
                                 credentials: 'same-origin',
@@ -509,15 +511,14 @@
                                     window.location.href = `payment.php?order_id=${orderId}`;
                                     return;
                                 }
-                                // success — clear cart and redirect to order/payment page
-                                clearCart();
-                                alert('Order placed successfully!');
+                                // success — clear cart (skip confirmation) and redirect to order/payment page
+                                clearCart(true);
                                 window.location.href = `payment.php?order_id=${orderId}`;
                             })
                             .catch(err => {
                                 console.error('COD confirm error', err);
-                                // fallback: redirect to order page
-                                clearCart();
+                                // fallback: redirect to order page and clear cart (skip confirmation)
+                                clearCart(true);
                                 window.location.href = `payment.php?order_id=${orderId}`;
                             });
                     }

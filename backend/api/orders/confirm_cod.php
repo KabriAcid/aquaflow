@@ -14,7 +14,14 @@ $data = json_decode($raw, true) ?: [];
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$customer_id = $_SESSION['customer_id'] ?? null;
+$role = $_SESSION['user_role'] ?? null;
+$customer_id = null;
+if ($role) {
+    $roleKey = preg_replace('/[^a-z0-9_]/', '', strtolower($role)) . '_id';
+    if (!empty($_SESSION[$roleKey])) $customer_id = (int)$_SESSION[$roleKey];
+}
+if (!$customer_id && !empty($_SESSION['user_id'])) $customer_id = (int)$_SESSION['user_id'];
+
 if (!$customer_id) {
     error_response('Not authenticated', null, 401);
 }

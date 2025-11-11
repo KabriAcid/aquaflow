@@ -24,8 +24,8 @@
 
     <!-- Dashboard Content -->
     <main class="py-10">
-        <div class="container-fluid">
-            <div class="max-w-6xl mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <div>
                 <div class="mb-6">
                     <h1 class="text-2xl font-semibold text-gray-700">Customer Dashboard</h1>
                     <p class="text-gray-500">Welcome back, <span id="userName"></span>!</p>
