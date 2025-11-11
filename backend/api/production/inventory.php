@@ -9,34 +9,79 @@ set_json_headers();
 // Authenticate and check for production_manager role
 require_role(['production_manager']);
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+// Get database connection
+$pdo = get_db_connection();
+
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
 if ($method === 'GET') {
-    // For now, return static data. Later, this will fetch from the database.
-    $inventory = [
-        ['id' => 1, 'product_name' => 'Natural Spring Water - 1L', 'quantity' => 15000, 'last_updated' => '2024-07-28 10:00:00'],
-        ['id' => 2, 'product_name' => 'Sparkling Beverage - 330ml', 'quantity' => 8000, 'last_updated' => '2024-07-28 11:30:00'],
-        ['id' => 3, 'product_name' => 'Bulk Water Package - 24x500ml', 'quantity' => 2500, 'last_updated' => '2024-07-28 09:00:00'],
-        ['id' => 4, 'product_name' => 'Flavored Water - Berry 500ml', 'quantity' => 6000, 'last_updated' => '2024-07-27 15:00:00'],
-    ];
-    send_response(200, "Inventory data retrieved successfully.", $inventory);
-} elseif ($method === 'POST') {
-    // This part will handle inventory updates. 
-    // For now, we simulate an update.
-    $data = json_decode(file_get_contents('php://input'), true);
+    try {
+        $query = "
+            SELECT 
+                i.id,
+                i.product_id,
+                p.name AS product_name,
+                i.current_stock AS quantity,
+                i.last_updated,
+                i.minimum_stock_level,
+                i.reorder_point
+            FROM inventory i
+            INNER JOIN products p ON i.product_id = p.id
+            ORDER BY p.name ASC
+        ";
 
-    if (!isset($data['product_id']) || !isset($data['quantity'])) {
-        send_response(400, "Invalid input. Product ID and quantity are required.");
-        exit;
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        $inventory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        success_response("Inventory data retrieved successfully.", $inventory);
+    } catch (PDOException $e) {
+        error_response("Failed to retrieve inventory data: " . $e->getMessage(), null, 500);
     }
+} elseif ($method === 'POST') {
+    try {
+        $data = json_decode(file_get_contents('php://input'), true);
 
-    // In a real application, you would update the database here.
-    // e.g., UPDATE products SET quantity = :quantity WHERE id = :product_id
+        if (!isset($data['product_id']) || !isset($data['quantity'])) {
+            error_response("Invalid input. Product ID and quantity are required.", null, 400);
+            exit;
+        }
 
-    send_response(200, "Inventory updated successfully for product ID: " . htmlspecialchars($data['product_id']));
+        $product_id = (int) $data['product_id'];
+        $quantity = (int) $data['quantity'];
+
+        // Verify the product exists
+        $check_query = "SELECT id FROM products WHERE id = :product_id";
+        $check_stmt = $pdo->prepare($check_query);
+        $check_stmt->execute(['product_id' => $product_id]);
+
+        if (!$check_stmt->fetch()) {
+            error_response("Product not found.", null, 404);
+            exit;
+        }
+
+        // Update inventory
+        $update_query = "
+            UPDATE inventory 
+            SET current_stock = :quantity 
+            WHERE product_id = :product_id
+        ";
+
+        $update_stmt = $pdo->prepare($update_query);
+        $update_stmt->execute([
+            'quantity' => $quantity,
+            'product_id' => $product_id
+        ]);
+
+        success_response("Inventory updated successfully for product ID: " . $product_id);
+    } catch (PDOException $e) {
+        error_response("Failed to update inventory: " . $e->getMessage(), null, 500);
+    }
 } else {
-    send_response(405, "Method Not Allowed");
+    error_response("Method Not Allowed", null, 405);
 }
