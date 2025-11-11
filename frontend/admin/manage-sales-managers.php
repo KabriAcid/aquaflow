@@ -18,7 +18,7 @@ include 'partials/sidebar.php';
                     <h1 class="text-2xl font-semibold text-gray-700">Sales Managers</h1>
                     <p class="text-gray-500">Create and manage sales manager accounts.</p>
                 </div>
-                <button id="add-manager-btn" class="btn-primary inline-flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4" aria-hidden="true"></i> Add Manager</button>
+                <button id="add-manager-btn" class="btn-primary inline-flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 inline" aria-hidden="true"></i> Add Manager</button>
             </div>
 
             <div class="bg-white p-6 rounded-lg multi-shadow">

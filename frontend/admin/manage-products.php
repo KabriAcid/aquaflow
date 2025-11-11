@@ -10,39 +10,63 @@ include 'partials/header.php';
 include 'partials/sidebar.php';
 ?>
 
-<div class="flex-1 flex flex-col md:ml-64">
-    <main class="flex-1 p-6 bg-gray-100">
-        <div class="container-fluid">
-            <div class="mb-6 flex justify-between items-center">
+<div class="md:ml-64">
+    <main class="p-6 bg-gray-100 min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header Section -->
+            <div class="mb-8 flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-semibold text-gray-700">Products</h1>
-                    <p class="text-gray-500">Manage your product catalog.</p>
+                    <h1 class="text-3xl font-bold text-gray-800">Manage Products</h1>
+                    <p class="text-gray-600 mt-1">Create, edit, and manage your product catalog.</p>
                 </div>
-                <button id="add-product-btn" class="btn-primary inline-flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4" aria-hidden="true"></i> Add Product</button>
+                <button id="add-product-btn" class="btn-primary inline-flex items-center gap-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i> Add Product
+                </button>
             </div>
 
-            <div class="max-w-6xl mx-auto px-4">
-                <h1 class="text-3xl font-bold mb-6 text-gray-800">Browse Products</h1>
-
-                <!-- Filters -->
-                <div class="flex justify-between items-center mb-6">
-                    <div class="flex space-x-4">
-                        <select id="categoryFilter" class="border rounded px-3 py-2">
-                            <option value="">All Categories</option>
-                            <option value="bottled_water">Bottled Water</option>
-                            <option value="beverage">Beverages</option>
-                            <option value="package">Packages</option>
-                        </select>
-                        <input type="text" id="searchFilter" placeholder="Search by name..." class="border rounded px-3 py-2">
-                    </div>
-                </div>
-
-                <!-- Products Grid -->
-                <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Products will be populated by JavaScript -->
+            <!-- Filters & Search -->
+            <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                <div class="flex gap-4">
+                    <input type="text" id="searchFilter" placeholder="Search by name..." class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    <select id="categoryFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="">All Categories</option>
+                        <option value="bottled_water">Bottled Water</option>
+                        <option value="beverage">Beverages</option>
+                        <option value="package">Packages</option>
+                    </select>
                 </div>
             </div>
-            <script src="../js/admin-products.js" defer></script>
+
+            <!-- Products Table -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div id="loading-indicator" class="text-center p-8 hidden">
+                    <p class="text-gray-500">Loading products...</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="text-left py-3 px-6 font-semibold text-gray-700">Image</th>
+                                <th class="text-left py-3 px-6 font-semibold text-gray-700">Product Name</th>
+                                <th class="text-left py-3 px-6 font-semibold text-gray-700">Category</th>
+                                <th class="text-left py-3 px-6 font-semibold text-gray-700">Size/Volume</th>
+                                <th class="text-right py-3 px-6 font-semibold text-gray-700">Price</th>
+                                <th class="text-center py-3 px-6 font-semibold text-gray-700">Status</th>
+                                <th class="text-center py-3 px-6 font-semibold text-gray-700">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <!-- Rows will be injected by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="no-products-message" class="text-center py-8 text-gray-500 hidden">
+                    <i data-lucide="inbox" class="w-12 h-12 inline-block text-gray-300 mb-2"></i>
+                    <p class="mt-2">No products found</p>
+                </div>
+            </div>
         </div>
     </main>
 

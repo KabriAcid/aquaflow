@@ -19,7 +19,7 @@ include 'partials/sidebar.php';
                     <p class="text-gray-500">Create and manage production manager accounts.</p>
                 </div>
                 <button id="add-manager-btn" class="btn-primary gap-2">
-                    <i data-lucide="user-plus" class="w-4 h-4" aria-hidden="true"></i> Add Manager</button>
+                    <i data-lucide="user-plus" class="w-4 h-4 inline" aria-hidden="true"></i> Add Manager</button>
             </div>
 
             <div class="bg-white p-6 rounded-lg multi-shadow">

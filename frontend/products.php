@@ -98,7 +98,7 @@
                     const productCard = `
                         <div class="bg-white rounded-lg multi-shadow p-4">
                             <div class="h-40 bg-gray-200 rounded-md mb-4 flex items-center justify-center">
-                                <img src="${product.image_url || '../assets/images/product_placeholder.png'}" alt="${product.name}" class="h-full w-full object-cover rounded-md">
+                                <img src="${product.image_url === 'default.png' ? '../assets/images/default.png' : (product.image_url || '../assets/images/default.png')}" alt="${product.name}" class="h-full w-full object-cover rounded-md" onerror="this.src='../assets/images/default.png'">
                             </div>
                             <h3 class="font-semibold text-lg">${product.name}</h3>
                             <p class="text-gray-600">${product.size} ${product.volume}</p>
