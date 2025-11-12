@@ -60,6 +60,7 @@ include 'partials/sidebar.php';
             </div>
 
             <script src="../js/admin-reports.js"></script>
+            <script src="../js/utils.js"></script>
         </div>
 
         <?php include 'partials/footer.php'; ?>

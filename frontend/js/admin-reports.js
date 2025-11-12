@@ -185,6 +185,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const getStatusBadge = (status) => {
+    const statusColors = {
+      pending: "bg-yellow-100 text-yellow-800",
+      processing: "bg-blue-100 text-blue-800",
+      ready: "bg-purple-100 text-purple-800",
+      shipped: "bg-indigo-100 text-indigo-800",
+      delivered: "bg-green-100 text-green-800",
+      cancelled: "bg-red-100 text-red-800",
+    };
+
+    const colorClass =
+      statusColors[status?.toLowerCase()] || "bg-gray-100 text-gray-800";
+    const displayStatus = status
+      ? status.charAt(0).toUpperCase() + status.slice(1)
+      : "Unknown";
+
+    return `<span class="px-2 py-1 rounded-full text-xs font-medium ${colorClass}">${displayStatus}</span>`;
+  };
+
   const renderTable = (orders) => {
     if (!orders || orders.length === 0) {
       reportTableContainer.innerHTML =
@@ -215,10 +234,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <td class="p-2">${new Date(
                                   order.order_date
                                 ).toLocaleDateString()}</td>
-                                <td class="p-2">$${parseFloat(
+                                <td class="p-2">${formatNaira(
                                   order.total_amount
-                                ).toFixed(2)}</td>
-                                <td class="p-2">${order.status}</td>
+                                )}</td>
+                                <td class="p-2">${getStatusBadge(
+                                  order.status
+                                )}</td>
                             </tr>
                         `
                           )

@@ -323,19 +323,26 @@ def get_inventory_report():
                 END,
                 p.name ASC
         """
-        inventory_df = pd.read_sql(inventory_query, conn)
         
-        # Low stock items
-        low_stock_df = inventory_df[inventory_df['stock_status'].isin(['Critical', 'Low'])]
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(inventory_query)
+        inventory = cursor.fetchall()
+        cursor.close()
+        
+        # Filter low stock items
+        low_stock_items = [item for item in inventory if item['stock_status'] in ['Critical', 'Low']]
+        critical_items = [item for item in inventory if item['stock_status'] == 'Critical']
+        low_items = [item for item in inventory if item['stock_status'] == 'Low']
+        normal_items = [item for item in inventory if item['stock_status'] == 'Normal']
         
         report_data = {
-            "inventory": safe_json_response(inventory_df.to_dict('records')),
-            "low_stock_items": safe_json_response(low_stock_df.to_dict('records')),
+            "inventory": safe_json_response(inventory),
+            "low_stock_items": safe_json_response(low_stock_items),
             "summary": {
-                "total_products": int(len(inventory_df)),
-                "critical_stock": int(len(inventory_df[inventory_df['stock_status'] == 'Critical'])),
-                "low_stock": int(len(inventory_df[inventory_df['stock_status'] == 'Low'])),
-                "normal_stock": int(len(inventory_df[inventory_df['stock_status'] == 'Normal']))
+                "total_products": len(inventory),
+                "critical_stock": len(critical_items),
+                "low_stock": len(low_items),
+                "normal_stock": len(normal_items)
             }
         }
 
@@ -382,7 +389,10 @@ def get_financial_report():
             WHERE o.order_date BETWEEN %s AND %s
                 AND o.status != 'cancelled'
         """
-        revenue_df = pd.read_sql(revenue_query, conn, params=(start_date, end_date))
+        
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(revenue_query, (start_date, end_date))
+        revenue_summary = cursor.fetchone() or {}
         
         # Revenue by status
         status_revenue_query = """
@@ -394,11 +404,13 @@ def get_financial_report():
             WHERE o.order_date BETWEEN %s AND %s
             GROUP BY o.status
         """
-        status_revenue_df = pd.read_sql(status_revenue_query, conn, params=(start_date, end_date))
+        cursor.execute(status_revenue_query, (start_date, end_date))
+        revenue_by_status = cursor.fetchall()
+        cursor.close()
         
         report_data = {
-            "revenue_summary": safe_json_response(revenue_df.to_dict('records')[0] if not revenue_df.empty else {}),
-            "revenue_by_status": safe_json_response(status_revenue_df.to_dict('records')),
+            "revenue_summary": safe_json_response(revenue_summary),
+            "revenue_by_status": safe_json_response(revenue_by_status),
             "date_range": {
                 "start_date": start_date,
                 "end_date": end_date
