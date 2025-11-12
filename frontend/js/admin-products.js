@@ -31,12 +31,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const openModal = (modal) => {
     modal.classList.remove("hidden");
     modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    document.body.style.overflow = "hidden";
     lucide.createIcons();
   };
 
   const closeModal = (modal) => {
     modal.classList.add("hidden");
     modal.style.display = "none";
+    document.body.style.overflow = "auto";
   };
 
   // Image preview handler
@@ -227,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
   categoryFilter.addEventListener("change", filterAndRender);
 
   // Handle form submission
-  productForm.addEventListener("submit", async (e) => {
+  saveBtn.addEventListener("click", async (e) => {
     e.preventDefault();
 
     const productId = document.getElementById("product-id").value;
@@ -241,8 +245,13 @@ document.addEventListener("DOMContentLoaded", () => {
       unit_price: formData.get("unit_price"),
       minimum_order_quantity: formData.get("minimum_order_quantity"),
       description: formData.get("description"),
-      image_url: formData.get("image_url"),
     };
+
+    // Only include image_url if it's a string (existing URL), not a File object
+    const imageValue = formData.get("image_url");
+    if (imageValue && typeof imageValue === "string" && imageValue !== "") {
+      data.image_url = imageValue;
+    }
 
     if (productId) {
       data.id = productId;
@@ -266,15 +275,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
 
-      if (result.status === 200 || result.status === "success") {
+      if (result.success === true) {
         const successMsg = document.createElement("div");
         successMsg.className =
-          "fixed top-4 right-4 bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 shadow-lg";
-        successMsg.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 inline"></i> ${
+          "fixed top-4 right-4 bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 shadow-lg z-50";
+        successMsg.innerHTML = `<svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> ${
           result.message || "Product saved successfully!"
         }`;
         document.body.appendChild(successMsg);
-        lucide.createIcons();
 
         setTimeout(() => successMsg.remove(), 3000);
 
@@ -353,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const result = await response.json();
 
-          if (result.status === 200 || result.status === "success") {
+          if (result.success === true) {
             const successMsg = document.createElement("div");
             successMsg.className =
               "fixed top-4 right-4 bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 shadow-lg z-50";

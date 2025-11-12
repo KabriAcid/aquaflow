@@ -75,10 +75,10 @@ include 'partials/sidebar.php';
     </main>
 
     <!-- Add/Edit Product Modal -->
-    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden p-4" style="display: none; align-items: center; justify-content: center;">
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" style="display: none; align-items: center; justify-content: center;">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" style="display: flex;">
             <!-- Modal Header -->
-            <div class="border-b border-gray-200 p-6 sticky top-0 bg-white">
+            <div class="border-b border-gray-200 p-6 bg-white flex-shrink-0">
                 <div class="flex items-center justify-between">
                     <h2 id="modal-title" class="text-2xl font-bold text-gray-800">Add Product</h2>
                     <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition p-1 rounded hover:bg-gray-100">
@@ -89,8 +89,8 @@ include 'partials/sidebar.php';
                 </div>
             </div>
 
-            <!-- Modal Body -->
-            <form id="product-form" class="p-6">
+            <!-- Modal Body - Scrollable -->
+            <form id="product-form" class="flex-1 overflow-y-auto p-6 pb-24" style="scrollbar-width: none; -ms-overflow-style: none;">
                 <input type="hidden" id="product-id" name="product_id">
 
                 <!-- Name -->
@@ -125,11 +125,25 @@ include 'partials/sidebar.php';
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="product-size" class="block text-sm font-semibold text-gray-700 mb-2">Size *</label>
-                        <input type="text" id="product-size" name="size" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="e.g., Small, Large" required>
+                        <select id="product-size" name="size" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                            <option value="">Select size...</option>
+                            <option value="Small">Small</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Large">Large</option>
+                            <option value="Bundle">Bundle (pack of 12)</option>
+                        </select>
                     </div>
                     <div>
                         <label for="product-volume" class="block text-sm font-semibold text-gray-700 mb-2">Volume *</label>
-                        <input type="text" id="product-volume" name="volume" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="e.g., 500ml, 1.5L" required>
+                        <select id="product-volume" name="volume" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                            <option value="">Select volume...</option>
+                            <option value="250ml">250ml</option>
+                            <option value="500ml">500ml</option>
+                            <option value="1L">1L</option>
+                            <option value="1.5L">1.5L</option>
+                            <option value="2L">2L</option>
+                            <option value="5L">5L</option>
+                        </select>
                     </div>
                 </div>
 
@@ -152,26 +166,26 @@ include 'partials/sidebar.php';
                 </div>
 
                 <!-- Image Upload -->
-                <div class="mb-6">
+                <div class="mb-4">
                     <label for="product-image" class="block text-sm font-semibold text-gray-700 mb-2">Product Image</label>
                     <div class="flex items-center gap-4">
                         <div class="flex-1">
                             <input type="file" id="product-image" name="image_url" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                             <p class="text-xs text-gray-500 mt-1">Recommended: 500x500px (JPG, PNG)</p>
                         </div>
-                        <div id="image-preview" class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-300">
+                        <div id="image-preview" class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-300 flex-shrink-0">
                             <img id="preview-img" src="" alt="Preview" class="w-full h-full object-cover rounded-lg hidden">
                             <i data-lucide="image" class="w-8 h-8 text-gray-400" id="preview-icon"></i>
                         </div>
                     </div>
                 </div>
-
-                <!-- Form Actions -->
-                <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                    <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
-                    <button type="submit" id="save-btn" class="btn-primary">Save Product</button>
-                </div>
             </form>
+
+            <!-- Modal Footer - Fixed -->
+            <div class="border-t border-gray-200 p-6 bg-white flex-shrink-0 flex justify-end gap-3 sticky bottom-0">
+                <button type="button" id="cancel-btn" class="btn-secondary rounded border px-3 py-2">Cancel</button>
+                <button type="submit" id="save-btn" class="btn-primary">Save Product</button>
+            </div>
         </div>
     </div>
 

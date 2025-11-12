@@ -87,8 +87,12 @@ try {
         $params[':description'] = trim($input['description']);
     }
     if (isset($input['image_url'])) {
-        $fields[] = 'image_url = :image_url';
-        $params[':image_url'] = trim($input['image_url']) ?: 'default.png';
+        $imageUrl = $input['image_url'];
+        // Only update image_url if it's a string (not null, not empty, not an array)
+        if (is_string($imageUrl) && !empty($imageUrl)) {
+            $fields[] = 'image_url = :image_url';
+            $params[':image_url'] = trim($imageUrl) ?: 'default.png';
+        }
     }
 
     if (empty($fields)) {
