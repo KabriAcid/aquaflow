@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // DOM Elements
+  // DOM Elements - with null checks
   const profileForm = document.getElementById("profile-form");
   const passwordForm = document.getElementById("password-form");
   const fullnameInput = document.getElementById("fullname");
@@ -13,6 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileEmail = document.getElementById("profile-email");
   const profileDate = document.getElementById("profile-date");
 
+  // Verify all elements exist before proceeding
+  if (!profileForm || !passwordForm || !fullnameInput || !emailInput || 
+      !currentPasswordInput || !newPasswordInput || !confirmPasswordInput ||
+      !profileFullname || !profileEmail || !profileDate) {
+    console.error("Required DOM elements not found");
+    return;
+  }
+
   const GET_URL = "/aquaflow/backend/api/users/get.php";
   const UPDATE_URL = "/aquaflow/backend/api/users/update.php";
 
@@ -25,14 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success && result.data) {
         const user = result.data;
 
-        // Populate form inputs
-        fullnameInput.value = user.full_name || user.username || "";
-        emailInput.value = user.email || "";
+        // Populate form inputs with null checks
+        if (fullnameInput) fullnameInput.value = user.full_name || user.username || "";
+        if (emailInput) emailInput.value = user.email || "";
 
-        // Update profile card
-        profileFullname.textContent =
+        // Update profile card with null checks
+        if (profileFullname) profileFullname.textContent =
           user.full_name || user.username || "Admin User";
-        profileEmail.textContent = user.email || "N/A";
+        if (profileEmail) profileEmail.textContent = user.email || "N/A";
 
         // Format date
         if (user.created_at) {

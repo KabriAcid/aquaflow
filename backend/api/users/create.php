@@ -21,14 +21,19 @@ $state = trim($input['state'] ?? '');
 $city = trim($input['city'] ?? '');
 $phone = trim($input['phone'] ?? '');
 $status = $input['status'] ?? 'active';
+$role = trim($input['role'] ?? 'customer'); // Allow role to be specified, default to 'customer'
 
 if (empty($full_name) || empty($email) || empty($password)) {
     error_response('Missing required fields: full_name, email, password.', null, 400);
     exit;
 }
 
-// Force role to be 'customer' for the manage-users page
-$role = 'customer';
+// Validate role
+$allowed_roles = ['customer', 'sales_manager', 'production_manager', 'admin'];
+if (!in_array($role, $allowed_roles)) {
+    error_response('Invalid role specified.', null, 400);
+    exit;
+}
 
 $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
