@@ -4,20 +4,20 @@ require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../utils/response.php';
 require_once __DIR__ . '/../../utils/auth.php';
 
-session_start();
 set_json_headers();
 
-// Any authenticated user can fetch their own profile
-if (!isset($_SESSION['user_id'])) {
+// Get current session user (handles both user_id and role_id variants)
+$session = get_session_user();
+$user_id = $session['id'];
+
+if (!$user_id) {
     error_response('User not authenticated.', null, 401);
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
-
 try {
     $pdo = get_db_connection();
-    $stmt = $pdo->prepare("SELECT id AS user_id, full_name AS username, email, role, created_at FROM users WHERE id = :user_id");
+    $stmt = $pdo->prepare("SELECT id, full_name, email, role, status, created_at FROM users WHERE id = :user_id");
     $stmt->execute([':user_id' => $user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
