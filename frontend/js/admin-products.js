@@ -57,6 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
   addProductBtn.addEventListener("click", () => {
     modalTitle.textContent = "Add New Product";
     saveBtn.textContent = "Create Product";
+    saveBtn.classList.remove("bg-amber-600", "hover:bg-amber-700");
+    saveBtn.classList.add("bg-blue-600", "hover:bg-blue-700");
     productForm.reset();
     previewImg.classList.add("hidden");
     previewIcon.classList.remove("hidden");
@@ -138,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    products.forEach((product) => {
+    products.forEach((product, index) => {
       const row = document.createElement("tr");
       row.className = "border-b border-gray-200 hover:bg-gray-50 transition";
 
@@ -153,6 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
           : '<span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold">Inactive</span>';
 
       row.innerHTML = `
+                <td class="py-4 px-6 text-center text-gray-600 font-semibold text-sm">${
+                  index + 1
+                }</td>
                 <td class="py-4 px-6">
                     <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                         <img src="${imageUrl}" alt="${
@@ -174,16 +179,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 ).toFixed(2)}</td>
                 <td class="py-4 px-6 text-center">${statusBadge}</td>
                 <td class="py-4 px-6 text-center">
-                    <div class="flex justify-center gap-2">
-                        <button class="edit-btn bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded transition text-sm font-medium" data-id="${
+                    <div class="flex justify-center gap-3">
+                        <button class="edit-btn text-amber-500 hover:text-amber-700 transition p-1 hover:bg-amber-50 rounded" title="Edit product" data-id="${
                           product.id
                         }">
-                            Edit
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-7-4l7-7m0 0l4-4m-4 4l-4-4"></path>
+                            </svg>
                         </button>
-                        <button class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition text-sm font-medium" data-id="${
+                        <button class="delete-btn text-red-500 hover:text-red-700 transition p-1 hover:bg-red-50 rounded" title="Delete product" data-id="${
                           product.id
                         }">
-                            Delete
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
                         </button>
                     </div>
                 </td>
@@ -314,6 +323,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
           modalTitle.textContent = "Edit Product";
           saveBtn.textContent = "Update Product";
+          saveBtn.classList.remove("bg-blue-600", "hover:bg-blue-700");
+          saveBtn.classList.add("bg-amber-600", "hover:bg-amber-700");
           openModal(productModal);
         }
       } catch (error) {
@@ -322,55 +333,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } else if (e.target.closest(".delete-btn")) {
       const productId = e.target.closest(".delete-btn").dataset.id;
-      document.getElementById("delete-product-id").value = productId;
-      openModal(deleteProductModal);
-    }
-  });
+      const product = allProducts.find((p) => p.id == productId);
 
-  // Handle delete form submission
-  deleteProductForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+      // Show confirmation dialog with product name
+      if (
+        confirm(
+          `Are you sure you want to delete "${
+            product?.name || "this product"
+          }"? This action cannot be undone.`
+        )
+      ) {
+        try {
+          const response = await fetch(DELETE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ id: productId }),
+          });
 
-    const productId = document.getElementById("delete-product-id").value;
-    const submitBtn = deleteProductForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
+          const result = await response.json();
 
-    try {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML =
-        '<i data-lucide="loader" class="w-4 h-4 animate-spin inline"></i> Deleting...';
+          if (result.status === 200 || result.status === "success") {
+            const successMsg = document.createElement("div");
+            successMsg.className =
+              "fixed top-4 right-4 bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 shadow-lg z-50";
+            successMsg.innerHTML = `<svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> ${
+              product?.name || "Product"
+            } deleted successfully!`;
+            document.body.appendChild(successMsg);
 
-      const response = await fetch(DELETE_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ id: productId }),
-      });
-
-      const result = await response.json();
-
-      if (result.status === 200 || result.status === "success") {
-        const successMsg = document.createElement("div");
-        successMsg.className =
-          "fixed top-4 right-4 bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 shadow-lg";
-        successMsg.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 inline"></i> Product deleted successfully!`;
-        document.body.appendChild(successMsg);
-        lucide.createIcons();
-
-        setTimeout(() => successMsg.remove(), 3000);
-
-        closeModal(deleteProductModal);
-        fetchProducts();
-      } else {
-        alert("Error: " + (result.message || "Failed to delete product"));
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+            setTimeout(() => successMsg.remove(), 3000);
+            fetchProducts();
+          } else {
+            alert("Error: " + (result.message || "Failed to delete product"));
+          }
+        } catch (error) {
+          console.error("Error deleting product:", error);
+          alert("Error deleting product: " + error.message);
+        }
       }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("Error deleting product: " + error.message);
-      submitBtn.innerHTML = originalText;
-      submitBtn.disabled = false;
     }
   });
 

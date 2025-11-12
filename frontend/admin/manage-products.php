@@ -38,15 +38,19 @@ include 'partials/sidebar.php';
             </div>
 
             <!-- Products Table -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                <div id="loading-indicator" class="text-center p-8 hidden">
-                    <p class="text-gray-500">Loading products...</p>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
+                <div id="loading-indicator" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center hidden z-40 rounded-lg">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-blue-500 mx-auto mb-4"></div>
+                        <p class="text-gray-600 font-medium">Loading products...</p>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
+                                <th class="text-center py-3 px-6 font-semibold text-gray-700 w-12">#</th>
                                 <th class="text-left py-3 px-6 font-semibold text-gray-700">Image</th>
                                 <th class="text-left py-3 px-6 font-semibold text-gray-700">Product Name</th>
                                 <th class="text-left py-3 px-6 font-semibold text-gray-700">Category</th>

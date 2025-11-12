@@ -21,19 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (empty($input['product_id'])) {
-    error_response('Missing required field: product_id.', null, 400);
+if (empty($input['id'])) {
+    error_response('Missing required field: id.', null, 400);
     exit;
 }
 
-$product_id = trim($input['product_id']);
+$product_id = trim($input['id']);
 
 try {
     $pdo = get_db_connection();
 
     // Fetch the existing product to ensure it exists
-    $stmt = $pdo->prepare("SELECT * FROM products WHERE product_id = :product_id");
-    $stmt->execute([':product_id' => $product_id]);
+    $stmt = $pdo->prepare("SELECT * FROM products WHERE id = :id");
+    $stmt->execute([':id' => $product_id]);
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$product) {
@@ -42,33 +42,53 @@ try {
     }
 
     $fields = [];
-    $params = [':product_id' => $product_id];
+    $params = [':id' => $product_id];
 
     if (isset($input['name'])) {
         $fields[] = 'name = :name';
         $params[':name'] = trim($input['name']);
     }
+    if (isset($input['category'])) {
+        $fields[] = 'category = :category';
+        $params[':category'] = trim($input['category']);
+    }
+    if (isset($input['product_type'])) {
+        $fields[] = 'product_type = :product_type';
+        $params[':product_type'] = trim($input['product_type']);
+    }
+    if (isset($input['size'])) {
+        $fields[] = 'size = :size';
+        $params[':size'] = trim($input['size']);
+    }
+    if (isset($input['volume'])) {
+        $fields[] = 'volume = :volume';
+        $params[':volume'] = trim($input['volume']);
+    }
+    if (isset($input['unit_price'])) {
+        $price = filter_var($input['unit_price'], FILTER_VALIDATE_FLOAT);
+        if ($price === false || $price < 0) {
+            error_response('Invalid unit price.', null, 400);
+            exit;
+        }
+        $fields[] = 'unit_price = :unit_price';
+        $params[':unit_price'] = $price;
+    }
+    if (isset($input['minimum_order_quantity'])) {
+        $moq = filter_var($input['minimum_order_quantity'], FILTER_VALIDATE_INT);
+        if ($moq === false || $moq < 1) {
+            error_response('Invalid minimum order quantity.', null, 400);
+            exit;
+        }
+        $fields[] = 'minimum_order_quantity = :minimum_order_quantity';
+        $params[':minimum_order_quantity'] = $moq;
+    }
     if (isset($input['description'])) {
         $fields[] = 'description = :description';
         $params[':description'] = trim($input['description']);
     }
-    if (isset($input['price'])) {
-        $price = filter_var($input['price'], FILTER_VALIDATE_FLOAT);
-        if ($price === false || $price < 0) {
-            error_response('Invalid price.', null, 400);
-            exit;
-        }
-        $fields[] = 'price = :price';
-        $params[':price'] = $price;
-    }
-    if (isset($input['stock_quantity'])) {
-        $stock = filter_var($input['stock_quantity'], FILTER_VALIDATE_INT);
-        if ($stock === false || $stock < 0) {
-            error_response('Invalid stock quantity.', null, 400);
-            exit;
-        }
-        $fields[] = 'stock_quantity = :stock_quantity';
-        $params[':stock_quantity'] = $stock;
+    if (isset($input['image_url'])) {
+        $fields[] = 'image_url = :image_url';
+        $params[':image_url'] = trim($input['image_url']) ?: 'default.png';
     }
 
     if (empty($fields)) {
@@ -76,7 +96,7 @@ try {
         exit;
     }
 
-    $sql = "UPDATE products SET " . implode(', ', $fields) . " WHERE product_id = :product_id";
+    $sql = "UPDATE products SET " . implode(', ', $fields) . " WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
