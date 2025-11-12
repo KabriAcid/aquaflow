@@ -20,7 +20,7 @@ include 'partials/sidebar.php';
                     <p class="text-gray-600 mt-1">Create, edit, and manage your product catalog.</p>
                 </div>
                 <button id="add-product-btn" class="btn-primary inline-flex items-center gap-2">
-                    <i data-lucide="plus" class="w-5 h-5"></i> Add Product
+                    <i data-lucide="plus" class="w-5 h-5 inline"></i> Add Product
                 </button>
             </div>
 
@@ -195,3 +195,7 @@ include 'partials/sidebar.php';
             </form>
         </div>
     </div>
+</div>
+
+<script src="../js/admin-products.js" defer></script>
+<?php include 'partials/footer.php'; ?>

@@ -1,6 +1,3 @@
-<?php
-// public/products.php
-?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -73,7 +70,7 @@
             const searchFilter = document.getElementById('searchFilter');
             let allProducts = [];
 
-            fetch('../backend/api/products/get_all.php')
+            fetch('/aquaflow/backend/api/products/get_all.php')
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -98,7 +95,7 @@
                     const productCard = `
                         <div class="bg-white rounded-lg multi-shadow p-4">
                             <div class="h-40 bg-gray-200 rounded-md mb-4 flex items-center justify-center">
-                                <img src="${product.image_url === 'default.png' ? '../assets/images/default.png' : (product.image_url || '../assets/images/default.png')}" alt="${product.name}" class="h-full w-full object-cover rounded-md" onerror="this.src='../assets/images/default.png'">
+                                <img src="${product.image_url === 'default.png' ? '/aquaflow/assets/images/default.png' : (product.image_url || '/aquaflow/assets/images/default.png')}" alt="${product.name}" class="h-full w-full object-cover rounded-md" onerror="this.src='/aquaflow/assets/images/default.png'">
                             </div>
                             <h3 class="font-semibold text-lg">${product.name}</h3>
                             <p class="text-gray-600">${product.size} ${product.volume}</p>
