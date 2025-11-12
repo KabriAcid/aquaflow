@@ -1,0 +1,8 @@
+Order Number,Customer Name,Order Date,Delivery City,Delivery State,Subtotal,Delivery Fee,Total Amount,Status,Payment Status
+AF1762860558363,Bevis Todd,2025-11-11 12:29:18,Gwale,Kano,3800.00,500.00,4300.00,delivered,unpaid
+AF1762859940441,Bevis Todd,2025-11-11 12:19:00,Zaria,Kaduna,4080.00,500.00,4580.00,delivered,unpaid
+AF1762859624775,Bevis Todd,2025-11-11 12:13:44,Nassarawa,Kano,11300.00,500.00,11800.00,delivered,paid
+AF1762858367856,Bevis Todd,2025-11-11 11:52:47,Ikeja,Lagos,9320.00,500.00,9820.00,out_for_delivery,paid
+AF1762439662896,Bevis Todd,2025-11-06 15:34:22,Surulere,Lagos,9600.00,500.00,10100.00,delivered,unpaid
+AF1762438964726,Bevis Todd,2025-11-06 15:22:44,Bonny,Rivers,36530.00,500.00,37030.00,delivered,unpaid
+AF1762436426361,Bevis Todd,2025-11-06 14:40:26,Surulere,Lagos,24780.00,500.00,25280.00,cancelled,unpaid

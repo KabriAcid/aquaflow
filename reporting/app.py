@@ -1,9 +1,9 @@
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
-import pandas as pd
 import mysql.connector
 import os
 from datetime import datetime, timedelta
+import csv
 import io
 
 app = Flask(__name__)
@@ -29,16 +29,21 @@ def format_currency(value):
     """Format number as currency"""
     return float(value) if value else 0.0
 
+def fetch_all(cursor):
+    """Fetch all results and convert to list of dicts"""
+    columns = [desc[0] for desc in cursor.description]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
 def safe_json_response(data):
-    """Convert pandas/numpy types to native Python types for JSON"""
+    """Convert database types to JSON-safe types"""
     if isinstance(data, dict):
         return {k: safe_json_response(v) for k, v in data.items()}
     elif isinstance(data, list):
         return [safe_json_response(item) for item in data]
-    elif pd.isna(data):
+    elif isinstance(data, (datetime,)):
+        return data.isoformat()
+    elif data is None:
         return None
-    elif hasattr(data, 'item'):  # numpy types
-        return data.item()
     else:
         return data
 
@@ -63,6 +68,8 @@ def get_sales_report():
         end_date = request.args.get('end_date', datetime.now().strftime('%Y-%m-%d'))
         limit = int(request.args.get('limit', 10))
 
+        cursor = conn.cursor(dictionary=True)
+        
         # --- 1. Top Selling Products ---
         top_products_query = """
             SELECT 
@@ -78,7 +85,8 @@ def get_sales_report():
             ORDER BY total_quantity DESC
             LIMIT 10
         """
-        top_products_df = pd.read_sql(top_products_query, conn, params=(start_date, end_date))
+        cursor.execute(top_products_query, (start_date, end_date))
+        top_products = cursor.fetchall()
         
         # --- 2. Sales Over Time (Daily) ---
         sales_over_time_query = """
@@ -92,7 +100,8 @@ def get_sales_report():
             GROUP BY DATE(o.order_date)
             ORDER BY date ASC
         """
-        sales_over_time_df = pd.read_sql(sales_over_time_query, conn, params=(start_date, end_date))
+        cursor.execute(sales_over_time_query, (start_date, end_date))
+        sales_over_time = cursor.fetchall()
         
         # --- 3. Recent Orders ---
         recent_orders_query = """
@@ -110,7 +119,8 @@ def get_sales_report():
             ORDER BY o.order_date DESC
             LIMIT %s
         """
-        recent_orders_df = pd.read_sql(recent_orders_query, conn, params=(start_date, end_date, limit))
+        cursor.execute(recent_orders_query, (start_date, end_date, limit))
+        recent_orders = cursor.fetchall()
         
         # --- 4. Summary Statistics ---
         summary_query = """
@@ -123,7 +133,8 @@ def get_sales_report():
             WHERE o.order_date BETWEEN %s AND %s
                 AND o.status != 'cancelled'
         """
-        summary_df = pd.read_sql(summary_query, conn, params=(start_date, end_date))
+        cursor.execute(summary_query, (start_date, end_date))
+        summary = cursor.fetchone() or {}
         
         # --- 5. Status Breakdown ---
         status_query = """
@@ -135,15 +146,18 @@ def get_sales_report():
             WHERE o.order_date BETWEEN %s AND %s
             GROUP BY o.status
         """
-        status_df = pd.read_sql(status_query, conn, params=(start_date, end_date))
+        cursor.execute(status_query, (start_date, end_date))
+        status_breakdown = cursor.fetchall()
+        
+        cursor.close()
 
         # Build response data
         report_data = {
-            "top_products": safe_json_response(top_products_df.to_dict('records')),
-            "sales_over_time": safe_json_response(sales_over_time_df.to_dict('records')),
-            "recent_orders": safe_json_response(recent_orders_df.to_dict('records')),
-            "summary": safe_json_response(summary_df.to_dict('records')[0] if not summary_df.empty else {}),
-            "status_breakdown": safe_json_response(status_df.to_dict('records')),
+            "top_products": safe_json_response(top_products),
+            "sales_over_time": safe_json_response(sales_over_time),
+            "recent_orders": safe_json_response(recent_orders),
+            "summary": safe_json_response(summary),
+            "status_breakdown": safe_json_response(status_breakdown),
             "date_range": {
                 "start_date": start_date,
                 "end_date": end_date
@@ -184,6 +198,8 @@ def export_sales_report_csv():
         end_date = request.args.get('end_date', datetime.now().strftime('%Y-%m-%d'))
         report_type = request.args.get('report_type', 'orders')
 
+        cursor = conn.cursor(dictionary=True)
+        
         if report_type == 'orders':
             # Export all orders
             query = """
@@ -243,23 +259,24 @@ def export_sales_report_csv():
             """
             filename = f"sales_summary_{start_date}_to_{end_date}.csv"
 
-        df = pd.read_sql(query, conn, params=(start_date, end_date))
+        cursor.execute(query, (start_date, end_date))
+        rows = cursor.fetchall()
+        cursor.close()
         
         # Create CSV in memory
         output = io.StringIO()
-        df.to_csv(output, index=False)
-        output.seek(0)
+        if rows:
+            writer = csv.DictWriter(output, fieldnames=rows[0].keys())
+            writer.writeheader()
+            writer.writerows(rows)
         
-        # Convert to BytesIO for sending
-        mem = io.BytesIO()
-        mem.write(output.getvalue().encode('utf-8'))
-        mem.seek(0)
+        # Create response
+        csv_data = output.getvalue()
         
-        return send_file(
-            mem,
+        return Response(
+            csv_data,
             mimetype='text/csv',
-            as_attachment=True,
-            download_name=filename
+            headers={'Content-Disposition': f'attachment; filename="{filename}"'}
         )
 
     except Exception as e:
