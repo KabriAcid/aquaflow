@@ -15,29 +15,120 @@ document.addEventListener("DOMContentLoaded", () => {
   const API_URL = "../../backend/api/reports/get_sales_report.php";
   const EXPORT_URL = "../../backend/api/reports/export_sales_report.php";
 
+  // Progress bar elements
+  const loadingProgress = document.getElementById("loadingProgress");
+  const progressBar = document.getElementById("progressBar");
+  const progressPercentage = document.getElementById("progressPercentage");
+  const loadingStatus = document.getElementById("loadingStatus");
+  const reportBtnText = document.getElementById("reportBtnText");
+
+  // Simulate progressive loading
+  const simulateProgress = () => {
+    return new Promise((resolve) => {
+      let progress = 0;
+      const statuses = [
+        { percent: 10, text: "Connecting to database..." },
+        { percent: 25, text: "Fetching sales data..." },
+        { percent: 40, text: "Analyzing top products..." },
+        { percent: 60, text: "Processing sales trends..." },
+        { percent: 75, text: "Compiling recent orders..." },
+        { percent: 90, text: "Generating charts..." },
+        { percent: 100, text: "Finalizing report..." },
+      ];
+
+      const interval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(interval);
+          resolve();
+          return;
+        }
+
+        const nextStatus = statuses.find((s) => s.percent > progress);
+        if (nextStatus) {
+          progress = nextStatus.percent;
+          progressBar.style.width = `${progress}%`;
+          progressPercentage.textContent = `${progress}%`;
+          loadingStatus.textContent = nextStatus.text;
+        }
+      }, 400);
+    });
+  };
+
   const generateReport = async () => {
+    // Show loading UI
     reportSpinner.classList.remove("hidden");
+    loadingProgress.classList.remove("hidden");
+    reportContent.classList.add("hidden");
     generateReportBtn.disabled = true;
+    reportBtnText.textContent = "Generating...";
+
+    // Reset progress
+    progressBar.style.width = "0%";
+    progressPercentage.textContent = "0%";
+    loadingStatus.textContent = "Initializing...";
 
     try {
-      const response = await fetch(API_URL);
-      const { data } = await response.json();
+      // Start progress simulation
+      const progressPromise = simulateProgress();
 
-      if (data) {
+      // Fetch data
+      const response = await fetch(API_URL, {
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Wait for progress animation to complete
+      await progressPromise;
+
+      if (result.success && result.data) {
+        const data = result.data;
         renderCharts(data);
         renderTable(data.recent_orders);
         reportContent.classList.remove("hidden");
+
+        // Show success message
+        const successMsg = document.createElement("div");
+        successMsg.className =
+          "fixed top-4 right-4 bg-green-100 text-green-700 border border-green-300 rounded-lg p-4 shadow-lg z-50 animate-slide-in";
+        successMsg.innerHTML = `
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Report generated successfully!</span>
+          </div>
+        `;
+        document.body.appendChild(successMsg);
+        setTimeout(() => {
+          successMsg.remove();
+        }, 3000);
       } else {
         reportContent.innerHTML =
           '<p class="text-center text-gray-500">No data available to generate a report.</p>';
+        reportContent.classList.remove("hidden");
       }
     } catch (error) {
       console.error("Error generating report:", error);
-      reportContent.innerHTML =
-        '<p class="text-center text-red-500">Failed to generate report. Please try again.</p>';
+      reportContent.innerHTML = `
+        <div class="text-center py-8">
+          <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <p class="text-red-600 font-semibold mb-2">Failed to generate report</p>
+          <p class="text-gray-500 text-sm">Please ensure the Python microservice is running on port 5001</p>
+        </div>
+      `;
+      reportContent.classList.remove("hidden");
     } finally {
       reportSpinner.classList.add("hidden");
+      loadingProgress.classList.add("hidden");
       generateReportBtn.disabled = false;
+      reportBtnText.textContent = "Generate Report";
     }
   };
 
