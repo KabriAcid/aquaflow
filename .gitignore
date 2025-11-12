@@ -2,7 +2,10 @@
 vendor
 .env
 .bat
-.vscode
+.vscode/
 logs/
 uploads/
 .log
+*.exe
+.idea/
+.DS_Store
