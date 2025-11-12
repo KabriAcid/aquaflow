@@ -98,22 +98,28 @@ if (isset($_SESSION['user_id'])) {
         <section id="featured" class="py-12">
             <h2 class="text-2xl font-semibold mb-6">Featured Products</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <article class="bg-white rounded shadow p-4">
-                    <div class="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center">Image</div>
+                <article class="bg-white rounded shadow-lg p-4">
+                    <div class="rounded mb-4 flex items-center justify-center">
+                        <img src="assets/images/default.png" alt="">
+                    </div>
                     <h3 class="font-semibold">Natural Spring Water — 1L</h3>
                     <p class="text-sm text-gray-600">₦120</p>
                     <div class="mt-3"><a href="frontend/products.php" class="text-blue-600">View</a></div>
                 </article>
 
-                <article class="bg-white rounded shadow p-4">
-                    <div class="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center">Image</div>
+                <article class="bg-white rounded shadow-lg p-4">
+                    <div class="rounded mb-4 flex items-center justify-center">
+                        <img src="assets/images/default.png" alt="">
+                    </div>
                     <h3 class="font-semibold">Sparkling Beverage — 330ml</h3>
                     <p class="text-sm text-gray-600">₦200</p>
                     <div class="mt-3"><a href="frontend/products.php" class="text-blue-600">View</a></div>
                 </article>
 
-                <article class="bg-white rounded shadow p-4">
-                    <div class="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center">Image</div>
+                <article class="bg-white rounded shadow-lg p-4">
+                    <div class="rounded mb-4 flex items-center justify-center">
+                        <img src="assets/images/default.png" alt="">
+                    </div>
                     <h3 class="font-semibold">Bulk Water Package — 24 x 500ml</h3>
                     <p class="text-sm text-gray-600">₦2,500</p>
                     <div class="mt-3"><a href="frontend/products.php" class="text-blue-600">View</a></div>
