@@ -14,51 +14,50 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-$username = trim($input['username'] ?? '');
+$full_name = trim($input['full_name'] ?? '');
 $email = trim($input['email'] ?? '');
 $password = $input['password'] ?? '';
-$role = $input['role'] ?? 'customer';
 $state = trim($input['state'] ?? '');
-$lga = trim($input['lga'] ?? '');
+$city = trim($input['city'] ?? '');
 $phone = trim($input['phone'] ?? '');
+$status = $input['status'] ?? 'active';
 
-if (empty($username) || empty($email) || empty($password) || empty($role)) {
-    error_response('Missing required fields: username, email, password, role.', null, 400);
+if (empty($full_name) || empty($email) || empty($password)) {
+    error_response('Missing required fields: full_name, email, password.', null, 400);
     exit;
 }
 
-if (!in_array($role, ['customer', 'sales_manager', 'admin'])) {
-    error_response('Invalid role specified.', null, 400);
-    exit;
-}
+// Force role to be 'customer' for the manage-users page
+$role = 'customer';
 
 $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
 try {
     $pdo = get_db_connection();
-    // Map to current schema: `full_name`, `email`, `password_hash`, `role`, `city`, `state`, `phone`
     $stmt = $pdo->prepare(
-        "INSERT INTO users (full_name, email, password_hash, role, city, state, phone) VALUES (:full_name, :email, :password_hash, :role, :city, :state, :phone)"
+        "INSERT INTO users (full_name, email, password_hash, role, city, state, phone, status) VALUES (:full_name, :email, :password_hash, :role, :city, :state, :phone, :status)"
     );
     $stmt->execute([
-        ':full_name' => $username,
+        ':full_name' => $full_name,
         ':email' => $email,
         ':password_hash' => $password_hash,
         ':role' => $role,
-        ':city' => $lga,
+        ':city' => $city,
         ':state' => $state,
-        ':phone' => $phone
+        ':phone' => $phone,
+        ':status' => $status
     ]);
 
     $user_id = $pdo->lastInsertId();
     $newUser = [
-        'user_id' => $user_id,
-        'full_name' => $username,
+        'id' => $user_id,
+        'full_name' => $full_name,
         'email' => $email,
         'role' => $role,
-        'city' => $lga,
+        'city' => $city,
         'state' => $state,
-        'phone' => $phone
+        'phone' => $phone,
+        'status' => $status
     ];
     success_response('User created successfully', $newUser, 201);
 } catch (PDOException $e) {

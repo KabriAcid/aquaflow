@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loadingIndicator.classList.add("hidden");
       usersTbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-center py-8">
+                    <td colspan="8" class="text-center py-8">
                         <div class="bg-red-50 border border-red-200 rounded-lg p-4 inline-block">
                             <p class="text-red-700 font-semibold">Failed to load users</p>
                             <p class="text-red-600 text-sm mt-1">${error.message}</p>
@@ -175,29 +175,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const row = document.createElement("tr");
       row.className = "border-b border-gray-200 hover:bg-gray-50 transition";
 
-      const roleColors = {
-        admin: "bg-red-100 text-red-800",
-        sales_manager: "bg-blue-100 text-blue-800",
-        production_manager: "bg-purple-100 text-purple-800",
-        customer: "bg-green-100 text-green-800",
-      };
-
       const statusColors = {
         active: "bg-green-100 text-green-800",
         inactive: "bg-gray-100 text-gray-800",
         suspended: "bg-red-100 text-red-800",
       };
-
-      const roleBadge = `<span class="${
-        roleColors[user.role] || "bg-gray-100 text-gray-800"
-      } px-3 py-1 rounded-full text-xs font-semibold">${
-        user.role
-          ? user.role
-              .replace(/_/g, " ")
-              .charAt(0)
-              .toUpperCase() + user.role.replace(/_/g, " ").slice(1)
-          : "Unknown"
-      }</span>`;
 
       const statusBadge = `<span class="${
         statusColors[user.status] || "bg-gray-100 text-gray-800"
@@ -212,12 +194,19 @@ document.addEventListener("DOMContentLoaded", () => {
                   index + 1
                 }</td>
                 <td class="py-4 px-6 text-gray-800 font-medium">${
-                  user.full_name
+                  user.full_name || "N/A"
                 }</td>
-                <td class="py-4 px-6 text-gray-600 text-sm">${user.email}</td>
-                <td class="py-4 px-6 text-center">${roleBadge}</td>
+                <td class="py-4 px-6 text-gray-600 text-sm">${
+                  user.email || "N/A"
+                }</td>
                 <td class="py-4 px-6 text-gray-600 text-sm">${
                   user.phone || "N/A"
+                }</td>
+                <td class="py-4 px-6 text-gray-600 text-sm">${
+                  user.state || "N/A"
+                }</td>
+                <td class="py-4 px-6 text-gray-600 text-sm">${
+                  user.city || "N/A"
                 }</td>
                 <td class="py-4 px-6 text-center">${statusBadge}</td>
                 <td class="py-4 px-6 text-center">
@@ -256,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
       full_name: formData.get("name"),
       email: formData.get("email"),
       phone: formData.get("phone") || null,
-      role: formData.get("role"),
       state: formData.get("state") || null,
       city: formData.get("city") || null,
       status: formData.get("status"),
@@ -323,12 +311,11 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const user = allUsers.find((u) => u.id == userId);
         if (user) {
-          document.getElementById("user-id").value = user.id;
-          document.getElementById("name").value = user.full_name;
-          document.getElementById("email").value = user.email;
+          document.getElementById("user-id").value = user.id || "";
+          document.getElementById("name").value = user.full_name || "";
+          document.getElementById("email").value = user.email || "";
           document.getElementById("phone").value = user.phone || "";
-          document.getElementById("role").value = user.role;
-          document.getElementById("status").value = user.status;
+          document.getElementById("status").value = user.status || "";
 
           // Set state and city
           if (user.state) {
@@ -348,7 +335,10 @@ document.addEventListener("DOMContentLoaded", () => {
           passwordRequired.textContent = "";
           passwordField.required = false;
           passwordField.value = "";
+          console.log("Opening modal for user:", user);
           openModal(userModal);
+        } else {
+          console.warn("User not found in allUsers:", userId);
         }
       } catch (error) {
         console.error("Error loading user:", error);

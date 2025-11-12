@@ -40,8 +40,9 @@ include 'partials/sidebar.php';
                                 <th class="text-center py-3 px-6 font-semibold text-gray-700 w-12">#</th>
                                 <th class="text-left py-3 px-6 font-semibold text-gray-700">Full Name</th>
                                 <th class="text-left py-3 px-6 font-semibold text-gray-700">Email</th>
-                                <th class="text-left py-3 px-6 font-semibold text-gray-700">Role</th>
                                 <th class="text-left py-3 px-6 font-semibold text-gray-700">Phone</th>
+                                <th class="text-left py-3 px-6 font-semibold text-gray-700">State</th>
+                                <th class="text-left py-3 px-6 font-semibold text-gray-700">LGA</th>
                                 <th class="text-left py-3 px-6 font-semibold text-gray-700">Status</th>
                                 <th class="text-center py-3 px-6 font-semibold text-gray-700">Actions</th>
                             </tr>
@@ -91,20 +92,19 @@ include 'partials/sidebar.php';
                     </div>
                 </div>
 
-                <!-- Phone & Role -->
+                <!-- Phone & Status -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
                         <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="e.g., +234 xxx xxxx xxx">
                     </div>
                     <div>
-                        <label for="role" class="block text-sm font-semibold text-gray-700 mb-2">Role *</label>
-                        <select id="role" name="role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                            <option value="">Select role</option>
-                            <option value="customer">Customer</option>
-                            <option value="sales_manager">Sales Manager</option>
-                            <option value="production_manager">Production Manager</option>
-                            <option value="admin">Admin</option>
+                        <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
+                        <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                            <option value="">Select status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
                         </select>
                     </div>
                 </div>
@@ -130,17 +130,6 @@ include 'partials/sidebar.php';
                     <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password <span id="password-required" class="text-red-500">*</span></label>
                     <input type="password" id="password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Enter password" required>
                     <p class="text-xs text-gray-500 mt-1">Leave empty to keep existing password (for edit mode)</p>
-                </div>
-
-                <!-- Status -->
-                <div class="mb-4">
-                    <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">Status *</label>
-                    <select id="status" name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                        <option value="">Select status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="suspended">Suspended</option>
-                    </select>
                 </div>
             </form>
 
@@ -170,8 +159,8 @@ include 'partials/sidebar.php';
             <form id="delete-user-form" class="border-t border-gray-200 p-6">
                 <input type="hidden" id="delete-user-id" name="user_id">
                 <div class="flex justify-end gap-3">
-                    <button type="button" id="cancel-delete-btn" class="btn-secondary">Cancel</button>
-                    <button type="submit" class="btn-danger">Delete User</button>
+                    <button type="button" id="cancel-delete-btn" class="btn-secondary border rounded px-3 py-2">Cancel</button>
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">Delete User</button>
                 </div>
             </form>
         </div>

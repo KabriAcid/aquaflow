@@ -14,12 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (empty($input['user_id'])) {
-    error_response('Missing required field: user_id.', null, 400);
+if (empty($input['id'])) {
+    error_response('Missing required field: id.', null, 400);
     exit;
 }
 
-$user_id = $input['user_id'];
+$user_id = $input['id'];
 
 try {
     $pdo = get_db_connection();
@@ -27,10 +27,9 @@ try {
     $fields = [];
     $params = [':user_id' => $user_id];
 
-    if (isset($input['username'])) {
-        // map `username` field expected by front-end to `full_name` in DB
+    if (isset($input['full_name'])) {
         $fields[] = 'full_name = :full_name';
-        $params[':full_name'] = trim($input['username']);
+        $params[':full_name'] = trim($input['full_name']);
     }
     if (isset($input['email'])) {
         $email = filter_var($input['email'], FILTER_SANITIZE_EMAIL);
@@ -41,26 +40,25 @@ try {
         $fields[] = 'email = :email';
         $params[':email'] = $email;
     }
-    if (isset($input['role'])) {
-        if (!in_array($input['role'], ['customer', 'sales_manager', 'admin'])) {
-            error_response('Invalid role specified.', null, 400);
-            exit;
-        }
-        $fields[] = 'role = :role';
-        $params[':role'] = $input['role'];
-    }
     if (isset($input['state'])) {
         $fields[] = 'state = :state';
         $params[':state'] = trim($input['state']);
     }
-    if (isset($input['lga'])) {
-        // frontend may provide `lga`; map to DB `city`
+    if (isset($input['city'])) {
         $fields[] = 'city = :city';
-        $params[':city'] = trim($input['lga']);
+        $params[':city'] = trim($input['city']);
     }
     if (isset($input['phone'])) {
         $fields[] = 'phone = :phone';
         $params[':phone'] = trim($input['phone']);
+    }
+    if (isset($input['status'])) {
+        if (!in_array($input['status'], ['active', 'inactive', 'suspended'])) {
+            error_response('Invalid status specified.', null, 400);
+            exit;
+        }
+        $fields[] = 'status = :status';
+        $params[':status'] = $input['status'];
     }
     if (!empty($input['password'])) {
         $password_hash = password_hash($input['password'], PASSWORD_DEFAULT);

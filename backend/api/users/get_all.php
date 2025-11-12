@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     $pdo = get_db_connection();
-    $stmt = $pdo->query("SELECT id AS user_id, full_name AS username, email, role, state, city, phone, created_at FROM users ORDER BY created_at DESC");
+    $stmt = $pdo->query("SELECT id, full_name, email, role, state, city, phone, status, created_at FROM users WHERE role = 'customer' ORDER BY created_at DESC");
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     success_response('Users fetched successfully', $users);
