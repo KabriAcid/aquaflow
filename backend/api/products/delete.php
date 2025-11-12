@@ -6,8 +6,8 @@ require_once __DIR__ . '/../../utils/auth.php';
 
 set_json_headers();
 
-// Allow sales_manager and production_manager to delete products
-require_role(['sales_manager', 'production_manager']);
+// Allow sales_manager, production_manager, and admin to delete products
+require_role(['sales_manager', 'production_manager', 'admin']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);

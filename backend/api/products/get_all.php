@@ -6,8 +6,8 @@ require_once __DIR__ . '/../../utils/auth.php';
 
 set_json_headers();
 
-// Allow customers, sales managers, and production managers to see products
-require_role(['customer', 'sales_manager', 'production_manager']);
+// Allow customers, sales managers, production managers, and admins to see products
+require_role(['customer', 'sales_manager', 'production_manager', 'admin']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);

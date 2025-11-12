@@ -37,15 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
         orders.forEach(order => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="p-3 border-b">#${order.order_id}</td>
+                <td class="p-3 border-b">#${order.id}</td>
                 <td class="p-3 border-b">${order.customer_name}</td>
                 <td class="p-3 border-b">${new Date(order.order_date).toLocaleDateString()}</td>
-                <td class="p-3 border-b">$${parseFloat(order.total_amount).toFixed(2)}</td>
+                <td class="p-3 border-b">${formatNaira(order.total_amount)}</td>
                 <td class="p-3 border-b">
                     <span class="px-2 py-1 text-xs font-semibold rounded-full bg-${getStatusColor(order.status)}-100 text-${getStatusColor(order.status)}-800">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
                 </td>
                 <td class="p-3 border-b">
-                    <button class="view-btn text-blue-500 hover:text-blue-700" data-id="${order.order_id}"><i class="fas fa-eye"></i> View</button>
+                    <button class="view-btn text-blue-500 hover:text-blue-700" data-id="${order.id}"><i class="fas fa-eye"></i> View</button>
                 </td>
             `;
             ordersTbody.appendChild(tr);

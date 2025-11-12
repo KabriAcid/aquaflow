@@ -52,6 +52,7 @@ include 'partials/sidebar.php';
                 </div>
             </div>
 
+            <script src="../js/util.js"></script>
             <script src="../js/admin-orders.js" defer></script>
         </div>
     </main>

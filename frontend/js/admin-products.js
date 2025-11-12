@@ -85,11 +85,26 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       loadingIndicator.classList.remove("hidden");
       productsTbody.innerHTML = "";
+      noProductsMessage.classList.add("hidden");
 
       const response = await fetch(API_URL, { credentials: "same-origin" });
       const data = await response.json();
 
-      if (!data.data || data.data.length === 0) {
+      console.log("API Response:", data, "Status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || `HTTP ${response.status}: Failed to fetch products`
+        );
+      }
+
+      if (!data.data || !Array.isArray(data.data)) {
+        noProductsMessage.classList.remove("hidden");
+        loadingIndicator.classList.add("hidden");
+        return;
+      }
+
+      if (data.data.length === 0) {
         noProductsMessage.classList.remove("hidden");
         loadingIndicator.classList.add("hidden");
         return;
@@ -103,8 +118,11 @@ document.addEventListener("DOMContentLoaded", () => {
       loadingIndicator.classList.add("hidden");
       productsTbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-center py-8 text-red-600">
-                        <p>Failed to load products</p>
+                    <td colspan="7" class="text-center py-8">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 inline-block">
+                            <p class="text-red-700 font-semibold">Failed to load products</p>
+                            <p class="text-red-600 text-sm mt-1">${error.message}</p>
+                        </div>
                     </td>
                 </tr>
             `;
